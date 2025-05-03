@@ -15,8 +15,6 @@ namespace RS {
 
     namespace Detail {
 
-        template <typename> constexpr auto dependent_false = false;
-
         template <typename T>
         concept StringOrView = std::convertible_to<T, std::string>
             || std::convertible_to<T, std::string_view>;
@@ -187,7 +185,7 @@ public:
         } else if constexpr (FormatByToString<T>) {
             out = to_string(t);
         } else {
-            static_assert(dependent_false<T>);
+            static_assert(RS::dependent_false<T>);
         }
 
         return std::ranges::copy(out, ctx.out()).out;

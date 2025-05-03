@@ -11,6 +11,9 @@ void test_rs_core_format_automation();
 void test_rs_core_global_bitmask_functions();
 void test_rs_core_global_character_functions();
 void test_rs_core_global_range_functions();
+void test_rs_core_hash_kernighan();
+void test_rs_core_hash_mix();
+void test_rs_core_hash_standard();
 void test_rs_core_version();
 
 int main(int argc, char** argv) {
@@ -27,6 +30,9 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_global_bitmask_functions, "test_rs_core_global_bitmask_functions");
     call_me_maybe(test_rs_core_global_character_functions, "test_rs_core_global_character_functions");
     call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
+    call_me_maybe(test_rs_core_hash_kernighan, "test_rs_core_hash_kernighan");
+    call_me_maybe(test_rs_core_hash_mix, "test_rs_core_hash_mix");
+    call_me_maybe(test_rs_core_hash_standard, "test_rs_core_hash_standard");
     call_me_maybe(test_rs_core_version, "test_rs_core_version");
 
     std::println("{}{}{}", xrule, rule, xreset);
