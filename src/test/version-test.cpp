@@ -1,5 +1,5 @@
 #include "rs-core/version.hpp"
-#include "test/unit-test.hpp"
+#include "rs-core/unit-test.hpp"
 
 using namespace RS;
 

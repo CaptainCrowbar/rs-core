@@ -1,6 +1,6 @@
 #include "rs-core/enum.hpp"
 #include "rs-core/format.hpp"
-#include "test/unit-test.hpp"
+#include "rs-core/unit-test.hpp"
 #include <concepts>
 #include <cstdint>
 #include <format>

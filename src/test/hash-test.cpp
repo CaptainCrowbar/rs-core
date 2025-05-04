@@ -1,5 +1,5 @@
 #include "rs-core/hash.hpp"
-#include "test/unit-test.hpp"
+#include "rs-core/unit-test.hpp"
 #include <cstddef>
 #include <functional>
 #include <string>
