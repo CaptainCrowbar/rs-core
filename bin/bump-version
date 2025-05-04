@@ -13,17 +13,16 @@ fi
 
 bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 root="$(readlink -f "$bin/..")"
-
-if [ "${root##*/}" != "rs-core" ]; then
-    echo "*** Project root not found"
-    exit 1
-fi
-
 cd "$root"
 
 cmakefile=src/CMakeLists.txt
-header=src/rs-core/version.hpp
 temp=__TEMP__
+header=$(ls src/*/version.hpp)
+
+if ! [[ -f "$header" ]]; then
+    echo "*** Version header not found"
+    exit 1
+fi
 
 version=$(grep -E '    VERSION \d+\.\d+\.\d+' "$cmakefile" \
     | head -n 1 \

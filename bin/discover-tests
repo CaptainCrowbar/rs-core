@@ -14,11 +14,6 @@ fi
 bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 root="$(readlink -f "$bin/..")"
 
-if [ "${root##*/}" != "rs-core" ]; then
-    echo "*** Project root not found"
-    exit 1
-fi
-
 src="$root/src"
 
 if ! [ -d "$src" ]; then
