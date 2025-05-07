@@ -8,14 +8,6 @@
 
 namespace RS {
 
-    // Mixin class            Requires         Defines
-    // -----------            --------         -------
-    // OutputIterator         i=v              *i ++i i++
-    // InputIterator          *i ++i i==j      i-> i++ i!=j i<=>j
-    // ForwardIterator        *i ++i i==j      i-> i++ i!=j i<=>j
-    // BidirectionalIterator  *i ++i --i i==j  i-> i++ i-- i!=j i<=>j
-    // RandomAccessIterator   *i i+=n i-j      i-> i[n] ++i i++ --i i-- i-=n i+n n+i i-n i==j i!=j i<j i>j i<=j i>=j i<=>j
-
     template <typename I>
     class OutputIterator {
     public:
