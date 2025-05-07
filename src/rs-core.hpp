@@ -4,4 +4,5 @@
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
+#include "rs-core/iterator.hpp"
 #include "rs-core/version.hpp"

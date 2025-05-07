@@ -26,6 +26,7 @@ Requires C++23.
 * [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
 * [`rs-core/format.hpp` -- Formatting helpers](format.html)
 * [`rs-core/hash.hpp` -- Hash function helpers](hash.html)
+* [`rs-core/iterator.hpp` -- Iterator helpers](iterator.html)
 * [`rs-core/version.hpp` -- Version information](version.html)
 
 ## Using the library
