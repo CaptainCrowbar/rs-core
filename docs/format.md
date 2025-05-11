@@ -19,47 +19,31 @@ template <typename T> struct std::formatter<T>;
 ```
 
 If this header is included, a formatter is automatically generated for any
-type for which a function exists with the signature:
+user defined type for which a function named `rs_core_format()` exists. This
+can be a member function or a free function in the same namespace as the UDT.
+It can optionally take a formatting flags argument (a string or string view),
+a size argument (an integer), or both. The return type can be a string or
+string view.
 
-```c++
-[void] rs_core_format(T);
-```
+Any of the following signatures will be recognized (in this order of
+preference):
 
-The function need not be defined; the existence of the declaration is enough.
-The return type is not important and will never be used. I chose this
-approach, with a dummy function declared to request the creation of a
-formatter, rather than having this function do the formatting itself, to make
-it easier to add a formatter after the fact to existing types.
+* `[string or view] T::rs_core_format(std::string_view flags,
+    std::size_t size) const;`
+* `[string or view] T::rs_core_format(std::string_view flags) const;`
+* `[string or view] T::rs_core_format(std::size_t size) const;`
+* `[string or view] T::rs_core_format() const;`
+* `[string or view] rs_core_format(const T& t, std::string_view flags,
+    std::size_t size) const;`
+* `[string or view] rs_core_format(const T& t,
+    std::string_view flags) const;`
+* `[string or view] rs_core_format(const T& t, std::size_t size) const;`
+* `[string or view] rs_core_format(const T& t) const;`
 
-In addition to the dummy signalling function, the type must be formattable
-using either a `str()` member function or a `to_string()` namespace scope
-function that can be found by ADL. Besides the main object argument, these
-may optionally have an argument that takes a string of flag letters that
-control formatting behaviour, and one that takes an unsigned integer, usually
-specifying the display precision for number-like types.
-
-In summary, the following formatting functions will be recognized and called
-by the formatter:
-
-* `std::string T::str(std::string_view flags, std::size_t prec) const;`
-* `std::string T::str(std::string_view flags) const;`
-* `std::string T::str(std::size_t prec) const;`
-* `std::string T::str() const;`
-* `std::string to_string(const T& t, std::string_view flags,
-    std::size_t prec) const;`
-* `std::string to_string(const T& t, std::string_view flags) const;`
-* `std::string to_string(const T& t, std::size_t prec) const;`
-* `std::string to_string(const T& t) const;`
-
-The formatter will allow non-digit characters as formatting flags if the
-formatting function takes a flags argument, and an integer formatting flag if
-the function takes a precision argument. Specific flags are not checked; if a
-flags argument is allowed at all, any character will be accepted and passed
-on to the underlying formatting function, except control characters, digits,
-and braces.
-
-UTF-8 encoded non-ASCII Unicode characters are valid flags. Behaviour is
-undefined if the format string contains invalid UTF-8.
+If the formatting function takes a flags argument, the generated formatter
+will accept any character except null, digits, or braces as part of the flags
+argument; interpreting them is up to the user defined formatting function.
+The flags in a formatting call are limited to a maximum of 16 bytes.
 
 Formatting to output string types other than plain `std::string` is not
 supported.
@@ -70,10 +54,12 @@ Example:
 class MyClass {
     std::string str(std::string_view flags) const;
 };
-void rs_core_format(MyClass);
+std::string rs_core_format(const MyClass& x, std::string_view flags) {
+    return x.str(flags);
+}
 
 MyClass x;
 std::println("{}", x);      // OK, generates default format
 std::println("{:abc}", x);  // OK, calls x.str("abc")
-std::println("{:42}", x);   // Compile error, str() has no int argument
+std::println("{:42}", x);   // Compile error, no int argument allowed
 ```

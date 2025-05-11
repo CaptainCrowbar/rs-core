@@ -51,8 +51,10 @@
             return it->second; \
         } \
     } \
-    [[maybe_unused]] void rs_core_enum(EnumType); \
-    [[maybe_unused]] void rs_core_format(EnumType);
+    [[maybe_unused]] inline std::string rs_core_format(EnumType t) { \
+        return to_string(t); \
+    } \
+    [[maybe_unused]] void rs_core_enum(EnumType);
 
 #define RS_BITMASK(EnumType, IntType, ...) \
     enum class EnumType: IntType { \
@@ -91,6 +93,9 @@
             return std::format("0x{:x}", index); \
         } \
     } \
+    [[maybe_unused]] inline std::string rs_core_format(EnumType t) { \
+        return to_string(t); \
+    } \
     [[maybe_unused]] constexpr bool operator!(EnumType t) noexcept { \
         return ! static_cast<bool>(t); \
     } \
@@ -116,8 +121,7 @@
         return t = t ^ u; \
     } \
     [[maybe_unused]] void rs_core_bitmask(EnumType); \
-    [[maybe_unused]] void rs_core_enum(EnumType); \
-    [[maybe_unused]] void rs_core_format(EnumType);
+    [[maybe_unused]] void rs_core_enum(EnumType);
 
 namespace RS::Detail {
 

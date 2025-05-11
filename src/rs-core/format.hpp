@@ -20,60 +20,55 @@ namespace RS {
             || std::convertible_to<T, std::string_view>;
 
         template <typename T>
-        concept FormatMarker = requires(T t) {
-            rs_core_format(t);
+        concept FormatByMemberFunction = requires (const T& t) {
+            { t.rs_core_format() } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByStrMethod = requires (const T& t) {
-            { t.str() } -> StringOrView;
+        concept FormatByMemberFunctionWithFlags = requires (const T& t, std::string_view s) {
+            { t.rs_core_format(s) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByStrMethodWithFlags = requires (const T& t, std::string_view s) {
-            { t.str(s) } -> StringOrView;
+        concept FormatByMemberFunctionWithSize = requires (const T& t, std::size_t n) {
+            { t.rs_core_format(n) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByStrMethodWithSize = requires (const T& t, std::size_t n) {
-            { t.str(n) } -> StringOrView;
+        concept FormatByMemberFunctionWithBoth = requires (const T& t, std::string_view s, std::size_t n) {
+            { t.rs_core_format(s, n) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByStrMethodWithBoth = requires (const T& t, std::string_view s, std::size_t n) {
-            { t.str(s, n) } -> StringOrView;
+        concept FormatByFreeFunction = requires (const T& t) {
+            { rs_core_format(t) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByToString = requires (const T& t) {
-            { to_string(t) } -> StringOrView;
+        concept FormatByFreeFunctionWithFlags = requires (const T& t, std::string_view s) {
+            { rs_core_format(t, s) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByToStringWithFlags = requires (const T& t, std::string_view s) {
-            { to_string(t, s) } -> StringOrView;
+        concept FormatByFreeFunctionWithSize = requires (const T& t, std::size_t n) {
+            { rs_core_format(t, n) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByToStringWithSize = requires (const T& t, std::size_t n) {
-            { to_string(t, n) } -> StringOrView;
+        concept FormatByFreeFunctionWithBoth = requires (const T& t, std::string_view s, std::size_t n) {
+            { rs_core_format(t, s, n) } -> StringOrView;
         };
 
         template <typename T>
-        concept FormatByToStringWithBoth = requires (const T& t, std::string_view s, std::size_t n) {
-            { to_string(t, s, n) } -> StringOrView;
-        };
-
-        template <typename T>
-        concept AutoFormat = FormatMarker<T>
-            && (FormatByStrMethod<T>
-                || FormatByStrMethodWithFlags<T>
-                || FormatByStrMethodWithSize<T>
-                || FormatByStrMethodWithBoth<T>
-                || FormatByToString<T>
-                || FormatByToStringWithFlags<T>
-                || FormatByToStringWithSize<T>
-                || FormatByToStringWithBoth<T>);
+        concept AutoFormat =
+            FormatByMemberFunction<T>
+            || FormatByMemberFunctionWithFlags<T>
+            || FormatByMemberFunctionWithSize<T>
+            || FormatByMemberFunctionWithBoth<T>
+            || FormatByFreeFunction<T>
+            || FormatByFreeFunctionWithFlags<T>
+            || FormatByFreeFunctionWithSize<T>
+            || FormatByFreeFunctionWithBoth<T>;
 
     }
 
@@ -84,22 +79,24 @@ struct std::formatter<T> {
 
 private:
 
+    static constexpr auto max_flags = 16uz;
+
     static constexpr auto with_flags =
-        ::RS::Detail::FormatByStrMethodWithFlags<T>
-        || ::RS::Detail::FormatByStrMethodWithBoth<T>
-        || ::RS::Detail::FormatByToStringWithFlags<T>
-        || ::RS::Detail::FormatByToStringWithBoth<T>;
+        ::RS::Detail::FormatByMemberFunctionWithFlags<T>
+        || ::RS::Detail::FormatByMemberFunctionWithBoth<T>
+        || ::RS::Detail::FormatByFreeFunctionWithFlags<T>
+        || ::RS::Detail::FormatByFreeFunctionWithBoth<T>;
 
     static constexpr auto with_size =
-        ::RS::Detail::FormatByStrMethodWithSize<T>
-        || ::RS::Detail::FormatByStrMethodWithBoth<T>
-        || ::RS::Detail::FormatByToStringWithSize<T>
-        || ::RS::Detail::FormatByToStringWithBoth<T>;
+        ::RS::Detail::FormatByMemberFunctionWithSize<T>
+        || ::RS::Detail::FormatByMemberFunctionWithBoth<T>
+        || ::RS::Detail::FormatByFreeFunctionWithSize<T>
+        || ::RS::Detail::FormatByFreeFunctionWithBoth<T>;
 
-    template <int> class dummy_type {};
+    template <int> class empty_type {};
 
     struct flags_base {
-        std::array<char, 128> flags;
+        std::array<char, max_flags> flags;
         std::size_t n_flags = 0;
     };
 
@@ -108,8 +105,8 @@ private:
     };
 
     struct info_type:
-    std::conditional_t<with_flags, flags_base, dummy_type<1>>,
-    std::conditional_t<with_size, size_base, dummy_type<2>> {};
+    std::conditional_t<with_flags, flags_base, empty_type<1>>,
+    std::conditional_t<with_size, size_base, empty_type<2>> {};
 
     info_type info_;
 
@@ -122,10 +119,8 @@ private:
     }
 
     static constexpr bool legit_flag(char c) noexcept {
-        return (c >= ' ' && c <= '~'
-                && ! (c >= '0' && c <= '9')
-                && c != '{' && c != '}')
-            || static_cast<unsigned char>(c) >= 0x80;
+        return c != 0 && c != '{' && c != '}'
+            && (c < '0' || c > '9');
     }
 
 public:
@@ -137,7 +132,7 @@ public:
         for (; it != ctx.end() && *it != '}'; ++it) {
 
             if constexpr (with_flags) {
-                if (legit_flag(*it)) {
+                if (legit_flag(*it) && info_.n_flags < max_flags) {
                     info_.flags[info_.n_flags++] = *it;
                     continue;
                 }
@@ -158,7 +153,7 @@ public:
 
     }
 
-    // The gratuitous template here is a workaround for a libc++ bug.
+    // The gratuitous template here is a workaround for a libc++ bug
     // https://github.com/llvm/llvm-project/issues/66466
 
     template <typename FormatContext>
@@ -168,22 +163,22 @@ public:
 
         std::string out;
 
-        if constexpr (FormatByStrMethodWithBoth<T>) {
-            out = t.str(flags(), info_.size);
-        } else if constexpr (FormatByStrMethodWithFlags<T>) {
-            out = t.str(flags());
-        } else if constexpr (FormatByStrMethodWithSize<T>) {
-            out = t.str(info_.size);
-        } else if constexpr (FormatByStrMethod<T>) {
-            out = t.str();
-        } else if constexpr (FormatByToStringWithBoth<T>) {
-            out = to_string(t, flags(), info_.size);
-        } else if constexpr (FormatByToStringWithFlags<T>) {
-            out = to_string(t, flags());
-        } else if constexpr (FormatByToStringWithSize<T>) {
-            out = to_string(t, info_.size);
-        } else if constexpr (FormatByToString<T>) {
-            out = to_string(t);
+        if constexpr (FormatByMemberFunctionWithBoth<T>) {
+            out = t.rs_core_format(flags(), info_.size);
+        } else if constexpr (FormatByMemberFunctionWithFlags<T>) {
+            out = t.rs_core_format(flags());
+        } else if constexpr (FormatByMemberFunctionWithSize<T>) {
+            out = t.rs_core_format(info_.size);
+        } else if constexpr (FormatByMemberFunction<T>) {
+            out = t.rs_core_format();
+        } else if constexpr (FormatByFreeFunctionWithBoth<T>) {
+            out = rs_core_format(t, flags(), info_.size);
+        } else if constexpr (FormatByFreeFunctionWithFlags<T>) {
+            out = rs_core_format(t, flags());
+        } else if constexpr (FormatByFreeFunctionWithSize<T>) {
+            out = rs_core_format(t, info_.size);
+        } else if constexpr (FormatByFreeFunction<T>) {
+            out = rs_core_format(t);
         } else {
             static_assert(RS::dependent_false<T>);
         }
