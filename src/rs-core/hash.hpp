@@ -12,16 +12,6 @@ namespace RS {
 
     // Concepts
 
-    namespace Detail {
-
-        template <typename T>
-        concept AutoHash = requires (const T& t) {
-            rs_core_hash(t);
-            { t.hash() } -> std::convertible_to<std::size_t>;
-        };
-
-    }
-
     template <typename T>
     concept Hashable = requires (T t) {
         { std::hash<std::remove_cvref_t<T>>()(t) } -> std::convertible_to<std::size_t>;
@@ -66,12 +56,3 @@ namespace RS {
     }
 
 }
-
-// Automatically define a standard hash object
-
-template <RS::Detail::AutoHash T>
-struct std::hash<T> {
-    std::size_t operator()(const T& t) const noexcept {
-        return t.hash();
-    }
-};

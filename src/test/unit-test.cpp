@@ -16,7 +16,6 @@ void test_rs_core_format_concepts();
 void test_rs_core_format_automation();
 void test_rs_core_hash_kernighan();
 void test_rs_core_hash_mix();
-void test_rs_core_hash_standard();
 void test_rs_core_iterator_tags();
 void test_rs_core_iterator_output_iterators();
 void test_rs_core_iterator_input_iterators();
@@ -43,7 +42,6 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_format_automation, "test_rs_core_format_automation");
     call_me_maybe(test_rs_core_hash_kernighan, "test_rs_core_hash_kernighan");
     call_me_maybe(test_rs_core_hash_mix, "test_rs_core_hash_mix");
-    call_me_maybe(test_rs_core_hash_standard, "test_rs_core_hash_standard");
     call_me_maybe(test_rs_core_iterator_tags, "test_rs_core_iterator_tags");
     call_me_maybe(test_rs_core_iterator_output_iterators, "test_rs_core_iterator_output_iterators");
     call_me_maybe(test_rs_core_iterator_input_iterators, "test_rs_core_iterator_input_iterators");
