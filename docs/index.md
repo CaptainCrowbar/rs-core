@@ -34,8 +34,8 @@ Requires C++23.
 
 There is a `CMakeLists.txt` file, but this is usually only needed if you want
 to run the unit tests. The library is header-only and can be installed simply
-by copying the `rs-core` directory and the `rs-core.hpp` header (under `src`)
-into somewhere on your include path. Running
+by copying or linking the `rs-core` directory into somewhere on your include
+path. Running
 
 ```sh
 cmake --build . --config Release --target install
@@ -43,6 +43,5 @@ cmake --build . --config Release --target install
 
 will do this, or you can just copy or symlink it by hand.
 
-To use the library, `#include` either the individual headers you want, or
-`rs-core.hpp` to include all of them. No special link-time options are
-needed.
+To use the library, just `#include` the headers you want. No special link-time
+options are needed.
