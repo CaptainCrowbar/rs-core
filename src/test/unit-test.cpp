@@ -7,9 +7,8 @@
 
 using namespace RS::UnitTest;
 
-void test_rs_core_global_bitmask_functions();
-void test_rs_core_global_character_functions();
-void test_rs_core_global_range_functions();
+void test_rs_core_bitmask_functions();
+void test_rs_core_character_functions();
 void test_rs_core_enum();
 void test_rs_core_enum_bitmask();
 void test_rs_core_format_concepts();
@@ -23,6 +22,7 @@ void test_rs_core_iterator_forward_iterators();
 void test_rs_core_iterator_bidirectional_iterators();
 void test_rs_core_iterator_random_access_iterators();
 void test_rs_core_iterator_contiguous_iterators();
+void test_rs_core_range_functions();
 void test_rs_core_scope_guard();
 void test_rs_core_version();
 
@@ -33,9 +33,8 @@ int main(int argc, char** argv) {
     std::println("{}Running unit tests{}", xhead, xreset);
     std::println("{}{}{}", xrule, rule, xreset);
 
-    call_me_maybe(test_rs_core_global_bitmask_functions, "test_rs_core_global_bitmask_functions");
-    call_me_maybe(test_rs_core_global_character_functions, "test_rs_core_global_character_functions");
-    call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
+    call_me_maybe(test_rs_core_bitmask_functions, "test_rs_core_bitmask_functions");
+    call_me_maybe(test_rs_core_character_functions, "test_rs_core_character_functions");
     call_me_maybe(test_rs_core_enum, "test_rs_core_enum");
     call_me_maybe(test_rs_core_enum_bitmask, "test_rs_core_enum_bitmask");
     call_me_maybe(test_rs_core_format_concepts, "test_rs_core_format_concepts");
@@ -49,6 +48,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_iterator_bidirectional_iterators, "test_rs_core_iterator_bidirectional_iterators");
     call_me_maybe(test_rs_core_iterator_random_access_iterators, "test_rs_core_iterator_random_access_iterators");
     call_me_maybe(test_rs_core_iterator_contiguous_iterators, "test_rs_core_iterator_contiguous_iterators");
+    call_me_maybe(test_rs_core_range_functions, "test_rs_core_range_functions");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
     call_me_maybe(test_rs_core_version, "test_rs_core_version");
 

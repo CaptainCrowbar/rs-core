@@ -1,6 +1,6 @@
 # Formatting Helpers
 
-_[Core utilty library by Ross Smith](index.html)_
+_[Core utility library by Ross Smith](index.html)_
 
 ```c++
 #include "rs-core/format.hpp"

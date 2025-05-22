@@ -1,64 +1,9 @@
-#include "rs-core/global.hpp"
+#include "rs-core/core.hpp"
 #include "rs-core/unit-test.hpp"
-#include <concepts>
-#include <iterator>
-#include <map>
-#include <ranges>
-#include <string>
 
 using namespace RS;
 
-namespace {
-
-    enum class MyBitmask: int {
-        none     = 0,
-        alpha    = 1,
-        bravo    = 2,
-        charlie  = 4,
-        all      = 7,
-    };
-
-}
-
-void test_rs_core_global_bitmask_functions() {
-
-    int n;
-
-    n = 0;  TEST(! has_bit(n, 0));  TEST(! has_bits(n, 0));
-    n = 0;  TEST(! has_bit(n, 1));  TEST(! has_bits(n, 1));
-    n = 6;  TEST(! has_bit(n, 1));  TEST(! has_bits(n, 1));
-    n = 6;  TEST(has_bit(n, 2));    TEST(has_bits(n, 2));
-    n = 6;  TEST(has_bit(n, 4));    TEST(has_bits(n, 4));
-    n = 6;  TEST(has_bit(n, 7));    TEST(! has_bits(n, 7));
-
-    unsigned u;
-
-    u = 0;  TEST(! has_bit(u, 0));  TEST(! has_bits(u, 0));
-    u = 0;  TEST(! has_bit(u, 1));  TEST(! has_bits(u, 1));
-    u = 6;  TEST(! has_bit(u, 1));  TEST(! has_bits(u, 1));
-    u = 6;  TEST(has_bit(u, 2));    TEST(has_bits(u, 2));
-    u = 6;  TEST(has_bit(u, 4));    TEST(has_bits(u, 4));
-    u = 6;  TEST(has_bit(u, 7));    TEST(! has_bits(u, 7));
-
-    MyBitmask b;
-
-    b = MyBitmask::none;   TEST(! has_bit(b, 0));  TEST(! has_bits(b, 0));
-    b = MyBitmask::none;   TEST(! has_bit(b, 1));  TEST(! has_bits(b, 1));
-    b = MyBitmask::bravo;  TEST(! has_bit(b, 1));  TEST(! has_bits(b, 1));
-    b = MyBitmask::bravo;  TEST(has_bit(b, 2));    TEST(has_bits(b, 2));
-    b = MyBitmask::bravo;  TEST(! has_bit(b, 4));  TEST(! has_bits(b, 4));
-    b = MyBitmask::bravo;  TEST(has_bit(b, 7));    TEST(! has_bits(b, 7));
-
-    b = MyBitmask::none;   TEST(! has_bit(b, MyBitmask::none));     TEST(! has_bits(b, MyBitmask::none));
-    b = MyBitmask::none;   TEST(! has_bit(b, MyBitmask::alpha));    TEST(! has_bits(b, MyBitmask::alpha));
-    b = MyBitmask::bravo;  TEST(! has_bit(b, MyBitmask::alpha));    TEST(! has_bits(b, MyBitmask::alpha));
-    b = MyBitmask::bravo;  TEST(has_bit(b, MyBitmask::bravo));      TEST(has_bits(b, MyBitmask::bravo));
-    b = MyBitmask::bravo;  TEST(! has_bit(b, MyBitmask::charlie));  TEST(! has_bits(b, MyBitmask::charlie));
-    b = MyBitmask::bravo;  TEST(has_bit(b, MyBitmask::all));        TEST(! has_bits(b, MyBitmask::all));
-
-}
-
-void test_rs_core_global_character_functions() {
+void test_rs_core_character_functions() {
 
     TEST(is_ascii('\0'));      TEST(ascii_iscntrl('\0'));      TEST(! ascii_isblank('\0'));    TEST(! ascii_isspace('\0'));
     TEST(is_ascii('\t'));      TEST(ascii_iscntrl('\t'));      TEST(ascii_isblank('\t'));      TEST(ascii_isspace('\t'));
@@ -184,37 +129,5 @@ void test_rs_core_global_character_functions() {
     TEST_EQUAL(ascii_toupper('\x7f'),  '\x7f');  TEST_EQUAL(ascii_tolower('\x7f'),  '\x7f');
     TEST_EQUAL(ascii_toupper('\x80'),  '\x80');  TEST_EQUAL(ascii_tolower('\x80'),  '\x80');
     TEST_EQUAL(ascii_toupper('\xff'),  '\xff');  TEST_EQUAL(ascii_tolower('\xff'),  '\xff');
-
-}
-
-void test_rs_core_global_range_functions() {
-
-    std::multimap<int, std::string> map = {
-        { 1, "alpha" },
-        { 2, "bravo" },
-        { 2, "charlie" },
-        { 2, "delta" },
-        { 3, "echo" },
-    };
-
-    auto eq_pair = map.equal_range(2);
-    auto eq_range = as_range(eq_pair);
-
-    static_assert(std::same_as<decltype(eq_range),
-        std::ranges::subrange<
-            std::multimap<int, std::string>::iterator,
-            std::multimap<int, std::string>::iterator
-        >>);
-
-    auto i = eq_range.begin();
-    auto j = eq_range.end();
-    TEST_EQUAL(std::distance(i, j), 3);
-    TEST_EQUAL(i->second, "bravo");
-    ++i;
-    TEST_EQUAL(i->second, "charlie");
-    ++i;
-    TEST_EQUAL(i->second, "delta");
-    ++i;
-    TEST(i == j);
 
 }

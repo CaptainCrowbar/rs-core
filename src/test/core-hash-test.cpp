@@ -1,4 +1,4 @@
-#include "rs-core/hash.hpp"
+#include "rs-core/core.hpp"
 #include "rs-core/unit-test.hpp"
 #include <string>
 

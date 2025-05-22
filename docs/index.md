@@ -14,20 +14,20 @@ namespace RS;
 ## Introduction
 
 This is a set of basic utilities that I use throughout my C++ code, collected
-here to avoid widespread duplication. Most of the contents are
+here to avoid widespread duplication. Most of the contents are generic
 metaprogramming utilities used in the definition of more specialized classes
-and functions.
+and functions in specific projects.
+
+Most of the utilities are combined into the `"rs-core/core.hpp"` header,
+because I frequently use many of them together. Those that implicitly import
+system headers that are not part of the C++ standard library are in separate
+headers of their own, to avoid unnecessary dependencies.
 
 Requires C++23.
 
 ## Index of headers
 
-* [`rs-core/global.hpp` -- Global definitions](global.html)
-* [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
-* [`rs-core/format.hpp` -- Formatting helpers](format.html)
-* [`rs-core/hash.hpp` -- Hash function helpers](hash.html)
-* [`rs-core/iterator.hpp` -- Iterator helpers](iterator.html)
-* [`rs-core/scope-guard.hpp` -- Scope guards](scope-guard.html)
+* [`rs-core/core.hpp` -- Core utilities](core.html)
 * [`rs-core/version.hpp` -- Version information](version.html)
 
 ## Using the library
