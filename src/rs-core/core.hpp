@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <exception>
 #include <format>
 #include <functional>
@@ -14,6 +15,7 @@
 #include <limits>
 #include <ranges>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -661,6 +663,108 @@ namespace RS {
         return BasicScopeGuard<F, ScopeMode::exit>(std::forward<F>(f));
     }
 
+    // UUID
+
+    class Uuid {
+
+    public:
+
+        constexpr Uuid() = default;
+        constexpr Uuid(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d,
+            std::uint8_t e, std::uint8_t f, std::uint8_t g, std::uint8_t h,
+            std::uint8_t i, std::uint8_t j, std::uint8_t k, std::uint8_t l,
+            std::uint8_t m, std::uint8_t n, std::uint8_t o, std::uint8_t p) noexcept:
+            bytes_{a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p} {}
+        explicit Uuid(std::string_view str);
+
+        constexpr std::uint8_t& operator[](std::size_t i) noexcept { return bytes_[i]; }
+        constexpr const std::uint8_t& operator[](std::size_t i) const noexcept { return bytes_[i]; }
+        constexpr std::uint8_t* begin() noexcept { return bytes_.data(); }
+        constexpr const std::uint8_t* begin() const noexcept { return bytes_.data(); }
+        constexpr std::uint8_t* end() noexcept { return begin() + 16; }
+        constexpr const std::uint8_t* end() const noexcept { return begin() + 16; }
+
+        constexpr std::size_t hash() const noexcept { return kernighan_hash(begin(), 16); }
+        std::string str() const;
+        std::string rs_core_format() const { return str(); }
+        explicit operator std::string() const { return str(); }
+
+        constexpr static Uuid read(const void* ptr) noexcept {
+            Uuid u;
+            std::memcpy(u.bytes_.data(), ptr, 16);
+            return u;
+        }
+
+        friend constexpr bool operator==(const Uuid& u, const Uuid& v) noexcept { return u.bytes_ == v.bytes_; }
+        friend constexpr auto operator<=>(const Uuid& u, const Uuid& v) noexcept { return u.bytes_ <=> v.bytes_; }
+
+    private:
+
+        std::array<std::uint8_t, 16> bytes_ {0};
+
+    };
+
+        inline Uuid::Uuid(std::string_view str) {
+            if (str.empty()) {
+                return;
+            }
+            static constexpr auto is_separator = [] (char c) {
+                return ascii_isblank(c) || ascii_ispunct(c);
+            };
+            auto i = 0uz;
+            auto j = 0uz;
+            while (i < str.size() && j < 16) {
+                auto len = str.size() - i;
+                if (len >= 2 && str[i] == '0' && (str[i + 1] == 'X' || str[i + 1] == 'x')) {
+                    i += 2;
+                } else if (len >= 2 && ascii_isxdigit(str[i]) && ascii_isxdigit(str[i + 1])) {
+                    for (auto k = 0; k < 2; ++k) {
+                        bytes_[j] *= 16;
+                        auto c = str[i + k];
+                        if (ascii_isdigit(c)) {
+                            bytes_[j] += static_cast<std::uint8_t>(c - '0');
+                        } else if (ascii_isupper(c)) {
+                            bytes_[j] += static_cast<std::uint8_t>(c - 'A' + 10);
+                        } else {
+                            bytes_[j] += static_cast<std::uint8_t>(c - 'a' + 10);
+                        }
+                    }
+                    i += 2;
+                    ++j;
+                } else if (is_separator(str[i])) {
+                    ++i;
+                } else {
+                    break;
+                }
+            }
+            while (i < str.size() && is_separator(str[i])) {
+                ++i;
+            }
+            if (i < str.size() || j < 16) {
+                throw std::invalid_argument(std::format("Invalid UUID: {:?}", str));
+            }
+        }
+
+        inline std::string Uuid::str() const {
+            std::string s;
+            s.reserve(37);
+            const auto append_bytes = [this,&s] (std::size_t pos, std::size_t len) {
+                static constexpr const char* xdigits = "0123456789abcdef";
+                for (auto i = 0uz; i < len; ++i) {
+                    s += xdigits[bytes_[pos + i] / 16];
+                    s += xdigits[bytes_[pos + i] % 16];
+                }
+                s += '-';
+            };
+            append_bytes(0, 4);
+            append_bytes(4, 2);
+            append_bytes(6, 2);
+            append_bytes(8, 2);
+            append_bytes(10, 6);
+            s.pop_back();
+            return s;
+        }
+
 }
 
 // Formatters
@@ -771,7 +875,7 @@ public:
         } else if constexpr (FormatByFreeFunction<T>) {
             out = rs_core_format(t);
         } else {
-            static_assert(RS::dependent_false<T>);
+            static_assert(::RS::dependent_false<T>);
         }
 
         return std::ranges::copy(out, ctx.out()).out;
@@ -779,3 +883,14 @@ public:
     }
 
 };
+
+// Hash functions
+
+namespace std {
+
+    template <>
+    struct hash<::RS::Uuid> {
+        std::size_t operator()(const ::RS::Uuid& u) const noexcept { return u.hash(); }
+    };
+
+}

@@ -305,26 +305,61 @@ context.
 ## Random number generators
 
 ```c++
-class Pcg {
-    using result_type = std::uint64_t;
-    constexpr Pcg() noexcept;
-    constexpr explicit Pcg(std::uint64_t s) noexcept;
-    constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1) noexcept;
-    constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1,
-        std::uint64_t s2, std::uint64_t s3) noexcept;
-    constexpr std::uint64_t operator()() noexcept;
-    constexpr void seed(std::uint64_t s) noexcept;
-    constexpr void seed(std::uint64_t s0, std::uint64_t s1) noexcept;
-    constexpr void seed(std::uint64_t s0, std::uint64_t s1,
-        std::uint64_t s2, std::uint64_t s3) noexcept;
-    constexpr static std::uint64_t min() noexcept;
-    constexpr static std::uint64_t max() noexcept;
-};
+class Pcg;
 ```
 
 Implementation of the PCG64-DXSM random number engine, based on code by
 [Melissa O'Neill](http://www.pcg-random.org/) and
 [Tony Finch](https://dotat.at/@/2023-06-21-pcg64-dxsm.html).
+
+```c++
+using Pcg::result_type = std::uint64_t;
+```
+
+Member types.
+
+```c++
+constexpr Pcg::Pcg() noexcept;
+constexpr explicit Pcg::Pcg(std::uint64_t s) noexcept;
+constexpr explicit Pcg::Pcg(std::uint64_t s0, std::uint64_t s1) noexcept;
+constexpr explicit Pcg::Pcg(std::uint64_t s0, std::uint64_t s1,
+    std::uint64_t s2, std::uint64_t s3) noexcept;
+```
+
+Constructors from one or more seeds. The default constructor uses a standard
+seed.
+
+```c++
+constexpr Pcg::~Pcg() noexcept;
+constexpr Pcg::Pcg(const Pcg& p) noexcept;
+constexpr Pcg::Pcg(Pcg&& p) noexcept;
+constexpr Pcg& Pcg::operator=(const Pcg& p) noexcept;
+constexpr Pcg& Pcg::operator=(Pcg&& p) noexcept;
+```
+
+Other life cycle functions.
+
+```c++
+constexpr std::uint64_t Pcg::operator()() noexcept;
+```
+
+Random number generation operator.
+
+```c++
+constexpr void Pcg::seed(std::uint64_t s) noexcept;
+constexpr void Pcg::seed(std::uint64_t s0, std::uint64_t s1) noexcept;
+constexpr void Pcg::seed(std::uint64_t s0, std::uint64_t s1,
+    std::uint64_t s2, std::uint64_t s3) noexcept;
+```
+
+Re-seed the generator.
+
+```c++
+constexpr static std::uint64_t Pcg::min() noexcept;
+constexpr static std::uint64_t Pcg::max() noexcept;
+```
+
+Minimum and maximum values.
 
 ## Range functions
 
@@ -380,3 +415,99 @@ template <std::invocable F> [scope guard] on_scope_exit(F&& f);
 
 These construct scope guards that will invoke their callbacks under the
 appropriate conditions.
+
+## UUID
+
+```c++
+class Uuid;
+```
+
+A class representing a 128-bit universally unique identifier.
+
+```c++
+constexpr Uuid::Uuid() noexcept;
+```
+
+The default constructor creates an all-zero UUID.
+
+```c++
+constexpr Uuid::Uuid(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d,
+    std::uint8_t e, std::uint8_t f, std::uint8_t g, std::uint8_t h,
+    std::uint8_t i, std::uint8_t j, std::uint8_t k, std::uint8_t l,
+    std::uint8_t m, std::uint8_t n, std::uint8_t o, std::uint8_t p) noexcept;
+```
+
+Constructor from an explicit list of bytes.
+
+```c++
+explicit Uuid::Uuid(std::string_view str);
+```
+
+Constructor from a string. The string must contain exactly 32 hex digits,
+grouped in any way as long as each group contains an even number of digits.
+Groups may be separated by any combination of ASCII punctuation, spaces, or
+tabs; groups may be prefixed with `"0x"` (case insensitive). An empty string
+is interpreted as a default constructed UUID. Otherwise, this will throw
+`std::invalid_argument` if the string is not a valid UUID.
+
+```c++
+constexpr Uuid::~Uuid() noexcept;
+constexpr Uuid::Uuid(const Uuid& u) noexcept;
+constexpr Uuid::Uuid(Uuid&& u) noexcept;
+constexpr Uuid& Uuid::operator=(const Uuid& u) noexcept;
+constexpr Uuid& Uuid::operator=(Uuid&& u) noexcept;
+```
+
+Other life cycle functions.
+
+```c++
+constexpr std::uint8_t& Uuid::operator[](std::size_t i) noexcept;
+constexpr const std::uint8_t& Uuid::operator[](std::size_t i) const noexcept;
+```
+
+Access to individual bytes. Behaviour is undefined if `i>=16.`
+
+```c++
+constexpr std::uint8_t* Uuid::begin() noexcept;
+constexpr const std::uint8_t* Uuid::begin() const noexcept;
+constexpr std::uint8_t* Uuid::end() noexcept;
+constexpr const std::uint8_t* Uuid::end() const noexcept;
+```
+
+These allow iteration over the bytes in a UUID, starting with the most
+significant.
+
+```c++
+constexpr std::size_t Uuid::hash() const noexcept;
+struct std::hash<Uuid>;
+```
+
+Hash function.
+
+```c++
+std::string Uuid::str() const;
+explicit Uuid::operator std::string() const;
+struct std::formatter<Uuid>;
+```
+
+These convert the UUID to a string, in the standard format:
+`"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".`
+
+```c++
+constexpr static Uuid Uuid::read(const void* ptr) noexcept;
+```
+
+Copies the bytes of a UUID from a block of memory. Behaviour is undefined if
+the pointer is null or does not point to a valid array of at least 16 bytes.
+
+```c++
+constexpr bool operator==(const Uuid& u, const Uuid& v) noexcept;
+constexpr bool operator!=(const Uuid& u, const Uuid& v) noexcept;
+constexpr bool operator<(const Uuid& u, const Uuid& v) noexcept;
+constexpr bool operator>(const Uuid& u, const Uuid& v) noexcept;
+constexpr bool operator<=(const Uuid& u, const Uuid& v) noexcept;
+constexpr bool operator>=(const Uuid& u, const Uuid& v) noexcept;
+constexpr std::strong_ordering operator<=>(const Uuid& u, const Uuid& v) noexcept;
+```
+
+Comparison operators.
