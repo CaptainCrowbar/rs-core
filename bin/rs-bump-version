@@ -43,8 +43,8 @@ cat << EOF > $header
 
 #pragma once
 
-#include <string>
 #include <array>
+#include <string>
 
 namespace RS {
 
