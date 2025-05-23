@@ -310,11 +310,13 @@ class Pcg {
     constexpr Pcg() noexcept;
     constexpr explicit Pcg(std::uint64_t s) noexcept;
     constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1) noexcept;
-    constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
+    constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1,
+        std::uint64_t s2, std::uint64_t s3) noexcept;
     constexpr std::uint64_t operator()() noexcept;
     constexpr void seed(std::uint64_t s) noexcept;
     constexpr void seed(std::uint64_t s0, std::uint64_t s1) noexcept;
-    constexpr void seed(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
+    constexpr void seed(std::uint64_t s0, std::uint64_t s1,
+        std::uint64_t s2, std::uint64_t s3) noexcept;
     constexpr static std::uint64_t min() noexcept;
     constexpr static std::uint64_t max() noexcept;
 };
