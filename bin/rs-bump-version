@@ -11,9 +11,14 @@ if [[ "${TRACE-}" ]]; then
     set -o xtrace
 fi
 
-bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-root="$(readlink -f "$bin/..")"
-cd "$root"
+if [[ "${PWD##*/}" =~ build ]]; then
+    cd ..
+fi
+
+if ! [ -d src ]; then
+    echo "*** Source directory not found"
+    exit 1
+fi
 
 cmakefile=src/CMakeLists.txt
 temp=__TEMP__

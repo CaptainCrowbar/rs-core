@@ -11,22 +11,21 @@ if [[ "${TRACE-}" ]]; then
     set -o xtrace
 fi
 
-bin="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-root="$(readlink -f "$bin/..")"
+if [[ "${PWD##*/}" =~ build ]]; then
+    cd ..
+fi
 
-src="$root/src"
-
-if ! [ -d "$src" ]; then
-    echo "*** Source directory not found: $src"
+if ! [ -d src ]; then
+    echo "*** Source directory not found"
     exit 1
 fi
 
-cmake_file="$src/CMakeLists.txt"
-test_harness="$src/test/unit-test.cpp"
+cmake_file="src/CMakeLists.txt"
+test_harness="src/test/unit-test.cpp"
 
 test_files=$(grep -E '^\s*test/.+-test.cpp' $cmake_file \
     | grep -Fv 'test/unit-test.cpp' \
-    | sed -E "s!test/!$src/&!")
+    | sed -E "s!test/!src/&!")
 
 test_functions=$(grep -Eh '^void [a-z0-9_]+\(\)' $test_files \
     | sed -E 's!void ([a-z0-9_]+)\(\).*!\1!')
