@@ -22,6 +22,7 @@ void test_rs_core_iterator_forward_iterators();
 void test_rs_core_iterator_bidirectional_iterators();
 void test_rs_core_iterator_random_access_iterators();
 void test_rs_core_iterator_contiguous_iterators();
+void test_rs_core_random_pcg_engine();
 void test_rs_core_range_functions();
 void test_rs_core_scope_guard();
 void test_rs_core_typename_static();
@@ -50,6 +51,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_iterator_bidirectional_iterators, "test_rs_core_iterator_bidirectional_iterators");
     call_me_maybe(test_rs_core_iterator_random_access_iterators, "test_rs_core_iterator_random_access_iterators");
     call_me_maybe(test_rs_core_iterator_contiguous_iterators, "test_rs_core_iterator_contiguous_iterators");
+    call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
     call_me_maybe(test_rs_core_range_functions, "test_rs_core_range_functions");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");

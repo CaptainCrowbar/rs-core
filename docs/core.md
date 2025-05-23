@@ -302,6 +302,28 @@ template <typename> constexpr bool dependent_false = false;
 Used when the equivalent of `static_assert(false)` is needed in a dependent
 context.
 
+## Random number generators
+
+```c++
+class Pcg {
+    using result_type = std::uint64_t;
+    constexpr Pcg() noexcept;
+    constexpr explicit Pcg(std::uint64_t s) noexcept;
+    constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1) noexcept;
+    constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
+    constexpr std::uint64_t operator()() noexcept;
+    constexpr void seed(std::uint64_t s) noexcept;
+    constexpr void seed(std::uint64_t s0, std::uint64_t s1) noexcept;
+    constexpr void seed(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
+    constexpr static std::uint64_t min() noexcept;
+    constexpr static std::uint64_t max() noexcept;
+};
+```
+
+Implementation of the PCG64-DXSM random number engine, based on code by
+[Melissa O'Neill](http://www.pcg-random.org/) and
+[Tony Finch](https://dotat.at/@/2023-06-21-pcg64-dxsm.html).
+
 ## Range functions
 
 ```c++
