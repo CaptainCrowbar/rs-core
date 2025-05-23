@@ -28,6 +28,7 @@ Requires C++23.
 ## Index of headers
 
 * [`rs-core/core.hpp` -- Core utilities](core.html)
+* [`rs-core/typename.hpp` -- Type names](typename.html)
 * [`rs-core/version.hpp` -- Version information](version.html)
 
 ## Using the library
