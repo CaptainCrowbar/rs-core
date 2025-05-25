@@ -488,8 +488,8 @@ namespace RS {
 
         struct Uint128 {
 
-            std::uint64_t high = 0;
-            std::uint64_t low = 0;
+            std::uint64_t high {};
+            std::uint64_t low {};
 
             constexpr Uint128() = default;
             constexpr Uint128(std::uint64_t lo) noexcept: low{lo} {}
@@ -528,7 +528,7 @@ namespace RS {
             }
 
             constexpr Uint128 operator*(Uint128 y) const noexcept {
-                static constexpr std::uint64_t max32 = ~ std::uint32_t{};
+                static constexpr std::uint64_t max32 = ~ 0_u32;
                 Uint128 z;
                 for (auto a = 0; a < 128; a += 32) {
                     auto c = (*this >> a).low & max32;
@@ -558,7 +558,9 @@ namespace RS {
         constexpr Pcg() noexcept { seed(default_seed); }
         constexpr explicit Pcg(std::uint64_t s) noexcept { seed(s); }
         constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1) noexcept { seed(s0, s1); }
-        constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept { seed(s0, s1, s2, s3); }
+        constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept {
+            seed(s0, s1, s2, s3);
+        }
 
         constexpr std::uint64_t operator()() noexcept;
         constexpr void seed(std::uint64_t s) noexcept { seed(0, s, 0, 0); }
@@ -566,11 +568,11 @@ namespace RS {
         constexpr void seed(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
 
         constexpr static std::uint64_t min() noexcept { return 0; }
-        constexpr static std::uint64_t max() noexcept { return ~ std::uint64_t{}; }
+        constexpr static std::uint64_t max() noexcept { return ~ 0_u64; }
 
     private:
 
-        static constexpr std::uint64_t default_seed = 0xcafe'f00d'd15e'a5e5ull;
+        static constexpr auto default_seed = 0xcafe'f00d'd15e'a5e5_u64;
 
         Detail::Uint128 state_;
         Detail::Uint128 delta_;
@@ -578,13 +580,13 @@ namespace RS {
     };
 
     constexpr std::uint64_t Pcg::operator()() noexcept {
-        static constexpr std::uint64_t factor = 0xda94'2042'e4dd'58b5ull;
-        auto u = this->state_;
-        this->state_ = u * factor + this->delta_;
+        static constexpr auto k = 0xda94'2042'e4dd'58b5_u64;
+        auto u = state_;
+        state_ = u * k + delta_;
         auto x = (u >> 64).low;
         auto y = (u | 1).low;
         x ^= x >> 32;
-        x *= factor;
+        x *= k;
         x ^= x >> 48;
         x *= y;
         return x;
@@ -746,23 +748,10 @@ namespace RS {
         }
 
         inline std::string Uuid::str() const {
-            std::string s;
-            s.reserve(37);
-            const auto append_bytes = [this,&s] (std::size_t pos, std::size_t len) {
-                static constexpr const char* xdigits = "0123456789abcdef";
-                for (auto i = 0uz; i < len; ++i) {
-                    s += xdigits[bytes_[pos + i] / 16];
-                    s += xdigits[bytes_[pos + i] % 16];
-                }
-                s += '-';
-            };
-            append_bytes(0, 4);
-            append_bytes(4, 2);
-            append_bytes(6, 2);
-            append_bytes(8, 2);
-            append_bytes(10, 6);
-            s.pop_back();
-            return s;
+            return std::format
+                ("{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+                bytes_[0], bytes_[1], bytes_[2], bytes_[3], bytes_[4], bytes_[5], bytes_[6], bytes_[7],
+                bytes_[8], bytes_[9], bytes_[10], bytes_[11], bytes_[12], bytes_[13], bytes_[14], bytes_[15]);
         }
 
 }
