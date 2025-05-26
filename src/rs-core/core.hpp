@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cerrno>
 #include <compare>
 #include <concepts>
 #include <cstddef>
@@ -13,6 +14,7 @@
 #include <functional>
 #include <iterator>
 #include <limits>
+#include <optional>
 #include <ranges>
 #include <set>
 #include <stdexcept>
@@ -146,54 +148,6 @@ namespace RS {
     constexpr std::string_view ascii_whitespace = "\t\n\r ";
     constexpr auto npos = ~ 0uz;
 
-    // Bitmask functions
-
-    namespace Detail {
-
-        template <std::integral T>
-        constexpr auto force_unsigned(T t) noexcept {
-            return static_cast<std::make_unsigned_t<T>>(t);
-        }
-
-        template <typename T>
-        requires std::is_enum_v<T>
-        constexpr auto force_unsigned(T t) noexcept {
-            return force_unsigned(static_cast<std::underlying_type_t<T>>(t));
-        }
-
-    }
-
-    template <typename T1, typename T2>
-    requires (std::integral<T1> || std::is_enum_v<T1>)
-        && (std::integral<T2> || std::is_enum_v<T2>)
-    constexpr bool has_bit(T1 x, T2 y) noexcept {
-        using namespace Detail;
-        auto u = force_unsigned(x);
-        auto v = force_unsigned(y);
-        return (u & v) != 0;
-    }
-
-    template <typename T1, typename T2>
-    requires (std::integral<T1> || std::is_enum_v<T1>)
-        && (std::integral<T2> || std::is_enum_v<T2>)
-    constexpr bool has_bits(T1 x, T2 y) noexcept {
-        using namespace Detail;
-        auto u = force_unsigned(x);
-        auto v = force_unsigned(y);
-        return v != 0 && (u & v) == v;
-    }
-
-    // Integer literals
-
-    constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return static_cast<std::int8_t>(x); }
-    constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return static_cast<std::int16_t>(x); }
-    constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return static_cast<std::int32_t>(x); }
-    constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return static_cast<std::int64_t>(x); }
-    constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return static_cast<std::uint8_t>(x); }
-    constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return static_cast<std::uint16_t>(x); }
-    constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return static_cast<std::uint32_t>(x); }
-    constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return static_cast<std::uint64_t>(x); }
-
     // Character functions
 
     constexpr bool is_ascii(char c) noexcept { return static_cast<unsigned char>(c) <= 0x7f; }
@@ -294,6 +248,226 @@ namespace RS {
             return make_enum_list<unsigned long long>(va_args);
         }
 
+    }
+
+    // Bitmask functions
+
+    namespace Detail {
+
+        template <std::integral T>
+        constexpr auto force_unsigned(T t) noexcept {
+            return static_cast<std::make_unsigned_t<T>>(t);
+        }
+
+        template <typename T>
+        requires std::is_enum_v<T>
+        constexpr auto force_unsigned(T t) noexcept {
+            return force_unsigned(static_cast<std::underlying_type_t<T>>(t));
+        }
+
+    }
+
+    template <typename T1, typename T2>
+    requires (std::integral<T1> || std::is_enum_v<T1>)
+        && (std::integral<T2> || std::is_enum_v<T2>)
+    constexpr bool has_bit(T1 x, T2 y) noexcept {
+        using namespace Detail;
+        auto u = force_unsigned(x);
+        auto v = force_unsigned(y);
+        return (u & v) != 0;
+    }
+
+    template <typename T1, typename T2>
+    requires (std::integral<T1> || std::is_enum_v<T1>)
+        && (std::integral<T2> || std::is_enum_v<T2>)
+    constexpr bool has_bits(T1 x, T2 y) noexcept {
+        using namespace Detail;
+        auto u = force_unsigned(x);
+        auto v = force_unsigned(y);
+        return v != 0 && (u & v) == v;
+    }
+
+    // Integer literals
+
+    constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return static_cast<std::int8_t>(x); }
+    constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return static_cast<std::int16_t>(x); }
+    constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return static_cast<std::int32_t>(x); }
+    constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return static_cast<std::int64_t>(x); }
+    constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return static_cast<std::uint8_t>(x); }
+    constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return static_cast<std::uint16_t>(x); }
+    constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return static_cast<std::uint32_t>(x); }
+    constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return static_cast<std::uint64_t>(x); }
+
+    // Number parsing
+
+    RS_ENUM(ParseNumber, int,
+        ok,
+        invalid_base,
+        invalid_number,
+        out_of_range,
+    )
+
+    namespace Detail {
+
+        template <std::unsigned_integral T>
+        ParseNumber parse_unsigned_integer(std::string_view str, T& t, int base) {
+
+            using limits = std::numeric_limits<T>;
+
+            if (str.empty()) {
+                return ParseNumber::invalid_number;
+            }
+
+            if (base == 0 && str.size() >= 3 && str[0] == '0') {
+                if (str[1] == 'B' || str[1] == 'b') {
+                    return parse_unsigned_integer(str.substr(2), t, 2);
+                } else if (str[1] == 'X' || str[1] == 'x') {
+                    return parse_unsigned_integer(str.substr(2), t, 16);
+                }
+            }
+
+            auto t_base = static_cast<T>(base);
+            auto max_before_multiply = limits::max() / t_base;
+            T digit {};
+            T value {};
+
+            for (auto c: str) {
+
+                if (ascii_isdigit(c)) {
+                    digit = static_cast<T>(c - '0');
+                } else if (base >= 11 && ascii_isupper(c)) {
+                    digit = static_cast<T>(c - 'A' + 10);
+                } else if (base >= 11 && ascii_islower(c)) {
+                    digit = static_cast<T>(c - 'a' + 10);
+                } else {
+                    return ParseNumber::invalid_number;
+                }
+
+                if (digit >= t_base) {
+                    return ParseNumber::invalid_number;
+                } else if (value > max_before_multiply) {
+                    return ParseNumber::out_of_range;
+                }
+
+                value = t_base * value + digit;
+
+                if (value < digit) {
+                    return ParseNumber::out_of_range;
+                }
+
+            }
+
+            t = value;
+
+            return ParseNumber::ok;
+
+        }
+
+        template <std::signed_integral T>
+        ParseNumber parse_signed_integer(std::string_view str, T& t, int base) {
+
+            using U = std::make_unsigned_t<T>;
+            using limits = std::numeric_limits<T>;
+
+            static constexpr auto max_value = static_cast<U>(limits::max());
+
+            auto negative = false;
+
+            if (! str.empty()) {
+                negative = str[0] == '-';
+                if (negative || str[0] == '+') {
+                    str = str.substr(1);
+                }
+            }
+
+            U u {};
+            auto rc = parse_unsigned_integer<U>(str, u, base);
+
+            if (rc != ParseNumber::ok) {
+                return rc;
+            } else if (u > max_value + static_cast<T>(negative)) {
+                return ParseNumber::out_of_range;
+            }
+
+            if (negative && u != 0) {
+                t = T{-1} - static_cast<T>(u - 1);
+            } else {
+                t = static_cast<T>(u);
+            }
+
+            return ParseNumber::ok;
+
+        }
+
+    }
+
+    template <std::integral T>
+    ParseNumber parse_number(std::string_view str, T& t, int base = 10) {
+        if (base < 0 || base == 1 || base > 36) {
+            return ParseNumber::invalid_base;
+        }
+        if constexpr (std::signed_integral<T>) {
+            return Detail::parse_signed_integer<T>(str, t, base);
+        } else {
+            return Detail::parse_unsigned_integer<T>(str, t, base);
+        }
+    }
+
+    template <std::floating_point T>
+    ParseNumber parse_number(std::string_view str, T& t) {
+
+        if (str.empty() || ! ascii_isgraph(str[0])) {
+            return ParseNumber::invalid_number;
+        }
+
+        T rc;
+        std::string str_copy {str};
+        char* endptr {nullptr};
+        errno = 0;
+
+        if constexpr (sizeof(T) <= sizeof(float)) {
+            rc = static_cast<T>(std::strtof(str_copy.data(), &endptr));
+        } else if constexpr (sizeof(T) <= sizeof(double)) {
+            rc = static_cast<T>(std::strtod(str_copy.data(), &endptr));
+        } else {
+            rc = static_cast<T>(std::strtold(str_copy.data(), &endptr));
+        }
+
+        int err = errno;
+
+        if (err == 0) {
+            t = rc;
+            if (endptr == str_copy.data() + str_copy.size()) {
+                return ParseNumber::ok;
+            } else {
+                return ParseNumber::invalid_number;
+            }
+        } else if (err == ERANGE) {
+            return ParseNumber::out_of_range;
+        } else {
+            return ParseNumber::invalid_number;
+        }
+
+    }
+
+    template <std::integral T>
+    std::optional<T> parse_number_maybe(std::string_view str, int base = 10) {
+        T t {};
+        if (parse_number(str, t, base) == ParseNumber::ok) {
+            return t;
+        } else {
+            return {};
+        }
+    }
+
+    template <std::floating_point T>
+    std::optional<T> parse_number_maybe(std::string_view str) {
+        T t {};
+        if (parse_number(str, t) == ParseNumber::ok) {
+            return t;
+        } else {
+            return {};
+        }
     }
 
     // Formatters
@@ -707,44 +881,40 @@ namespace RS {
     };
 
         inline Uuid::Uuid(std::string_view str) {
+
             if (str.empty()) {
                 return;
             }
+
             static constexpr auto is_separator = [] (char c) {
                 return ascii_isblank(c) || ascii_ispunct(c);
             };
+
             auto i = 0uz;
             auto j = 0uz;
-            while (i < str.size() && j < 16) {
-                auto len = str.size() - i;
-                if (len >= 2 && str[i] == '0' && (str[i + 1] == 'X' || str[i + 1] == 'x')) {
-                    i += 2;
-                } else if (len >= 2 && ascii_isxdigit(str[i]) && ascii_isxdigit(str[i + 1])) {
-                    for (auto k = 0; k < 2; ++k) {
-                        bytes_[j] *= 16;
-                        auto c = str[i + k];
-                        if (ascii_isdigit(c)) {
-                            bytes_[j] += static_cast<std::uint8_t>(c - '0');
-                        } else if (ascii_isupper(c)) {
-                            bytes_[j] += static_cast<std::uint8_t>(c - 'A' + 10);
-                        } else {
-                            bytes_[j] += static_cast<std::uint8_t>(c - 'a' + 10);
-                        }
-                    }
-                    i += 2;
-                    ++j;
-                } else if (is_separator(str[i])) {
+            auto last_pos = str.size() - 1;
+
+            while (i < last_pos && j < 16) {
+                if (is_separator(str[i])) {
                     ++i;
+                } else if (str[i] == '0' && (str[i + 1] == 'X' || str[i + 1] == 'x')) {
+                    i += 2;
+                } else if (ascii_isxdigit(str[i]) && ascii_isxdigit(str[i + 1])) {
+                    parse_number(str.substr(i, 2), bytes_[j++], 16);
+                    i += 2;
                 } else {
                     break;
                 }
             }
+
             while (i < str.size() && is_separator(str[i])) {
                 ++i;
             }
+
             if (i < str.size() || j < 16) {
                 throw std::invalid_argument(std::format("Invalid UUID: {:?}", str));
             }
+
         }
 
         inline std::string Uuid::str() const {
