@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.33
+    VERSION 0.1.34
     LANGUAGES CXX
 )
 
@@ -45,6 +45,7 @@ add_executable(${unittest}
     test/core-enum-test.cpp
     test/core-format-test.cpp
     test/core-hash-test.cpp
+    test/core-io-test.cpp
     test/core-iterator-test.cpp
     test/core-parse-number-test.cpp
     test/core-random-test.cpp
