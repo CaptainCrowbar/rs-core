@@ -67,3 +67,21 @@ void test_rs_core_uuid() {
     TEST(! (z == w));  TEST(z != w);      TEST(z < w);      TEST(! (z > w));  TEST(z <= w);      TEST(! (z >= w));
 
 }
+
+void test_rs_core_uuid_random() {
+
+    static constexpr auto iterations = 20;
+
+    Uuid u, v;
+    std::string s;
+    Pcg rng;
+
+    for (auto i = 0; i < iterations; ++i) {
+        TRY(u = Uuid::random(rng));
+        TEST(u != v);
+        TEST_EQUAL(u.version(), 4);
+        TRY(s = u.str());
+        TEST_MATCH(s, "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
+    }
+
+}

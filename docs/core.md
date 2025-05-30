@@ -610,7 +610,8 @@ constexpr Uuid::Uuid() noexcept;
 The default constructor creates an all-zero UUID.
 
 ```c++
-constexpr Uuid::Uuid(std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d,
+constexpr Uuid::Uuid
+    (std::uint8_t a, std::uint8_t b, std::uint8_t c, std::uint8_t d,
     std::uint8_t e, std::uint8_t f, std::uint8_t g, std::uint8_t h,
     std::uint8_t i, std::uint8_t j, std::uint8_t k, std::uint8_t l,
     std::uint8_t m, std::uint8_t n, std::uint8_t o, std::uint8_t p) noexcept;
@@ -641,7 +642,8 @@ Other life cycle functions.
 
 ```c++
 constexpr std::uint8_t& Uuid::operator[](std::size_t i) noexcept;
-constexpr const std::uint8_t& Uuid::operator[](std::size_t i) const noexcept;
+constexpr const std::uint8_t& Uuid::operator[](std::size_t i)
+    const noexcept;
 ```
 
 Access to individual bytes. Behaviour is undefined if `i>=16.`
@@ -673,11 +675,24 @@ These convert the UUID to a string, in the standard format:
 `"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".`
 
 ```c++
-constexpr static Uuid Uuid::read(const void* ptr) noexcept;
+constexpr int Uuid::version() const noexcept;
+```
+
+Returns the UUID version.
+
+```c++
+static Uuid Uuid::read(const void* ptr) noexcept;
 ```
 
 Copies the bytes of a UUID from a block of memory. Behaviour is undefined if
 the pointer is null or does not point to a valid array of at least 16 bytes.
+
+```c++
+template <std::uniform_random_bit_generator RNG>
+    static Uuid Uuid::random(RNG& rng);
+```
+
+Generates a random type 4 UUID.
 
 ```c++
 constexpr bool operator==(const Uuid& u, const Uuid& v) noexcept;
@@ -686,7 +701,8 @@ constexpr bool operator<(const Uuid& u, const Uuid& v) noexcept;
 constexpr bool operator>(const Uuid& u, const Uuid& v) noexcept;
 constexpr bool operator<=(const Uuid& u, const Uuid& v) noexcept;
 constexpr bool operator>=(const Uuid& u, const Uuid& v) noexcept;
-constexpr std::strong_ordering operator<=>(const Uuid& u, const Uuid& v) noexcept;
+constexpr std::strong_ordering operator<=>
+    (const Uuid& u, const Uuid& v) noexcept;
 ```
 
 Comparison operators.

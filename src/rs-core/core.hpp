@@ -17,6 +17,7 @@
 #include <iterator>
 #include <limits>
 #include <optional>
+#include <random>
 #include <ranges>
 #include <set>
 #include <stdexcept>
@@ -1107,15 +1108,13 @@ namespace RS {
         constexpr const std::uint8_t* end() const noexcept { return begin() + 16; }
 
         constexpr std::size_t hash() const noexcept { return kernighan_hash(begin(), 16); }
+        constexpr int version() const noexcept { return static_cast<int>(bytes_[6] >> 4); }
         std::string str() const;
         std::string rs_core_format() const { return str(); }
         explicit operator std::string() const { return str(); }
 
-        constexpr static Uuid read(const void* ptr) noexcept {
-            Uuid u;
-            std::memcpy(u.bytes_.data(), ptr, 16);
-            return u;
-        }
+        template <std::uniform_random_bit_generator RNG> static Uuid random(RNG& rng);
+        static Uuid read(const void* ptr) noexcept;
 
         friend constexpr bool operator==(const Uuid& u, const Uuid& v) noexcept { return u.bytes_ == v.bytes_; }
         friend constexpr auto operator<=>(const Uuid& u, const Uuid& v) noexcept { return u.bytes_ <=> v.bytes_; }
@@ -1168,6 +1167,35 @@ namespace RS {
                 ("{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
                 bytes_[0], bytes_[1], bytes_[2], bytes_[3], bytes_[4], bytes_[5], bytes_[6], bytes_[7],
                 bytes_[8], bytes_[9], bytes_[10], bytes_[11], bytes_[12], bytes_[13], bytes_[14], bytes_[15]);
+        }
+
+        template <std::uniform_random_bit_generator RNG>
+        inline Uuid Uuid::random(RNG& rng) {
+
+            std::uniform_int_distribution<std::uint32_t> dist;
+            Uuid u;
+            auto ptr = u.begin();
+
+            for (auto i = 0; i < 4; ++i) {
+                auto x = dist(rng);
+                for (auto j = 0; j < 4; ++j, x >>= 8) {
+                    *ptr++ = static_cast<std::uint8_t>(x);
+                }
+            }
+
+            u[6] &= 0x0f;
+            u[6] |= 0x40;
+            u[8] &= 0x3f;
+            u[8] |= 0x80;
+
+            return u;
+
+        }
+
+        inline Uuid Uuid::read(const void* ptr) noexcept {
+            Uuid u;
+            std::memcpy(u.bytes_.data(), ptr, 16);
+            return u;
         }
 
 }

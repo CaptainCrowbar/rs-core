@@ -33,6 +33,7 @@ void test_rs_core_random_pcg_engine();
 void test_rs_core_range_functions();
 void test_rs_core_scope_guard();
 void test_rs_core_uuid();
+void test_rs_core_uuid_random();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
 void test_rs_core_version();
@@ -70,6 +71,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_range_functions, "test_rs_core_range_functions");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
     call_me_maybe(test_rs_core_uuid, "test_rs_core_uuid");
+    call_me_maybe(test_rs_core_uuid_random, "test_rs_core_uuid_random");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");
     call_me_maybe(test_rs_core_version, "test_rs_core_version");
