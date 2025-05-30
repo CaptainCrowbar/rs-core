@@ -29,6 +29,7 @@ Requires C++23.
 * [`rs-core/iterator.hpp` -- Iterator base classes](iterator.html)
 * [`rs-core/random.hpp` -- Random number generators](random.html)
 * [`rs-core/scope.hpp` -- Scope guards](scope.html)
+* [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
 * [`rs-core/typename.hpp` -- Type names](typename.html)
 * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
 * [`rs-core/version.hpp` -- Version information](version.html)

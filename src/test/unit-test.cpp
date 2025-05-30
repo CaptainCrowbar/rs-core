@@ -32,6 +32,7 @@ void test_rs_core_iterator_random_access_iterators();
 void test_rs_core_iterator_contiguous_iterators();
 void test_rs_core_random_pcg_engine();
 void test_rs_core_scope_guard();
+void test_rs_core_terminal_escape_codes();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
 void test_rs_core_uuid_class();
@@ -70,6 +71,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_iterator_contiguous_iterators, "test_rs_core_iterator_contiguous_iterators");
     call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
+    call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");
     call_me_maybe(test_rs_core_uuid_class, "test_rs_core_uuid_class");
