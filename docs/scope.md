@@ -3,7 +3,7 @@
 _[Core utility library by Ross Smith](index.html)_
 
 ```c++
-#include "rs-core/scope-guard.hpp"
+#include "rs-core/scope.hpp"
 namespace RS;
 ```
 

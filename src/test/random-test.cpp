@@ -1,4 +1,4 @@
-#include "rs-core/core.hpp"
+#include "rs-core/random.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cstdint>
 #include <vector>

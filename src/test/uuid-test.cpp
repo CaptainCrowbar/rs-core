@@ -1,4 +1,6 @@
-#include "rs-core/core.hpp"
+#include "rs-core/uuid.hpp"
+#include "rs-core/format.hpp"
+#include "rs-core/random.hpp"
 #include "rs-core/unit-test.hpp"
 #include <format>
 #include <stdexcept>
@@ -6,7 +8,7 @@
 
 using namespace RS;
 
-void test_rs_core_uuid() {
+void test_rs_core_uuid_class() {
 
     Uuid u, v, w, z;
     std::string s;

@@ -7,17 +7,22 @@
 
 using namespace RS::UnitTest;
 
-void test_rs_core_bitmask_functions();
-void test_rs_core_character_functions();
-void test_rs_core_enum();
+void test_rs_core_global_character_functions();
+void test_rs_core_global_range_functions();
+void test_rs_core_arithmetic_bitmask_functions();
+void test_rs_core_arithmetic_parse_integers();
+void test_rs_core_arithmetic_parse_integers_maybe();
+void test_rs_core_arithmetic_parse_floating_point();
+void test_rs_core_arithmetic_parse_floating_point_maybe();
+void test_rs_core_enum_class();
 void test_rs_core_enum_bitmask();
 void test_rs_core_format_concepts();
 void test_rs_core_format_automation();
 void test_rs_core_hash_kernighan();
 void test_rs_core_hash_mix();
-void test_rs_core_io_cstdio();
-void test_rs_core_io_line_iterator();
-void test_rs_core_io_read_write_file();
+void test_rs_core_io_cstdio_class();
+void test_rs_core_io_cstdio_line_iterator();
+void test_rs_core_io_cstdio_read_write_file();
 void test_rs_core_iterator_tags();
 void test_rs_core_iterator_output_iterators();
 void test_rs_core_iterator_input_iterators();
@@ -25,17 +30,12 @@ void test_rs_core_iterator_forward_iterators();
 void test_rs_core_iterator_bidirectional_iterators();
 void test_rs_core_iterator_random_access_iterators();
 void test_rs_core_iterator_contiguous_iterators();
-void test_rs_core_parse_integers();
-void test_rs_core_parse_integers_maybe();
-void test_rs_core_parse_floating_point();
-void test_rs_core_parse_floating_point_maybe();
 void test_rs_core_random_pcg_engine();
-void test_rs_core_range_functions();
 void test_rs_core_scope_guard();
-void test_rs_core_uuid();
-void test_rs_core_uuid_random();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
+void test_rs_core_uuid_class();
+void test_rs_core_uuid_random();
 void test_rs_core_version();
 
 int main(int argc, char** argv) {
@@ -45,17 +45,22 @@ int main(int argc, char** argv) {
     std::println("{}Running unit tests{}", xhead, xreset);
     std::println("{}{}{}", xrule, rule, xreset);
 
-    call_me_maybe(test_rs_core_bitmask_functions, "test_rs_core_bitmask_functions");
-    call_me_maybe(test_rs_core_character_functions, "test_rs_core_character_functions");
-    call_me_maybe(test_rs_core_enum, "test_rs_core_enum");
+    call_me_maybe(test_rs_core_global_character_functions, "test_rs_core_global_character_functions");
+    call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
+    call_me_maybe(test_rs_core_arithmetic_bitmask_functions, "test_rs_core_arithmetic_bitmask_functions");
+    call_me_maybe(test_rs_core_arithmetic_parse_integers, "test_rs_core_arithmetic_parse_integers");
+    call_me_maybe(test_rs_core_arithmetic_parse_integers_maybe, "test_rs_core_arithmetic_parse_integers_maybe");
+    call_me_maybe(test_rs_core_arithmetic_parse_floating_point, "test_rs_core_arithmetic_parse_floating_point");
+    call_me_maybe(test_rs_core_arithmetic_parse_floating_point_maybe, "test_rs_core_arithmetic_parse_floating_point_maybe");
+    call_me_maybe(test_rs_core_enum_class, "test_rs_core_enum_class");
     call_me_maybe(test_rs_core_enum_bitmask, "test_rs_core_enum_bitmask");
     call_me_maybe(test_rs_core_format_concepts, "test_rs_core_format_concepts");
     call_me_maybe(test_rs_core_format_automation, "test_rs_core_format_automation");
     call_me_maybe(test_rs_core_hash_kernighan, "test_rs_core_hash_kernighan");
     call_me_maybe(test_rs_core_hash_mix, "test_rs_core_hash_mix");
-    call_me_maybe(test_rs_core_io_cstdio, "test_rs_core_io_cstdio");
-    call_me_maybe(test_rs_core_io_line_iterator, "test_rs_core_io_line_iterator");
-    call_me_maybe(test_rs_core_io_read_write_file, "test_rs_core_io_read_write_file");
+    call_me_maybe(test_rs_core_io_cstdio_class, "test_rs_core_io_cstdio_class");
+    call_me_maybe(test_rs_core_io_cstdio_line_iterator, "test_rs_core_io_cstdio_line_iterator");
+    call_me_maybe(test_rs_core_io_cstdio_read_write_file, "test_rs_core_io_cstdio_read_write_file");
     call_me_maybe(test_rs_core_iterator_tags, "test_rs_core_iterator_tags");
     call_me_maybe(test_rs_core_iterator_output_iterators, "test_rs_core_iterator_output_iterators");
     call_me_maybe(test_rs_core_iterator_input_iterators, "test_rs_core_iterator_input_iterators");
@@ -63,17 +68,12 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_iterator_bidirectional_iterators, "test_rs_core_iterator_bidirectional_iterators");
     call_me_maybe(test_rs_core_iterator_random_access_iterators, "test_rs_core_iterator_random_access_iterators");
     call_me_maybe(test_rs_core_iterator_contiguous_iterators, "test_rs_core_iterator_contiguous_iterators");
-    call_me_maybe(test_rs_core_parse_integers, "test_rs_core_parse_integers");
-    call_me_maybe(test_rs_core_parse_integers_maybe, "test_rs_core_parse_integers_maybe");
-    call_me_maybe(test_rs_core_parse_floating_point, "test_rs_core_parse_floating_point");
-    call_me_maybe(test_rs_core_parse_floating_point_maybe, "test_rs_core_parse_floating_point_maybe");
     call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
-    call_me_maybe(test_rs_core_range_functions, "test_rs_core_range_functions");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
-    call_me_maybe(test_rs_core_uuid, "test_rs_core_uuid");
-    call_me_maybe(test_rs_core_uuid_random, "test_rs_core_uuid_random");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");
+    call_me_maybe(test_rs_core_uuid_class, "test_rs_core_uuid_class");
+    call_me_maybe(test_rs_core_uuid_random, "test_rs_core_uuid_random");
     call_me_maybe(test_rs_core_version, "test_rs_core_version");
 
     std::println("{}{}{}", xrule, rule, xreset);

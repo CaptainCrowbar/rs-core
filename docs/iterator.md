@@ -1,4 +1,4 @@
-# Iterator Helpers
+# Iterator Base Classes
 
 _[Core utility library by Ross Smith](index.html)_
 

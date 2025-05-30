@@ -1,4 +1,5 @@
-#include "rs-core/core.hpp"
+#include "rs-core/enum.hpp"
+#include "rs-core/format.hpp"
 #include "rs-core/unit-test.hpp"
 #include <concepts>
 #include <cstdint>
@@ -32,7 +33,7 @@ namespace {
 
 }
 
-void test_rs_core_enum() {
+void test_rs_core_enum_class() {
 
     static_assert(std::same_as<std::underlying_type_t<Simple>, int>);
     static_assert(std::same_as<std::underlying_type_t<Complicated>, unsigned>);

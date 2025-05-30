@@ -1,4 +1,4 @@
-#include "rs-core/core.hpp"
+#include "rs-core/arithmetic.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cmath>
 #include <cstdint>
@@ -6,7 +6,57 @@
 
 using namespace RS;
 
-void test_rs_core_parse_integers() {
+namespace {
+
+    enum class MyBitmask: int {
+        none     = 0,
+        alpha    = 1,
+        bravo    = 2,
+        charlie  = 4,
+        all      = 7,
+    };
+
+}
+
+void test_rs_core_arithmetic_bitmask_functions() {
+
+    int n;
+
+    n = 0;  TEST(! has_bit(n, 0));  TEST(! has_bits(n, 0));
+    n = 0;  TEST(! has_bit(n, 1));  TEST(! has_bits(n, 1));
+    n = 6;  TEST(! has_bit(n, 1));  TEST(! has_bits(n, 1));
+    n = 6;  TEST(has_bit(n, 2));    TEST(has_bits(n, 2));
+    n = 6;  TEST(has_bit(n, 4));    TEST(has_bits(n, 4));
+    n = 6;  TEST(has_bit(n, 7));    TEST(! has_bits(n, 7));
+
+    unsigned u;
+
+    u = 0;  TEST(! has_bit(u, 0));  TEST(! has_bits(u, 0));
+    u = 0;  TEST(! has_bit(u, 1));  TEST(! has_bits(u, 1));
+    u = 6;  TEST(! has_bit(u, 1));  TEST(! has_bits(u, 1));
+    u = 6;  TEST(has_bit(u, 2));    TEST(has_bits(u, 2));
+    u = 6;  TEST(has_bit(u, 4));    TEST(has_bits(u, 4));
+    u = 6;  TEST(has_bit(u, 7));    TEST(! has_bits(u, 7));
+
+    MyBitmask b;
+
+    b = MyBitmask::none;   TEST(! has_bit(b, 0));  TEST(! has_bits(b, 0));
+    b = MyBitmask::none;   TEST(! has_bit(b, 1));  TEST(! has_bits(b, 1));
+    b = MyBitmask::bravo;  TEST(! has_bit(b, 1));  TEST(! has_bits(b, 1));
+    b = MyBitmask::bravo;  TEST(has_bit(b, 2));    TEST(has_bits(b, 2));
+    b = MyBitmask::bravo;  TEST(! has_bit(b, 4));  TEST(! has_bits(b, 4));
+    b = MyBitmask::bravo;  TEST(has_bit(b, 7));    TEST(! has_bits(b, 7));
+
+    b = MyBitmask::none;   TEST(! has_bit(b, MyBitmask::none));     TEST(! has_bits(b, MyBitmask::none));
+    b = MyBitmask::none;   TEST(! has_bit(b, MyBitmask::alpha));    TEST(! has_bits(b, MyBitmask::alpha));
+    b = MyBitmask::bravo;  TEST(! has_bit(b, MyBitmask::alpha));    TEST(! has_bits(b, MyBitmask::alpha));
+    b = MyBitmask::bravo;  TEST(has_bit(b, MyBitmask::bravo));      TEST(has_bits(b, MyBitmask::bravo));
+    b = MyBitmask::bravo;  TEST(! has_bit(b, MyBitmask::charlie));  TEST(! has_bits(b, MyBitmask::charlie));
+    b = MyBitmask::bravo;  TEST(has_bit(b, MyBitmask::all));        TEST(! has_bits(b, MyBitmask::all));
+
+}
+
+void test_rs_core_arithmetic_parse_integers() {
 
     ParseNumber rc {};
     std::int16_t i {};
@@ -102,7 +152,7 @@ void test_rs_core_parse_integers() {
 
 }
 
-void test_rs_core_parse_integers_maybe() {
+void test_rs_core_arithmetic_parse_integers_maybe() {
 
     std::optional<std::int16_t> i;
     std::optional<std::uint16_t> u;
@@ -197,7 +247,7 @@ void test_rs_core_parse_integers_maybe() {
 
 }
 
-void test_rs_core_parse_floating_point() {
+void test_rs_core_arithmetic_parse_floating_point() {
 
     ParseNumber rc {};
     double x {};
@@ -226,7 +276,7 @@ void test_rs_core_parse_floating_point() {
 
 }
 
-void test_rs_core_parse_floating_point_maybe() {
+void test_rs_core_arithmetic_parse_floating_point_maybe() {
 
     std::optional<double> x {};
 

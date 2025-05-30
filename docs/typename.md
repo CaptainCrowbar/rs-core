@@ -7,6 +7,11 @@ _[Core utility library by Ross Smith](index.html)_
 namespace RS;
 ```
 
+## Contents
+
+* TOC
+{:toc}
+
 ## Type names
 
 This header provides human readable type names on compilers that don't supply

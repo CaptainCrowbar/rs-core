@@ -14,21 +14,23 @@ namespace RS;
 ## Introduction
 
 This is a set of basic utilities that I use throughout my C++ code, collected
-here to avoid widespread duplication. Most of the contents are generic
-metaprogramming utilities used in the definition of more specialized classes
-and functions in specific projects.
-
-Most of the utilities are combined into the `"rs-core/core.hpp"` header,
-because I frequently use many of them together. Those that implicitly import
-system headers that are not part of the C++ standard library are in separate
-headers of their own, to avoid unnecessary dependencies.
+here to avoid widespread duplication.
 
 Requires C++23.
 
 ## Index of headers
 
-* [`rs-core/core.hpp` -- Core utilities](core.html)
+* [`rs-core/global.hpp` -- Global utilities](global.html)
+* [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
+* [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
+* [`rs-core/format.hpp` -- Formatting helpers](format.html)
+* [`rs-core/hash.hpp` -- Hash functions](hash.html)
+* [`rs-core/io.hpp` -- I/O utilities](io.html)
+* [`rs-core/iterator.hpp` -- Iterator base classes](iterator.html)
+* [`rs-core/random.hpp` -- Random number generators](random.html)
+* [`rs-core/scope.hpp` -- Scope guards](scope.html)
 * [`rs-core/typename.hpp` -- Type names](typename.html)
+* [`rs-core/uuid.hpp` -- UUID class](uuid.html)
 * [`rs-core/version.hpp` -- Version information](version.html)
 
 ## Using the library

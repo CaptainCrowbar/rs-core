@@ -1,4 +1,4 @@
-#include "rs-core/core.hpp"
+#include "rs-core/hash.hpp"
 #include "rs-core/unit-test.hpp"
 #include <string>
 
@@ -8,10 +8,10 @@ void test_rs_core_hash_kernighan() {
 
     std::string s;
 
-    s = "";                    TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0x0000'0000_u32);
-    s = "Hello world";         TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0xce59'8aa4_u32);
-    s = "Goodnight moon";      TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0x6758'daa6_u32);
-    s = "Here comes the sun";  TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0xdda4'f4dc_u32);
+    s = "";                    TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0x0000'0000ul);
+    s = "Hello world";         TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0xce59'8aa4ul);
+    s = "Goodnight moon";      TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0x6758'daa6ul);
+    s = "Here comes the sun";  TEST_EQUAL(kernighan_hash(s.data(), s.size()), 0xdda4'f4dcul);
 
 }
 

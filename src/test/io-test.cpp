@@ -1,4 +1,4 @@
-#include "rs-core/core.hpp"
+#include "rs-core/io.hpp"
 #include "rs-core/unit-test.hpp"
 #include <filesystem>
 #include <string>
@@ -6,7 +6,7 @@
 
 using namespace RS;
 
-void test_rs_core_io_cstdio() {
+void test_rs_core_io_cstdio_class() {
 
     std::string s;
     std::filesystem::path p{"test-file"};
@@ -53,7 +53,7 @@ void test_rs_core_io_cstdio() {
 
 }
 
-void test_rs_core_io_line_iterator() {
+void test_rs_core_io_cstdio_line_iterator() {
 
     std::string s;
     std::filesystem::path p{"test-file"};
@@ -107,7 +107,7 @@ void test_rs_core_io_line_iterator() {
 
 }
 
-void test_rs_core_io_read_write_file() {
+void test_rs_core_io_cstdio_read_write_file() {
 
     std::string s;
     std::filesystem::path p{"test-file"};

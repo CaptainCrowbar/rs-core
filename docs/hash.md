@@ -1,4 +1,4 @@
-# Hash Function Helpers
+# Hash Functions
 
 _[Core utility library by Ross Smith](index.html)_
 
