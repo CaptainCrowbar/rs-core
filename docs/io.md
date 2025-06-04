@@ -72,10 +72,33 @@ The destructor will close the stream handle, unless the handle is null or one
 of the three standard streams.
 
 ```c++
+void Cstdio::close();
+```
+
+Closes the stream and resets the internal `FILE*` pointer to null. This will
+do nothing if the stream was already null; if it is one of the three standard
+streams, the pointer will be reset but the stream will not be affected. This
+can throw if something goes wrong while closing the stream, but the pointer
+will be reset regardless. Other operations (destructor and assignment
+operator) that close the stream will ignore errors while closing.
+
+```c++
 bool Cstdio::eof() const noexcept;
 ```
 
 True if the stream's EOF flag has been set (and the stream is not null).
+
+```c++
+bool Cstdio::error() const noexcept;
+```
+
+True if the stream's error flag has been set, or the stream is null.
+
+```c++
+void Cstdio::flush();
+```
+
+Flushes the stream. This will do nothing if the stream is null.
 
 ```c++
 std::FILE* Cstdio::handle() const noexcept;

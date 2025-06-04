@@ -11,12 +11,16 @@
 #include <string_view>
 
 #ifdef _WIN32
+
     extern "C" {
         void* __stdcall GetStdHandle(unsigned long nStdHandle);
         int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
     }
+
 #else
+
     #include <unistd.h>
+
 #endif
 
 namespace RS {

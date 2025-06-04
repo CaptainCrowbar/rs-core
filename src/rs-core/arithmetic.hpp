@@ -2,8 +2,10 @@
 
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
+#include <algorithm>
 #include <cerrno>
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
@@ -61,6 +63,37 @@ namespace RS {
     constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return static_cast<std::uint16_t>(x); }
     constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return static_cast<std::uint32_t>(x); }
     constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return static_cast<std::uint64_t>(x); }
+
+    // Number formatting
+
+    template <std::unsigned_integral T>
+    std::string& append_number(std::string& str, T t, std::size_t digits = 1, int base = 10) {
+        static constexpr auto zero_offset = static_cast<T>('0');
+        static constexpr auto alpha_offset = static_cast<T>('a' - 10);
+        auto pos = str.size();
+        auto t_base = static_cast<T>(base);
+        for (auto i = 0uz; i < digits || t != 0; ++i, t /= t_base) {
+            auto digit = t % t_base;
+            if (digit < 10) {
+                str += static_cast<char>(digit + zero_offset);
+            } else {
+                str += static_cast<char>(digit + alpha_offset);
+            }
+        }
+        std::reverse(str.begin() + pos, str.end());
+        return str;
+    }
+
+    template <std::signed_integral T>
+    std::string& append_number(std::string& str, T t, std::size_t digits = 1, int base = 10) {
+        using U = std::make_unsigned_t<T>;
+        auto u = static_cast<U>(t);
+        if (t < 0) {
+            str += '-';
+            u = U{} - u;
+        }
+        return append_number(str, u, digits, base);
+    }
 
     // Number parsing
 

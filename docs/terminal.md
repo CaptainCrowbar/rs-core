@@ -3,7 +3,7 @@
 _[Core utility library by Ross Smith](index.html)_
 
 ```c++
-#include "rs-core/io.hpp"
+#include "rs-core/terminal.hpp"
 namespace RS;
 ```
 

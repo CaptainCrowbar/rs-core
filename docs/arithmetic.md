@@ -42,6 +42,19 @@ constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept;
 
 Defined for convenience.
 
+## Number formatting
+
+```c++
+template <std::unsigned_integral T>
+    std::string& append_number(std::string& str, T t, std::size_t digits = 1,
+        int base = 10);
+template <std::signed_integral T>
+    std::string& append_number(std::string& str, T t, std::size_t digits = 1,
+        int base = 10);
+```
+
+Simple formatters to append an integer to a string.
+
 ## Number parsing
 
 ```c++

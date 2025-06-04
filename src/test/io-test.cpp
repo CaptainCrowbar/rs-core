@@ -9,7 +9,7 @@ using namespace RS;
 void test_rs_core_io_cstdio_class() {
 
     std::string s;
-    std::filesystem::path p{"test-file"};
+    std::filesystem::path p{"__test_file__"};
     auto n = 0uz;
     auto z = 0z;
 
@@ -56,7 +56,7 @@ void test_rs_core_io_cstdio_class() {
 void test_rs_core_io_cstdio_line_iterator() {
 
     std::string s;
-    std::filesystem::path p{"test-file"};
+    std::filesystem::path p{"__test_file__"};
     Cstdio::line_range lines;
     Cstdio::iterator i;
 
@@ -110,7 +110,7 @@ void test_rs_core_io_cstdio_line_iterator() {
 void test_rs_core_io_cstdio_read_write_file() {
 
     std::string s;
-    std::filesystem::path p{"test-file"};
+    std::filesystem::path p{"__test_file__"};
 
     TRY(Cstdio::write_file("Hello world\n", p));
     TEST(std::filesystem::exists(p));

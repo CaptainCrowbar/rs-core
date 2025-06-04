@@ -42,9 +42,12 @@ namespace RS {
         Cstdio& operator=(Cstdio&& io) noexcept;
         Cstdio(const Cstdio&) = delete;
         Cstdio& operator=(const Cstdio&) = delete;
-        ~Cstdio() noexcept { close(); }
+        ~Cstdio() noexcept { close_stream(false); }
 
+        void close() { close_stream(true); }
         bool eof() const noexcept { return stream_ != nullptr && std::feof(stream_) != 0; }
+        bool error() const noexcept { return stream_ == nullptr || std::ferror(stream_) != 0; }
+        void flush();
         std::FILE* handle() const noexcept { return stream_; }
         line_range lines(bool trim_crlf = false);
         std::size_t read(void* ptr, std::size_t len);
@@ -64,7 +67,7 @@ namespace RS {
         std::FILE* stream_{nullptr};
 
         void check(int err) const;
-        void close() noexcept;
+        void close_stream(bool checked);
 
     };
 
@@ -94,10 +97,18 @@ namespace RS {
 
         inline Cstdio& Cstdio::operator=(Cstdio&& io) noexcept {
             if (&io != this) {
-                close();
+                close_stream(false);
                 stream_ = std::exchange(io.stream_, nullptr);
             }
             return *this;
+        }
+
+        inline void Cstdio::flush() {
+            if (stream_ != nullptr) {
+                errno = 0;
+                std::fflush(stream_);
+                check(errno);
+            }
         }
 
         inline Cstdio::line_range Cstdio::lines(bool trim_crlf) {
@@ -249,11 +260,18 @@ namespace RS {
             }
         }
 
-        inline void Cstdio::close() noexcept {
-            if (stream_ != nullptr && stream_ != stdin && stream_ != stdout && stream_ != stderr) {
+        inline void Cstdio::close_stream(bool checked) {
+            if (stream_ == stdin || stream_ == stdout || stream_ == stderr) {
+                stream_ = nullptr;
+            } else if (stream_ != nullptr) {
+                errno = 0;
                 std::fclose(stream_);
+                int err = errno;
+                stream_ = nullptr;
+                if (checked) {
+                    check(err);
+                }
             }
-            stream_ = nullptr;
         }
 
 }

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <optional>
+#include <string>
 
 using namespace RS;
 
@@ -53,6 +54,50 @@ void test_rs_core_arithmetic_bitmask_functions() {
     b = MyBitmask::bravo;  TEST(has_bit(b, MyBitmask::bravo));      TEST(has_bits(b, MyBitmask::bravo));
     b = MyBitmask::bravo;  TEST(! has_bit(b, MyBitmask::charlie));  TEST(! has_bits(b, MyBitmask::charlie));
     b = MyBitmask::bravo;  TEST(has_bit(b, MyBitmask::all));        TEST(! has_bits(b, MyBitmask::all));
+
+}
+
+void test_rs_core_arithmetic_append_integers() {
+
+    std::string s;
+
+    s = "*";  TRY(append_number(s, 0));                      TEST_EQUAL(s, "*0");
+    s = "*";  TRY(append_number(s, 42));                     TEST_EQUAL(s, "*42");
+    s = "*";  TRY(append_number(s, -42));                    TEST_EQUAL(s, "*-42");
+    s = "*";  TRY(append_number(s, 12345));                  TEST_EQUAL(s, "*12345");
+    s = "*";  TRY(append_number(s, -12345));                 TEST_EQUAL(s, "*-12345");
+    s = "*";  TRY(append_number(s, 0, 4));                   TEST_EQUAL(s, "*0000");
+    s = "*";  TRY(append_number(s, 42, 4));                  TEST_EQUAL(s, "*0042");
+    s = "*";  TRY(append_number(s, -42, 4));                 TEST_EQUAL(s, "*-0042");
+    s = "*";  TRY(append_number(s, 12345, 4));               TEST_EQUAL(s, "*12345");
+    s = "*";  TRY(append_number(s, -12345, 4));              TEST_EQUAL(s, "*-12345");
+    s = "*";  TRY(append_number(s, 0, 6));                   TEST_EQUAL(s, "*000000");
+    s = "*";  TRY(append_number(s, 42, 6));                  TEST_EQUAL(s, "*000042");
+    s = "*";  TRY(append_number(s, -42, 6));                 TEST_EQUAL(s, "*-000042");
+    s = "*";  TRY(append_number(s, 12345, 6));               TEST_EQUAL(s, "*012345");
+    s = "*";  TRY(append_number(s, -12345, 6));              TEST_EQUAL(s, "*-012345");
+    s = "*";  TRY(append_number(s, 0, 1, 16));               TEST_EQUAL(s, "*0");
+    s = "*";  TRY(append_number(s, 42, 1, 16));              TEST_EQUAL(s, "*2a");
+    s = "*";  TRY(append_number(s, -42, 1, 16));             TEST_EQUAL(s, "*-2a");
+    s = "*";  TRY(append_number(s, 12345, 1, 16));           TEST_EQUAL(s, "*3039");
+    s = "*";  TRY(append_number(s, -12345, 1, 16));          TEST_EQUAL(s, "*-3039");
+    s = "*";  TRY(append_number(s, 0u));                     TEST_EQUAL(s, "*0");
+    s = "*";  TRY(append_number(s, 42u));                    TEST_EQUAL(s, "*42");
+    s = "*";  TRY(append_number(s, 12345u));                 TEST_EQUAL(s, "*12345");
+    s = "*";  TRY(append_number(s, 0u, 4));                  TEST_EQUAL(s, "*0000");
+    s = "*";  TRY(append_number(s, 42u, 4));                 TEST_EQUAL(s, "*0042");
+    s = "*";  TRY(append_number(s, 12345u, 4));              TEST_EQUAL(s, "*12345");
+    s = "*";  TRY(append_number(s, 0u, 1, 16));              TEST_EQUAL(s, "*0");
+    s = "*";  TRY(append_number(s, 42u, 1, 16));             TEST_EQUAL(s, "*2a");
+    s = "*";  TRY(append_number(s, 12345u, 1, 16));          TEST_EQUAL(s, "*3039");
+    s = "*";  TRY(append_number(s, 32767_i16));              TEST_EQUAL(s, "*32767");
+    s = "*";  TRY(append_number(s, -32767_i16));             TEST_EQUAL(s, "*-32767");
+    s = "*";  TRY(append_number(s, -32767_i16 - 1));         TEST_EQUAL(s, "*-32768");
+    s = "*";  TRY(append_number(s, 65535_u16));              TEST_EQUAL(s, "*65535");
+    s = "*";  TRY(append_number(s, 32767_i16, 1, 16));       TEST_EQUAL(s, "*7fff");
+    s = "*";  TRY(append_number(s, -32767_i16, 1, 16));      TEST_EQUAL(s, "*-7fff");
+    s = "*";  TRY(append_number(s, -32767_i16 - 1, 1, 16));  TEST_EQUAL(s, "*-8000");
+    s = "*";  TRY(append_number(s, 65535_u16, 1, 16));       TEST_EQUAL(s, "*ffff");
 
 }
 
