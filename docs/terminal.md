@@ -30,7 +30,7 @@ explicit Xterm::Xterm(bool use_colour) noexcept;
 
 The constructor determines whether to generate colour control codes, and
 related codes such as font control. The default constructor will set colour
-mode only if `stdout_is_tty()` (see below) is true.
+mode only if `is_tty(stdout)` (see below) is true.
 
 ```c++
 Xterm::Xterm(const Xterm& xt) noexcept;
@@ -108,10 +108,9 @@ clamped to the range 0-5.
 
 ```c++
 enum class XtermMode: int {
-    dark,
-    light,
     unknown,
-    redirected,
+    light,
+    dark,
 };
 ```
 
@@ -132,15 +131,14 @@ static XtermMode Xterm::guess_mode() noexcept;
 ```
 
 Attempts to determine whether the output terminal. This checks the `COLORFGBG`
-environment variable, which is available on most Unix terminal emulators but
-will probably not be reliable on Windows. It will return `redirected` if
-`stdout_is_tty()` is false, and will return `unknown` if the variable is not
-available or has an unexpected format.
+environment variable, which is available on most Unix terminals but probably
+not reliable on Windows. It will return `unknown` if `is_tty(stdout)` is
+false. or if the variable is not available or its format is not recognized.
 
 ```c++
-static bool Xterm::stdin_is_tty() noexcept;
-static bool Xterm::stdout_is_tty() noexcept;
-static bool Xterm::stderr_is_tty() noexcept;
+static bool Xterm::is_tty(FILE* stream) noexcept;
 ```
 
-Query whether the standard I/O streams are connected to a terminal.
+Query whether the standard I/O streams (`stdin,stdout,stderr`) are connected
+to a terminal. This will always return false if the argument is not one of
+the three standard streams.

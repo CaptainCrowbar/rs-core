@@ -15,7 +15,8 @@ namespace {
 
 void test_rs_core_log_message() {
 
-    REQUIRE(! std::filesystem::exists(logfile));
+    TRY(std::filesystem::remove(logfile));
+    TEST(! std::filesystem::exists(logfile));
 
     {
         std::shared_ptr<Log> logptr;
@@ -28,7 +29,7 @@ void test_rs_core_log_message() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:24] Hello");
+        TEST_EQUAL(line, "[log-test.cpp:25] Hello");
     }
 
     {
@@ -44,25 +45,29 @@ void test_rs_core_log_message() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:38] Answer 42");
+        TEST_EQUAL(line, "[log-test.cpp:39] Answer 42");
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:39] Project 2501");
+        TEST_EQUAL(line, "[log-test.cpp:40] Project 2501");
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:40] Agent 86 ❤️ 99");
+        TEST_EQUAL(line, "[log-test.cpp:41] Agent 86 ❤️ 99");
     }
 
     TRY(std::filesystem::remove(logfile));
-    REQUIRE(! std::filesystem::exists(logfile));
+    TEST(! std::filesystem::exists(logfile));
 
 }
 
 void test_rs_core_log_context() {
 
-    REQUIRE(! std::filesystem::exists(logfile));
+    TRY(std::filesystem::remove(logfile));
+    TEST(! std::filesystem::exists(logfile));
 
     {
         Log log(logfile, Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -70,8 +75,11 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::time | Log::enabled);
+        Log log(logfile, Log::date | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -79,8 +87,23 @@ void test_rs_core_log_context() {
     }
 
     {
+        Log log(logfile, Log::time | Log::enabled);
+        TRY(log({"Hello"}));
+    }
+
+    {
+        Cstdio in(logfile);
+        std::string line;
+        TRY(line = in.read_line(true));
+        TEST_MATCH(line, R"(^\[\d{6}\.\d{6,9}\] Hello$)");
+    }
+
+    {
         Log log(logfile, Log::process | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -90,6 +113,9 @@ void test_rs_core_log_context() {
     {
         Log log(logfile, Log::thread | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -99,6 +125,9 @@ void test_rs_core_log_context() {
     {
         Log log(logfile, Log::path | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -112,6 +141,9 @@ void test_rs_core_log_context() {
     {
         Log log(logfile, Log::file | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -121,6 +153,9 @@ void test_rs_core_log_context() {
     {
         Log log(logfile, Log::pretty | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -130,6 +165,9 @@ void test_rs_core_log_context() {
     {
         Log log(logfile, Log::function | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -139,6 +177,9 @@ void test_rs_core_log_context() {
     {
         Log log(logfile, Log::file | Log::line | Log::column | Log::enabled);
         TRY(log({"Hello"}));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -146,7 +187,7 @@ void test_rs_core_log_context() {
     }
 
     TRY(std::filesystem::remove(logfile));
-    REQUIRE(! std::filesystem::exists(logfile));
+    TEST(! std::filesystem::exists(logfile));
 
 }
 
@@ -174,11 +215,15 @@ namespace {
 
 void test_rs_core_log_function_context() {
 
-    REQUIRE(! std::filesystem::exists(logfile));
+    TRY(std::filesystem::remove(logfile));
+    TEST(! std::filesystem::exists(logfile));
 
     {
         Log log(logfile, Log::pretty | Log::enabled);
         TRY(foo(log, 42));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -188,6 +233,9 @@ void test_rs_core_log_function_context() {
     {
         Log log(logfile, Log::function | Log::enabled);
         TRY(foo(log, 42));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -198,6 +246,9 @@ void test_rs_core_log_function_context() {
         Alpha a;
         Log log(logfile, Log::pretty | Log::enabled);
         TRY(a.f(log, 86));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -208,6 +259,9 @@ void test_rs_core_log_function_context() {
         Alpha a;
         Log log(logfile, Log::function | Log::enabled);
         TRY(a.f(log, 86));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -218,6 +272,9 @@ void test_rs_core_log_function_context() {
         Bravo b;
         Log log(logfile, Log::pretty | Log::enabled);
         TRY(b.f(log, 99));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -228,6 +285,9 @@ void test_rs_core_log_function_context() {
         Bravo b;
         Log log(logfile, Log::function | Log::enabled);
         TRY(b.f(log, 99));
+    }
+
+    {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
@@ -235,6 +295,6 @@ void test_rs_core_log_function_context() {
     }
 
     TRY(std::filesystem::remove(logfile));
-    REQUIRE(! std::filesystem::exists(logfile));
+    TEST(! std::filesystem::exists(logfile));
 
 }
