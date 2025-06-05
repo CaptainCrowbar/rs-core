@@ -1,7 +1,9 @@
 #include "rs-core/log.hpp"
 #include "rs-core/io.hpp"
 #include "rs-core/unit-test.hpp"
+#include <cstdio>
 #include <filesystem>
+#include <format>
 #include <memory>
 #include <string>
 
@@ -17,11 +19,13 @@ void test_rs_core_log_message() {
 
     TRY(std::filesystem::remove(logfile));
     TEST(! std::filesystem::exists(logfile));
+    auto line_number{0};
 
     {
         std::shared_ptr<Log> logptr;
         TRY(logptr = std::make_shared<Log>(logfile));
         TRY(logptr->enable());
+        line_number = __LINE__;
         TRY((*logptr)({"Hello"}));
     }
 
@@ -29,13 +33,14 @@ void test_rs_core_log_message() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:25] Hello");
+        TEST_EQUAL(line, std::format("[log-test.cpp:{}] Hello", line_number + 1));
     }
 
     {
         std::shared_ptr<Log> logptr;
         TRY(logptr = std::make_shared<Log>(logfile));
         TRY(logptr->enable());
+        line_number = __LINE__;
         TRY((*logptr)({"Answer {}", 42}));
         TRY((*logptr)({"Project {}", 2501}));
         TRY((*logptr)({"Agent {} ❤️ {}", 86, 99}));
@@ -45,17 +50,26 @@ void test_rs_core_log_message() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:39] Answer 42");
+        TEST_EQUAL(line, std::format("[log-test.cpp:{}] Answer 42", line_number + 1));
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:40] Project 2501");
+        TEST_EQUAL(line, std::format("[log-test.cpp:{}] Project 2501", line_number + 2));
         TRY(line = in.read_line(true));
-        TEST_EQUAL(line, "[log-test.cpp:41] Agent 86 ❤️ 99");
+        TEST_EQUAL(line, std::format("[log-test.cpp:{}] Agent 86 ❤️ 99", line_number + 3));
     }
 
     TRY(std::filesystem::remove(logfile));
     TEST(! std::filesystem::exists(logfile));
 
 }
+
+// void test_rs_core_log_terminal() {
+
+//     Log log(stdout, Log::enabled);
+//     TRY(log({"Answer {}", 42}));
+//     TRY(log({"Project {}", 2501}));
+//     TRY(log({"Agent {} ❤️ {}", 86, 99}));
+
+// }
 
 void test_rs_core_log_context() {
 

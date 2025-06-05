@@ -16,6 +16,7 @@
 #include <format>
 #include <functional>
 #include <mutex>
+#include <random>
 #include <source_location>
 #include <string>
 #include <string_view>
@@ -66,13 +67,10 @@ namespace RS {
 
         using enum LogFlags;
 
-        class message {
-        public:
+        struct message {
+            std::function<std::string()> get_message;
             template <typename... Args> message(std::format_string<const Args&...> fmt, const Args&... args):
-                callback_([=] { return std::format(fmt, args...); }) {}
-        private:
-            friend class Log;
-            std::function<std::string()> callback_;
+                get_message([=] { return std::format(fmt, args...); }) {}
         };
 
         static constexpr auto defaults = file | line;
@@ -122,13 +120,14 @@ namespace RS {
         LogFlags flags_{defaults};
         bool stop_request_{};
 
-        std::string add_context(const log_entry& entry) const;
-        void payload();
+        void add_context(const log_entry& entry, std::string& text) const;
+        void payload() noexcept;
 
         static std::string file_leaf_name(std::string_view path);
         static std::string function_leaf_name(std::string_view pretty);
         static process_id get_current_process();
         static thread_id get_current_thread();
+        static std::string make_prefix();
 
     };
 
@@ -149,32 +148,6 @@ namespace RS {
                 cv_.notify_one();
             }
             thread_.join();
-        }
-
-        inline void Log::payload() {
-
-            auto lock = std::unique_lock{mutex_};
-
-            while (! stop_request_ || ! queue_.empty()) {
-
-                cv_.wait(lock, [this] { return stop_request_ || ! queue_.empty(); });
-
-                if (stop_request_ && queue_.empty()) {
-                    break;
-                }
-
-                auto text = add_context(queue_.front());
-                text += queue_.front().what.callback_();
-                text += '\n';
-                out_.write(text);
-                out_.flush();
-                queue_.pop_front();
-
-            }
-
-            queue_.clear();
-            out_.close();
-
         }
 
         inline void Log::enable(bool flag) {
@@ -202,7 +175,6 @@ namespace RS {
             if (! flag) {
                 cv_.notify_one();
                 thread_.join();
-                out_ = {};
             }
 
         }
@@ -217,13 +189,11 @@ namespace RS {
             }
         }
 
-        inline std::string Log::add_context(const log_entry& entry) const {
+        inline void Log::add_context(const log_entry& entry, std::string& text) const {
 
             if (! has_bit(flags_, all)) {
-                return {};
+                return;
             }
-
-            std::string text;
 
             auto field = [this,&text] <typename T> (LogFlags mask, std::format_string<const T&> fmt, const T& t) {
                 if (! has_bit(flags_, mask)) {
@@ -246,7 +216,65 @@ namespace RS {
             text[0] = '[';
             text += "] ";
 
-            return text;
+        }
+
+        inline std::string Log::make_prefix() {
+
+            auto seed = static_cast<std::uint32_t>(get_current_thread());
+            std::minstd_rand rng(seed);
+            std::uniform_int_distribution<int> channel(0, 5);
+            int r, g, b, sum;
+
+            do {
+                r = channel(rng);
+                g = channel(rng);
+                b = channel(rng);
+                sum = r + g + b;
+            } while (sum == 0 || sum == 15);
+
+            return Xterm(true).rgb(r, g, b);
+
+        }
+
+        inline void Log::payload() noexcept {
+
+            std::string prefix, suffix;
+
+            if (Xterm::is_tty(out_.handle()))  {
+                try {
+                    prefix = make_prefix();
+                    suffix = Xterm(true).reset();
+                }
+                catch (...) {}
+            }
+
+            auto lock = std::unique_lock{mutex_};
+
+            while (! stop_request_ || ! queue_.empty()) {
+
+                cv_.wait(lock, [this] { return stop_request_ || ! queue_.empty(); });
+
+                if (stop_request_ && queue_.empty()) {
+                    break;
+                }
+
+                try {
+                    auto text{prefix};
+                    add_context(queue_.front(), text);
+                    text += queue_.front().what.get_message();
+                    text += suffix;
+                    text += '\n';
+                    out_.write(text);
+                    out_.flush();
+                }
+                catch (...) {}
+
+                queue_.pop_front();
+
+            }
+
+            queue_.clear();
+            out_ = {};
 
         }
 
