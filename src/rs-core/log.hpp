@@ -35,30 +35,30 @@
     #include <pthread.h>
     #include <unistd.h>
 
-    // If these fail some smarter code will be needed
-    static_assert(std::integral<pid_t>);
-    static_assert(std::is_pointer_v<pthread_t>);
+    static_assert(std::is_pointer_v<pthread_t>  // Apple
+        || std::unsigned_integral<pthread_t>);  // Linux
 
 #endif
 
 namespace RS {
 
-    RS_BITMASK(LogFlags, std::uint16_t,
+    RS_BITMASK(LogFlags, std::uint32_t,
         none      = 0,
         // Context flags
-        all       = 0x0fff,
-        date      = 0x0001,
-        time      = 0x0002,
-        process   = 0x0004,
-        thread    = 0x0008,
-        path      = 0x0010,
-        file      = 0x0020,
-        pretty    = 0x0040,
-        function  = 0x0080,
-        line      = 0x0100,
-        column    = 0x0200,
+        all       = 0x0000'ffff,
+        date      = 0x0000'0001,
+        time      = 0x0000'0002,
+        process   = 0x0000'0004,
+        thread    = 0x0000'0008,
+        path      = 0x0000'0010,
+        file      = 0x0000'0020,
+        pretty    = 0x0000'0040,
+        function  = 0x0000'0080,
+        line      = 0x0000'0100,
         // Other flags
-        enabled   = 0x1000,
+        append    = 0x0001'0000,
+        colour    = 0x0002'0000,
+        enabled   = 0x0004'0000,
     )
 
     class Log {
@@ -67,13 +67,13 @@ namespace RS {
 
         using enum LogFlags;
 
+        static constexpr auto defaults = file | line | colour;
+
         struct message {
             std::function<std::string()> get_message;
             template <typename... Args> message(std::format_string<const Args&...> fmt, const Args&... args):
                 get_message([=] { return std::format(fmt, args...); }) {}
         };
-
-        static constexpr auto defaults = file | line;
 
         Log(): out_(stderr) {}
         explicit Log(const std::filesystem::path& path, LogFlags flags = defaults);
@@ -97,7 +97,7 @@ namespace RS {
             using thread_id = unsigned long;
         #else
             using process_id = pid_t;
-            using thread_id = std::uintptr_t;
+            using thread_id = std::conditional_t<std::integral<pthread_t>, pthread_t, std::uintptr_t>;
         #endif
 
         struct log_entry {
@@ -123,8 +123,8 @@ namespace RS {
         void add_context(const log_entry& entry, std::string& text) const;
         void payload() noexcept;
 
-        static std::string file_leaf_name(std::string_view path);
-        static std::string function_leaf_name(std::string_view pretty);
+        static std::string_view file_leaf_name(std::string_view path);
+        static std::string_view function_leaf_name(std::string_view pretty);
         static process_id get_current_process();
         static thread_id get_current_thread();
         static std::string make_prefix();
@@ -162,10 +162,11 @@ namespace RS {
                 }
 
                 stop_request_ = ! flag;
+                auto append_mode = has_bit(flags_, append);
 
                 if (flag) {
                     if (! path_.empty()) {
-                        out_ = Cstdio{path_, "wb"};
+                        out_ = Cstdio{path_, append_mode ? "ab" : "wb"};
                     }
                     thread_ = std::thread{&Log::payload, this};
                 }
@@ -200,39 +201,24 @@ namespace RS {
                     return false;
                 }
                 text += std::format(fmt, t);
+                text += ':';
                 return true;
             };
 
-            field(date, ":{0:%Y}{0:%m}{0:%d}-{0:%H}{0:%M}{0:%S}", entry.when)
-                || field(time, ":{0:%H}{0:%M}{0:%S}", entry.when);
-            field(process, ":P{:x}", entry.process);
-            field(thread, ":T{:x}", entry.thread);
-            field(path, ":{}", entry.where.file_name())
-                || field(file, ":{}", file_leaf_name(entry.where.file_name()));
-            field(pretty, ":{}", entry.where.function_name())
-                || field(function, ":{}", function_leaf_name(entry.where.function_name()));
-            field(line | column, ":{}", entry.where.line());
-            field(column, ":{}", entry.where.column());
-            text[0] = '[';
+            text += '[';
+
+            field(date, "{0:%Y}{0:%m}{0:%d}-{0:%H}{0:%M}{0:%S}", entry.when)
+                || field(time, "{0:%H}{0:%M}{0:%S}", entry.when);
+            field(process, "P{:x}", entry.process);
+            field(thread, "T{:x}", entry.thread);
+            field(path, "{}", entry.where.file_name())
+                || field(file, "{}", file_leaf_name(entry.where.file_name()));
+            field(pretty, "{}", entry.where.function_name())
+                || field(function, "{}", function_leaf_name(entry.where.function_name()));
+            field(line, "{}", entry.where.line());
+
+            text.pop_back();
             text += "] ";
-
-        }
-
-        inline std::string Log::make_prefix() {
-
-            auto seed = static_cast<std::uint32_t>(get_current_thread());
-            std::minstd_rand rng(seed);
-            std::uniform_int_distribution<int> channel(0, 5);
-            int r, g, b, sum;
-
-            do {
-                r = channel(rng);
-                g = channel(rng);
-                b = channel(rng);
-                sum = r + g + b;
-            } while (sum == 0 || sum == 15);
-
-            return Xterm(true).rgb(r, g, b);
 
         }
 
@@ -240,7 +226,7 @@ namespace RS {
 
             std::string prefix, suffix;
 
-            if (Xterm::is_tty(out_.handle()))  {
+            if (has_bit(flags_, colour) && Xterm::is_tty(out_.handle()))  {
                 try {
                     prefix = make_prefix();
                     suffix = Xterm(true).reset();
@@ -278,17 +264,17 @@ namespace RS {
 
         }
 
-        inline std::string Log::file_leaf_name(std::string_view path) {
+        inline std::string_view Log::file_leaf_name(std::string_view path) {
             std::size_t last_delimiter;
             #ifdef _WIN32
                 last_delimiter = path.find_last_of("/\\");
             #else
                 last_delimiter = path.find_last_of('/');
             #endif
-            return std::string(path, last_delimiter + 1, npos);
+            return path.substr(last_delimiter + 1);
         }
 
-        inline std::string Log::function_leaf_name(std::string_view pretty) {
+        inline std::string_view Log::function_leaf_name(std::string_view pretty) {
 
             if (pretty.empty()) {
                 return {};
@@ -303,7 +289,7 @@ namespace RS {
             do {
                 paren_pos = pretty.find('(', paren_pos + 1);
                 if (paren_pos == npos) {
-                    return std::string{pretty};
+                    return pretty;
                 }
             } while (! name_char(pretty[paren_pos - 1]));
 
@@ -314,7 +300,7 @@ namespace RS {
                 --begin_name;
             }
 
-            return std::string{begin_name, end_name};
+            return std::string_view{begin_name, end_name};
 
         }
 
@@ -332,6 +318,24 @@ namespace RS {
             #else
                 return reinterpret_cast<thread_id>(pthread_self());
             #endif
+        }
+
+        inline std::string Log::make_prefix() {
+
+            auto seed = static_cast<std::uint32_t>(get_current_thread());
+            std::minstd_rand rng(seed);
+            std::uniform_int_distribution<int> channel(0, 5);
+            int r, g, b, sum;
+
+            do {
+                r = channel(rng);
+                g = channel(rng);
+                b = channel(rng);
+                sum = r + g + b;
+            } while (sum == 0 || sum == 15);
+
+            return Xterm(true).rgb(r, g, b);
+
         }
 
 }

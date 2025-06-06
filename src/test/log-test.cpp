@@ -64,7 +64,7 @@ void test_rs_core_log_message() {
 
 // void test_rs_core_log_terminal() {
 
-//     Log log(stdout, Log::enabled);
+//     Log log(stdout, Log::defaults | Log::date | Log::colour | Log::enabled);
 //     TRY(log({"Answer {}", 42}));
 //     TRY(log({"Project {}", 2501}));
 //     TRY(log({"Agent {} ❤️ {}", 86, 99}));
@@ -189,7 +189,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::file | Log::line | Log::column | Log::enabled);
+        Log log(logfile, Log::file | Log::line | Log::enabled);
         TRY(log({"Hello"}));
     }
 
@@ -197,7 +197,7 @@ void test_rs_core_log_context() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line(true));
-        TEST_MATCH(line, R"(^\[log-test\.cpp:\d{3}:\d{2}\] Hello$)");
+        TEST_MATCH(line, R"(^\[log-test\.cpp:\d{3}\] Hello$)");
     }
 
     TRY(std::filesystem::remove(logfile));
