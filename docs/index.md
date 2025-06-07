@@ -22,6 +22,7 @@ Requires C++23.
 
 * [`rs-core/global.hpp` -- Global utilities](global.html)
 * [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
+* [`rs-core/constants.hpp` -- Physical constants](constants.html)
 * [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
 * [`rs-core/format.hpp` -- Formatting helpers](format.html)
 * [`rs-core/hash.hpp` -- Hash functions](hash.html)
