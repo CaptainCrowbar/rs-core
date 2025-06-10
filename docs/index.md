@@ -4,13 +4,6 @@ By Ross Smith
 
 _[GitHub repository](https://github.com/CaptainCrowbar/rs-core)_
 
-## Overview
-
-```c++
-#include "rs-core.hpp"
-namespace RS;
-```
-
 ## Introduction
 
 This is a set of basic utilities that I use throughout my C++ code, collected
