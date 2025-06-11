@@ -24,12 +24,20 @@ cmakefile=src/CMakeLists.txt
 temp=__TEMP__
 header=$(ls src/*/version.hpp)
 
-version=$(grep -E '    VERSION \d+\.\d+\.\d+' "$cmakefile" \
+version=$(grep -E '^\s+VERSION \d+\.\d+\.\d+' "$cmakefile" \
     | head -n 1 \
     | grep -Eo '[0-9.]+')
 
 if ! [[ "$version" ]]; then
-    echo "*** Version number not found"
+    echo "*** Version number not found in CMake file"
+    exit 1
+fi
+
+namespace=$(grep -E '^namespace ' "$header" \
+    | grep -Eo 'RS\S*')
+
+if ! [[ "$namespace" ]]; then
+    echo "*** Namespace not found in version header"
     exit 1
 fi
 
@@ -51,7 +59,7 @@ cat << EOF > $header
 #include <array>
 #include <string>
 
-namespace RS {
+namespace $namespace {
 
     inline std::array<int, 3> version() noexcept {
         return {{ $v1, $v2, $v3 }};
