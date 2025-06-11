@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <limits>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -53,16 +54,88 @@ namespace RS {
         return v != 0 && (u & v) == v;
     }
 
+    // Conversion functions
+
+    template <std::integral To, std::integral From>
+    constexpr std::optional<To> checked_cast(From x) noexcept {
+
+        static constexpr auto from_signed = std::signed_integral<From>;
+        static constexpr auto to_signed = std::signed_integral<To>;
+        static constexpr auto min_to = std::numeric_limits<To>::min();
+        static constexpr auto max_to = std::numeric_limits<To>::max();
+
+        if constexpr (from_signed == to_signed) {
+
+            // Same signedness
+
+            if constexpr (sizeof(To) < sizeof(From)) {
+                if (x < static_cast<From>(min_to) || x > static_cast<From>(max_to)) {
+                    return {};
+                }
+            }
+
+        } else if constexpr (from_signed) {
+
+            // Signed to unsigned
+
+            if (x < 0) {
+                return {};
+            }
+
+            if constexpr (sizeof(To) < sizeof(From)) {
+                if (x > static_cast<From>(max_to)) {
+                    return {};
+                }
+            }
+
+        } else {
+
+            // Unsigned to signed
+
+            if constexpr (sizeof(To) <= sizeof(From)) {
+                if (x > static_cast<From>(max_to)) {
+                    return {};
+                }
+            }
+
+        }
+
+        return static_cast<To>(x);
+
+    }
+
+    template <std::integral To, std::integral From>
+    constexpr std::optional<To> checked_cast(std::optional<From> x) noexcept {
+        if (x) {
+            return checked_cast<To>(*x);
+        } else {
+            return {};
+        }
+    }
+
     // Integer literals
 
-    constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return static_cast<std::int8_t>(x); }
-    constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return static_cast<std::int16_t>(x); }
-    constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return static_cast<std::int32_t>(x); }
-    constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return static_cast<std::int64_t>(x); }
-    constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return static_cast<std::uint8_t>(x); }
-    constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return static_cast<std::uint16_t>(x); }
-    constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return static_cast<std::uint32_t>(x); }
-    constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return static_cast<std::uint64_t>(x); }
+    namespace Detail {
+
+        template <std::integral To, std::integral From>
+        constexpr To static_checked_cast(From x) {
+            auto opt = checked_cast<To>(x);
+            if (! opt) {
+                throw std::range_error("Integer out of range");
+            }
+            return *opt;
+        }
+
+    }
+
+    constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int8_t>(x); }
+    constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint8_t>(x); }
+    constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int16_t>(x); }
+    constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint16_t>(x); }
+    constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int32_t>(x); }
+    constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint32_t>(x); }
+    constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int64_t>(x); }
+    constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint64_t>(x); }
 
     // Number formatting
 

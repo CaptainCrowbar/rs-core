@@ -27,16 +27,28 @@ true if all bits in the second argument are also present in the first. Both
 functions will always return false if either argument is zero. Arguments can
 be any integer or enumeration type.
 
+## Conversion functions
+
+```c++
+template <std::integral To, std::integral From>
+    constexpr std::optional<To> checked_cast(From x) noexcept;
+template <std::integral To, std::integral From>
+    constexpr std::optional<To> checked_cast(std::optional<From> x) noexcept;
+```
+
+Convert an integer to a different type, returning null if the argument is out
+of range for the return type.
+
 ## Integer literals
 
 ```c++
 constexpr std::int8_t operator""_i8(unsigned long long x) noexcept;
-constexpr std::int16_t operator""_i16(unsigned long long x) noexcept;
-constexpr std::int32_t operator""_i32(unsigned long long x) noexcept;
-constexpr std::int64_t operator""_i64(unsigned long long x) noexcept;
 constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept;
+constexpr std::int16_t operator""_i16(unsigned long long x) noexcept;
 constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept;
+constexpr std::int32_t operator""_i32(unsigned long long x) noexcept;
 constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept;
+constexpr std::int64_t operator""_i64(unsigned long long x) noexcept;
 constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept;
 ```
 
