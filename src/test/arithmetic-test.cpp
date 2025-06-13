@@ -152,6 +152,50 @@ void test_rs_core_arithmetic_checked_cast() {
 
 }
 
+void test_rs_core_arithmetic_interpolation() {
+
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 0.0),   70.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 5.0),   60.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 10.0),  50.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 15.0),  40.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 20.0),  30.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 25.0),  20.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 30.0),  10.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 35.0),  0.0);
+    TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 40.0),  -10.0);
+
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 5.0),     70.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 10.0),    60.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 20.0),    50.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 40.0),    40.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 80.0),    30.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 160.0),   20.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 320.0),   10.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 640.0),   0.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_x>(20.0, 50.0, 320.0, 10.0, 1280.0),  -10.0, 1e-10);
+
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 0.0),   1280.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 5.0),   640.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 10.0),  320.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 15.0),  160.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 20.0),  80.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 25.0),  40.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 30.0),  20.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 35.0),  10.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_y>(10.0, 320.0, 30.0, 20.0, 40.0),  5.0, 1e-10);
+
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 5.0),     1280.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 10.0),    640.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 20.0),    320.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 40.0),    160.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 80.0),    80.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 160.0),   40.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 320.0),   20.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 640.0),   10.0, 1e-10);
+    TEST_NEAR(interpolate<Lerp::log_xy>(20.0, 320.0, 320.0, 20.0, 1280.0),  5.0, 1e-10);
+
+}
+
 void test_rs_core_arithmetic_append_integers() {
 
     std::string s;

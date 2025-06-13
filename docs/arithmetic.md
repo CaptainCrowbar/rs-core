@@ -54,6 +54,37 @@ constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept;
 
 Defined for convenience.
 
+## Interpolation fucntions
+
+```c++
+enum class Lerp: std::uint8_t {
+    none = 0,
+    log_x,
+    log_y,
+    log_xy = log_x | log_y,
+};
+```
+
+Bitmask values used to select linear or logarithmic interpolation.
+
+```c++
+template <Lerp Mode = Lerp::none, std::floating_point X, typename Y>
+    constexpr Y interpolate(X x1, Y y1, X x2, Y y2, X x3) noexcept;
+```
+
+Performs linear or logarithmic interpolation. The `Mode` argument indicates
+whether interpolation should be linear or logarithmic on the X or Y axis.
+
+Type `Y` does not have to be a floating point type unless the `log_y` flag is
+used. The only requirements are that it support addition and subtraction, and
+that multiplying an `X` by a `Y` is supported, yielding a `Y.`
+
+Behaviour is undefined if any of the following is true:
+
+* `x1=x2`
+* The `log_x` flag is used, and `x1<=0, x2<=0,` or `x3<=0`
+* The `log_y` flag is used, and `y1<=0` or `y2<=0`
+
 ## Number formatting
 
 ```c++
