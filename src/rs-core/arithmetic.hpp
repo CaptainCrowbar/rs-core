@@ -2,11 +2,9 @@
 
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
-#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
@@ -138,7 +136,7 @@ namespace RS {
     constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int64_t>(x); }
     constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint64_t>(x); }
 
-    // Interpolation fucntions
+    // Interpolation functions
 
     RS_BITMASK(Lerp, std::uint8_t,
         none    = 0,
@@ -172,37 +170,6 @@ namespace RS {
             y3 = std::exp(y3);
         }
         return y3;
-    }
-
-    // Number formatting
-
-    template <std::unsigned_integral T>
-    std::string& append_number(std::string& str, T t, std::size_t digits = 1, int base = 10) {
-        static constexpr auto zero_offset = static_cast<T>('0');
-        static constexpr auto alpha_offset = static_cast<T>('a' - 10);
-        auto pos = str.size();
-        auto t_base = static_cast<T>(base);
-        for (auto i = 0uz; i < digits || t != 0; ++i, t /= t_base) {
-            auto digit = t % t_base;
-            if (digit < 10) {
-                str += static_cast<char>(digit + zero_offset);
-            } else {
-                str += static_cast<char>(digit + alpha_offset);
-            }
-        }
-        std::reverse(str.begin() + pos, str.end());
-        return str;
-    }
-
-    template <std::signed_integral T>
-    std::string& append_number(std::string& str, T t, std::size_t digits = 1, int base = 10) {
-        using U = std::make_unsigned_t<T>;
-        auto u = static_cast<U>(t);
-        if (t < 0) {
-            str += '-';
-            u = U{} - u;
-        }
-        return append_number(str, u, digits, base);
     }
 
     // Number parsing

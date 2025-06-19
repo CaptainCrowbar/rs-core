@@ -85,19 +85,6 @@ Behaviour is undefined if any of the following is true:
 * The `log_x` flag is used, and `x1<=0, x2<=0,` or `x3<=0`
 * The `log_y` flag is used, and `y1<=0` or `y2<=0`
 
-## Number formatting
-
-```c++
-template <std::unsigned_integral T>
-    std::string& append_number(std::string& str, T t, std::size_t digits = 1,
-        int base = 10);
-template <std::signed_integral T>
-    std::string& append_number(std::string& str, T t, std::size_t digits = 1,
-        int base = 10);
-```
-
-Simple formatters to append an integer to a string.
-
 ## Number parsing
 
 ```c++

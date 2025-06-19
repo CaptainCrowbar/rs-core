@@ -12,7 +12,6 @@ void test_rs_core_global_range_functions();
 void test_rs_core_arithmetic_bitmask_functions();
 void test_rs_core_arithmetic_checked_cast();
 void test_rs_core_arithmetic_interpolation();
-void test_rs_core_arithmetic_append_integers();
 void test_rs_core_arithmetic_parse_integers();
 void test_rs_core_arithmetic_parse_integers_maybe();
 void test_rs_core_arithmetic_parse_floating_point();
@@ -58,7 +57,6 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_arithmetic_bitmask_functions, "test_rs_core_arithmetic_bitmask_functions");
     call_me_maybe(test_rs_core_arithmetic_checked_cast, "test_rs_core_arithmetic_checked_cast");
     call_me_maybe(test_rs_core_arithmetic_interpolation, "test_rs_core_arithmetic_interpolation");
-    call_me_maybe(test_rs_core_arithmetic_append_integers, "test_rs_core_arithmetic_append_integers");
     call_me_maybe(test_rs_core_arithmetic_parse_integers, "test_rs_core_arithmetic_parse_integers");
     call_me_maybe(test_rs_core_arithmetic_parse_integers_maybe, "test_rs_core_arithmetic_parse_integers_maybe");
     call_me_maybe(test_rs_core_arithmetic_parse_floating_point, "test_rs_core_arithmetic_parse_floating_point");
