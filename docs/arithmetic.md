@@ -125,3 +125,14 @@ template <std::floating_point T>
 These perform the same functions as `parse_number(),` but the arithmetic type
 must be specified explicitly, and the return value is an optional instead of
 a more detailed status.
+
+```c++
+template <std::integral T>
+    T try_parse_number(std::string_view str, int base = 10);
+template <std::floating_point T>
+    T try_parse_number(std::string_view str);
+```
+
+These perform the same functions as `parse_number_maybe(),` but a failed
+conversion will throw `std::invalid_argument` or `std::out_of_range` instead
+of returning a null optional.

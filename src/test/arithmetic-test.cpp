@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <optional>
+#include <stdexcept>
 
 using namespace RS;
 
@@ -386,6 +387,101 @@ void test_rs_core_arithmetic_parse_integers_maybe() {
 
 }
 
+void test_rs_core_arithmetic_try_parse_integers() {
+
+    std::int16_t i;
+    std::uint16_t u;
+
+    TRY(i = try_parse_number<std::int16_t>("0"));                            TEST_EQUAL(i, 0);
+    TRY(i = try_parse_number<std::int16_t>("42"));                           TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("+42"));                          TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("32767"));                        TEST_EQUAL(i, 32767);
+    TEST_THROW(i = try_parse_number<std::int16_t>("32768"),                  std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("99999"),                  std::out_of_range, "Number is out of range:");
+    TRY(i = try_parse_number<std::int16_t>("-42"));                          TEST_EQUAL(i, -42);
+    TRY(i = try_parse_number<std::int16_t>("-32768"));                       TEST_EQUAL(i, -32768);
+    TEST_THROW(i = try_parse_number<std::int16_t>("-32769"),                 std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("-99999"),                 std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>(""),                       std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("42a"),                    std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("hello"),                  std::invalid_argument, "Invalid number:");
+    TRY(i = try_parse_number<std::int16_t>("0", 16));                        TEST_EQUAL(i, 0);
+    TRY(i = try_parse_number<std::int16_t>("2a", 16));                       TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("+2a", 16));                      TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("7fff", 16));                     TEST_EQUAL(i, 32767);
+    TEST_THROW(i = try_parse_number<std::int16_t>("8000", 16),               std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("10000", 16),              std::out_of_range, "Number is out of range:");
+    TRY(i = try_parse_number<std::int16_t>("-2a", 16));                      TEST_EQUAL(i, -42);
+    TRY(i = try_parse_number<std::int16_t>("-8000", 16));                    TEST_EQUAL(i, -32768);
+    TEST_THROW(i = try_parse_number<std::int16_t>("-8001", 16),              std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("-10000", 16),             std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("", 16),                   std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("2x", 16),                 std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("hello", 16),              std::invalid_argument, "Invalid number:");
+    TRY(i = try_parse_number<std::int16_t>("0x0", 0));                       TEST_EQUAL(i, 0);
+    TRY(i = try_parse_number<std::int16_t>("0x2a", 0));                      TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("+0x2a", 0));                     TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("0x7fff", 0));                    TEST_EQUAL(i, 32767);
+    TEST_THROW(i = try_parse_number<std::int16_t>("0x8000", 0),              std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("0x10000", 0),             std::out_of_range, "Number is out of range:");
+    TRY(i = try_parse_number<std::int16_t>("-0x2a", 0));                     TEST_EQUAL(i, -42);
+    TRY(i = try_parse_number<std::int16_t>("-0x8000", 0));                   TEST_EQUAL(i, -32768);
+    TEST_THROW(i = try_parse_number<std::int16_t>("-0x8001", 0),             std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("-0x10000", 0),            std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("0x2x", 0),                std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("0xhello", 0),             std::invalid_argument, "Invalid number:");
+    TRY(i = try_parse_number<std::int16_t>("0", 2));                         TEST_EQUAL(i, 0);
+    TRY(i = try_parse_number<std::int16_t>("101010", 2));                    TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("+101010", 2));                   TEST_EQUAL(i, 42);
+    TRY(i = try_parse_number<std::int16_t>("111111111111111", 2));           TEST_EQUAL(i, 32767);
+    TEST_THROW(i = try_parse_number<std::int16_t>("1000000000000000", 2),    std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("10000000000000000", 2),   std::out_of_range, "Number is out of range:");
+    TRY(i = try_parse_number<std::int16_t>("-101010", 2));                   TEST_EQUAL(i, -42);
+    TRY(i = try_parse_number<std::int16_t>("-1000000000000000", 2));         TEST_EQUAL(i, -32768);
+    TEST_THROW(i = try_parse_number<std::int16_t>("-1000000000000001", 2),   std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("-10000000000000000", 2),  std::out_of_range, "Number is out of range:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("", 2),                    std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("1x", 2),                  std::invalid_argument, "Invalid number:");
+    TEST_THROW(i = try_parse_number<std::int16_t>("hello", 2),               std::invalid_argument, "Invalid number:");
+    TRY(u = try_parse_number<std::uint16_t>("0"));                           TEST_EQUAL(u, 0);
+    TRY(u = try_parse_number<std::uint16_t>("42"));                          TEST_EQUAL(u, 42);
+    TRY(u = try_parse_number<std::uint16_t>("65535"));                       TEST_EQUAL(u, 65535);
+    TEST_THROW(u = try_parse_number<std::uint16_t>("65536"),                 std::out_of_range, "Number is out of range:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("99999"),                 std::out_of_range, "Number is out of range:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>(""),                      std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("+42"),                   std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("-42"),                   std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("42a"),                   std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("hello"),                 std::invalid_argument, "Invalid number:");
+    TRY(u = try_parse_number<std::uint16_t>("0", 16));                       TEST_EQUAL(u, 0);
+    TRY(u = try_parse_number<std::uint16_t>("2a", 16));                      TEST_EQUAL(u, 42);
+    TRY(u = try_parse_number<std::uint16_t>("ffff", 16));                    TEST_EQUAL(u, 65535);
+    TEST_THROW(u = try_parse_number<std::uint16_t>("10000", 16),             std::out_of_range, "Number is out of range:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("", 16),                  std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("+2a", 16),               std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("-2a", 16),               std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("2x", 16),                std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("hello", 16),             std::invalid_argument, "Invalid number:");
+    TRY(u = try_parse_number<std::uint16_t>("0x0", 0));                      TEST_EQUAL(u, 0);
+    TRY(u = try_parse_number<std::uint16_t>("0x2a", 0));                     TEST_EQUAL(u, 42);
+    TRY(u = try_parse_number<std::uint16_t>("0xffff", 0));                   TEST_EQUAL(u, 65535);
+    TEST_THROW(u = try_parse_number<std::uint16_t>("0x10000", 0),            std::out_of_range, "Number is out of range:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("+0x2a", 0),              std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("-0x2a", 0),              std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("0x2x", 0),               std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("0xhello", 0),            std::invalid_argument, "Invalid number:");
+    TRY(u = try_parse_number<std::uint16_t>("0", 2));                        TEST_EQUAL(u, 0);
+    TRY(u = try_parse_number<std::uint16_t>("101010", 2));                   TEST_EQUAL(u, 42);
+    TRY(u = try_parse_number<std::uint16_t>("1111111111111111", 2));         TEST_EQUAL(u, 65535);
+    TEST_THROW(u = try_parse_number<std::uint16_t>("10000000000000000", 2),  std::out_of_range, "Number is out of range:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("", 2),                   std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("+101010", 2),            std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("-101010", 2),            std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("1x", 2),                 std::invalid_argument, "Invalid number:");
+    TEST_THROW(u = try_parse_number<std::uint16_t>("hello", 2),              std::invalid_argument, "Invalid number:");
+
+}
+
 void test_rs_core_arithmetic_parse_floating_point() {
 
     ParseNumber rc {};
@@ -440,5 +536,33 @@ void test_rs_core_arithmetic_parse_floating_point_maybe() {
     TRY(x = parse_number_maybe<double>("-1e9999"));   TEST(! x.has_value());
     TRY(x = parse_number_maybe<double>("1e-9999"));   TEST(! x.has_value());
     TRY(x = parse_number_maybe<double>("-1e-9999"));  TEST(! x.has_value());
+
+}
+
+void test_rs_core_arithmetic_try_parse_floating_point() {
+
+    double x {};
+
+    TRY(x = try_parse_number<double>("0"));               TEST_EQUAL(x, 0);
+    TRY(x = try_parse_number<double>("42"));              TEST_EQUAL(x, 42);
+    TRY(x = try_parse_number<double>("+42"));             TEST_EQUAL(x, 42);
+    TRY(x = try_parse_number<double>("-42"));             TEST_EQUAL(x, -42);
+    TRY(x = try_parse_number<double>("1234.5"));          TEST_EQUAL(x, 1234.5);
+    TRY(x = try_parse_number<double>("-1234.5"));         TEST_EQUAL(x, -1234.5);
+    TRY(x = try_parse_number<double>("1e6"));             TEST_EQUAL(x, 1e6);
+    TRY(x = try_parse_number<double>("-1e6"));            TEST_EQUAL(x, -1e6);
+    TRY(x = try_parse_number<double>("5e-1"));            TEST_EQUAL(x, 0.5);
+    TRY(x = try_parse_number<double>("-5e-1"));           TEST_EQUAL(x, -0.5);
+    TRY(x = try_parse_number<double>("inf"));             TEST(std::isinf(x)); TEST(! std::signbit(x));
+    TRY(x = try_parse_number<double>("+inf"));            TEST(std::isinf(x)); TEST(! std::signbit(x));
+    TRY(x = try_parse_number<double>("-inf"));            TEST(std::isinf(x)); TEST(std::signbit(x));
+    TRY(x = try_parse_number<double>("nan"));             TEST(std::isnan(x));
+    TEST_THROW(x = try_parse_number<double>(""),          std::invalid_argument, "Invalid number:");
+    TEST_THROW(x = try_parse_number<double>("42a"),       std::invalid_argument, "Invalid number:");
+    TEST_THROW(x = try_parse_number<double>("hello"),     std::invalid_argument, "Invalid number:");
+    TEST_THROW(x = try_parse_number<double>("1e9999"),    std::out_of_range, "Number is out of range:");
+    TEST_THROW(x = try_parse_number<double>("-1e9999"),   std::out_of_range, "Number is out of range:");
+    TEST_THROW(x = try_parse_number<double>("1e-9999"),   std::out_of_range, "Number is out of range:");
+    TEST_THROW(x = try_parse_number<double>("-1e-9999"),  std::out_of_range, "Number is out of range:");
 
 }

@@ -7,6 +7,7 @@
 #include <concepts>
 #include <cstdint>
 #include <cstdlib>
+#include <format>
 #include <limits>
 #include <optional>
 #include <stdexcept>
@@ -183,6 +184,15 @@ namespace RS {
 
     namespace Detail {
 
+        inline void check_parse_result(ParseNumber rc, std::string_view str, int base = 0) {
+            switch (rc) {
+                case ParseNumber::invalid_base:    throw std::invalid_argument(std::format("Invalid number base: {}", base));
+                case ParseNumber::invalid_number:  throw std::invalid_argument(std::format("Invalid number: {:?}", str));
+                case ParseNumber::out_of_range:    throw std::out_of_range(std::format("Number is out of range: {}", str));
+                default:                           break;
+            }
+        }
+
         template <std::unsigned_integral T>
         ParseNumber parse_unsigned_integer(std::string_view str, T& t, int base) {
 
@@ -342,6 +352,20 @@ namespace RS {
         } else {
             return {};
         }
+    }
+
+    template <std::integral T>
+    T try_parse_number(std::string_view str, int base = 10) {
+        T t {};
+        Detail::check_parse_result(parse_number(str, t, base), str, base);
+        return t;
+    }
+
+    template <std::floating_point T>
+    T try_parse_number(std::string_view str) {
+        T t {};
+        Detail::check_parse_result(parse_number(str, t), str);
+        return t;
     }
 
 }
