@@ -53,8 +53,7 @@
     } \
     [[maybe_unused]] inline std::string rs_core_format(EnumType t) { \
         return to_string(t); \
-    } \
-    [[maybe_unused]] void rs_core_enum(EnumType);
+    }
 
 #define RS_BITMASK(EnumType, IntType, ...) \
     enum class EnumType: IntType { \
@@ -119,19 +118,9 @@
     } \
     [[maybe_unused]] constexpr EnumType& operator^=(EnumType& t, EnumType u) noexcept { \
         return t = t ^ u; \
-    } \
-    [[maybe_unused]] void rs_core_bitmask(EnumType); \
-    [[maybe_unused]] void rs_core_enum(EnumType);
+    }
 
 namespace RS::Detail {
-
-    template <typename T>
-    concept ExtendedEnum = std::is_enum_v<T>
-        && requires(T t) { rs_core_enum(t); };
-
-    template <typename T>
-    concept ExtendedBitmask = std::is_enum_v<T>
-        && requires(T t) { rs_core_bitmask(t); };
 
     template <std::integral T>
     std::vector<std::pair<T, std::string>> make_enum_list(const char* va_args) {
