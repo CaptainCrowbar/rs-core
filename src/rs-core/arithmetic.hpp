@@ -128,14 +128,18 @@ namespace RS {
 
     }
 
-    constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int8_t>(x); }
-    constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint8_t>(x); }
-    constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int16_t>(x); }
-    constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint16_t>(x); }
-    constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int32_t>(x); }
-    constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint32_t>(x); }
-    constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int64_t>(x); }
-    constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint64_t>(x); }
+    namespace Literals {
+
+        constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int8_t>(x); }
+        constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint8_t>(x); }
+        constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int16_t>(x); }
+        constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint16_t>(x); }
+        constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int32_t>(x); }
+        constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint32_t>(x); }
+        constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int64_t>(x); }
+        constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint64_t>(x); }
+
+    }
 
     // Interpolation functions
 
