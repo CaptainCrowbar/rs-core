@@ -1,9 +1,11 @@
 #pragma once
 
+#include <algorithm>
 #include <concepts>
 #include <iterator>
 #include <limits>
 #include <ranges>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -29,12 +31,27 @@ namespace RS {
     constexpr bool ascii_isupper(char c) noexcept { return c >= 'A' && c <= 'Z'; }
     constexpr bool ascii_islower(char c) noexcept { return c >= 'a' && c <= 'z'; }
     constexpr bool ascii_isalpha(char c) noexcept { return ascii_isupper(c) || ascii_islower(c); }
+    constexpr bool ascii_isalpha_w(char c) noexcept { return ascii_isalpha(c) || c == '_'; }
     constexpr bool ascii_isalnum(char c) noexcept { return ascii_isdigit(c) || ascii_isalpha(c); }
+    constexpr bool ascii_isalnum_w(char c) noexcept { return ascii_isalnum(c) || c == '_'; }
     constexpr bool ascii_isgraph(char c) noexcept { return c >= '!' && c <= '~'; }
     constexpr bool ascii_isprint(char c) noexcept { return c >= ' ' && c <= '~'; }
     constexpr bool ascii_ispunct(char c) noexcept { return ascii_isgraph(c) && ! ascii_isalnum(c); }
+    constexpr bool ascii_ispunct_w(char c) noexcept { return ascii_ispunct(c) && c != '_'; }
     constexpr char ascii_tolower(char c) noexcept { return static_cast<char>(ascii_isupper(c) ? c + 0x20 : c); }
     constexpr char ascii_toupper(char c) noexcept { return static_cast<char>(ascii_islower(c) ? c - 0x20 : c); }
+
+    inline std::string ascii_lowercase(std::string_view str) {
+        std::string out(str);
+        std::transform(out.begin(), out.end(), out.begin(), ascii_tolower);
+        return out;
+    }
+
+    inline std::string ascii_uppercase(std::string_view str) {
+        std::string out(str);
+        std::transform(out.begin(), out.end(), out.begin(), ascii_toupper);
+        return out;
+    }
 
     // Metaprogramming utilities
 

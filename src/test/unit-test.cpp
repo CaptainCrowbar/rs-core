@@ -8,6 +8,7 @@
 using namespace RS::UnitTest;
 
 void test_rs_core_global_character_functions();
+void test_rs_core_global_case_conversion();
 void test_rs_core_global_range_functions();
 void test_rs_core_arithmetic_bitmask_functions();
 void test_rs_core_arithmetic_checked_cast();
@@ -55,6 +56,7 @@ int main(int argc, char** argv) {
     std::println("{}{}{}", xrule, rule, xreset);
 
     call_me_maybe(test_rs_core_global_character_functions, "test_rs_core_global_character_functions");
+    call_me_maybe(test_rs_core_global_case_conversion, "test_rs_core_global_case_conversion");
     call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
     call_me_maybe(test_rs_core_arithmetic_bitmask_functions, "test_rs_core_arithmetic_bitmask_functions");
     call_me_maybe(test_rs_core_arithmetic_checked_cast, "test_rs_core_arithmetic_checked_cast");

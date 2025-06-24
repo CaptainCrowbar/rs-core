@@ -43,6 +43,23 @@ constexpr char ascii_toupper(char c) noexcept;
 
 Locale independent ASCII character properties.
 
+```c++
+constexpr bool ascii_isalnum_w(char c) noexcept;
+constexpr bool ascii_isalpha_w(char c) noexcept;
+constexpr bool ascii_ispunct_w(char c) noexcept;
+```
+
+These return the same results as the similarly named functions above, except
+that the underscore character is counted as a letter (of neither case)
+instead of a punctuation mark.
+
+```c++
+std::string ascii_lowercase(std::string_view str);
+std::string ascii_uppercase(std::string_view str);
+```
+
+Convert case in a string. Non-ASCII bytes are copied unchanged.
+
 ## Metaprogramming utilities
 
 ```c++
