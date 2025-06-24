@@ -14,7 +14,7 @@ namespace RS {
 
     namespace Detail {
 
-        std::string demangle_typename(std::string name) {
+        inline std::string demangle_typename(std::string name) {
 
             #ifdef __GNUC__
 
