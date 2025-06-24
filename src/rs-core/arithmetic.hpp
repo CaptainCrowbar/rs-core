@@ -202,12 +202,15 @@ namespace RS {
                 return ParseNumber::invalid_number;
             }
 
-            if (base == 0 && str.size() >= 3 && str[0] == '0') {
-                if (str[1] == 'B' || str[1] == 'b') {
-                    return parse_unsigned_integer(str.substr(2), t, 2);
-                } else if (str[1] == 'X' || str[1] == 'x') {
-                    return parse_unsigned_integer(str.substr(2), t, 16);
+            if (base == 0) {
+                if (str.size() >= 2 && str[0] == '0') {
+                    if (str[1] == 'B' || str[1] == 'b') {
+                        return parse_unsigned_integer(str.substr(2), t, 2);
+                    } else if (str[1] == 'X' || str[1] == 'x') {
+                        return parse_unsigned_integer(str.substr(2), t, 16);
+                    }
                 }
+                base = 10;
             }
 
             auto t_base = static_cast<T>(base);
