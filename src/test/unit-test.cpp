@@ -41,6 +41,8 @@ void test_rs_core_random_pcg_engine();
 void test_rs_core_scope_guard();
 void test_rs_core_string_character_functions();
 void test_rs_core_string_case_conversion();
+void test_rs_core_string_xml_markup();
+void test_rs_core_string_html_markup();
 void test_rs_core_terminal_escape_codes();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
@@ -89,6 +91,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
     call_me_maybe(test_rs_core_string_character_functions, "test_rs_core_string_character_functions");
     call_me_maybe(test_rs_core_string_case_conversion, "test_rs_core_string_case_conversion");
+    call_me_maybe(test_rs_core_string_xml_markup, "test_rs_core_string_xml_markup");
+    call_me_maybe(test_rs_core_string_html_markup, "test_rs_core_string_html_markup");
     call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");
