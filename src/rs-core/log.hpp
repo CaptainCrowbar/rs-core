@@ -250,7 +250,7 @@ namespace RS {
                     text += queue_.front().what.get_message();
                     text += suffix;
                     text += '\n';
-                    out_.write(text);
+                    out_.write_str(text);
                     out_.flush();
                 }
                 catch (...) {}

@@ -195,7 +195,7 @@ void test_rs_core_string_xml_markup() {
         {
             Xtag h1;
             TRY(h1 = Xtag("<h1>\n", out));
-            out.write("Header");
+            out.write_str("Header");
         }
         Xtag br;
         TRY(br = Xtag("<br/>\n", out));
@@ -206,7 +206,7 @@ void test_rs_core_string_xml_markup() {
                 Xtag li, code;
                 TRY(li = Xtag("<li>\n", out));
                 TRY(code = Xtag("<code>", out));
-                out.write(item);
+                out.write_str(item);
             }
         }
     }

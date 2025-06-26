@@ -23,14 +23,13 @@ namespace RS {
         public InputIterator<iterator, const std::string> {
         public:
             iterator() {}
-            explicit iterator(Cstdio& io, bool trim_crlf = false);
+            explicit iterator(Cstdio& io);
             const std::string& operator*() const noexcept { return line_; }
             iterator& operator++();
             bool operator==(const iterator& i) const noexcept { return io_ == i.io_; }
         private:
             Cstdio* io_{};
             std::string line_;
-            bool trim_{};
         };
 
         using line_range = std::ranges::subrange<iterator>;
@@ -45,19 +44,19 @@ namespace RS {
         ~Cstdio() noexcept { close_stream(false); }
 
         void close() { close_stream(true); }
-        bool eof() const noexcept { return stream_ != nullptr && std::feof(stream_) != 0; }
-        bool error() const noexcept { return stream_ == nullptr || std::ferror(stream_) != 0; }
         void flush();
+        bool get(char& c);
         std::FILE* handle() const noexcept { return stream_; }
-        line_range lines(bool trim_crlf = false);
+        line_range lines();
+        void put(char c);
         std::size_t read(void* ptr, std::size_t len);
-        std::size_t read(std::string& buf, std::size_t pos = 0);
-        std::string read(std::size_t len);
-        std::string read_line(bool trim_crlf = false);
+        std::size_t read_into(std::string& buf, std::size_t pos = 0);
+        std::string read_line();
+        std::string read_str(std::size_t len);
         void seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR);
         std::ptrdiff_t tell() const;
         std::size_t write(const void* ptr, std::size_t len);
-        std::size_t write(std::string_view str) { return write(str.data(), str.size()); }
+        std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
 
         static std::string read_file(const std::filesystem::path& path);
         static void write_file(std::string_view str, const std::filesystem::path& path);
@@ -71,16 +70,15 @@ namespace RS {
 
     };
 
-        inline Cstdio::iterator::iterator(Cstdio& io, bool trim_crlf):
+        inline Cstdio::iterator::iterator(Cstdio& io):
         io_(&io),
-        line_(),
-        trim_(trim_crlf) {
+        line_() {
             ++*this;
         }
 
         inline Cstdio::iterator& Cstdio::iterator::operator++() {
-            line_ = io_->read_line(trim_);
-            if (line_.empty() && io_->eof()) {
+            line_ = io_->read_line();
+            if (line_.empty()) {
                 io_ = nullptr;
             }
             return *this;
@@ -111,9 +109,26 @@ namespace RS {
             }
         }
 
-        inline Cstdio::line_range Cstdio::lines(bool trim_crlf) {
-            iterator i(*this, trim_crlf);
-            return {i, {}};
+        inline bool Cstdio::get(char& c) {
+            errno = 0;
+            auto x = std::fgetc(stream_);
+            check(errno);
+            if (x == EOF) {
+                return false;
+            }
+            c = static_cast<char>(static_cast<unsigned char>(x));
+            return true;
+        }
+
+        inline Cstdio::line_range Cstdio::lines() {
+            return {iterator{*this}, {}};
+        }
+
+        inline void Cstdio::put(char c) {
+            auto x = static_cast<int>(static_cast<unsigned char>(c));
+            errno = 0;
+            std::fputc(x, stream_);
+            check(errno);
         }
 
         inline std::size_t Cstdio::read(void* ptr, std::size_t len) {
@@ -123,7 +138,7 @@ namespace RS {
             return n;
         }
 
-        inline std::size_t Cstdio::read(std::string& buf, std::size_t pos) {
+        inline std::size_t Cstdio::read_into(std::string& buf, std::size_t pos) {
             if (pos < buf.size()) {
                 return read(buf.data() + pos, buf.size() - pos);
             } else {
@@ -131,14 +146,7 @@ namespace RS {
             }
         }
 
-        inline std::string Cstdio::read(std::size_t len) {
-            std::string str(len, '\0');
-            auto n = read(str);
-            str.resize(n);
-            return str;
-        }
-
-        inline std::string Cstdio::read_line(bool trim_crlf) {
+        inline std::string Cstdio::read_line() {
 
             static constexpr auto block_size = 256uz;
 
@@ -174,15 +182,15 @@ namespace RS {
 
             }
 
-            if (trim_crlf && ! buf.empty() && buf.back() == '\n') {
-                buf.pop_back();
-                if (! buf.empty() && buf.back() == '\r') {
-                    buf.pop_back();
-                }
-            }
-
             return buf;
 
+        }
+
+        inline std::string Cstdio::read_str(std::size_t len) {
+            std::string str(len, '\0');
+            auto n = read_into(str);
+            str.resize(n);
+            return str;
         }
 
         inline void Cstdio::seek(std::ptrdiff_t offset, int from) {
@@ -245,10 +253,10 @@ namespace RS {
         inline void Cstdio::write_file(std::string_view str, const std::filesystem::path& path) {
             if (path.empty() || path == "-") {
                 Cstdio io(stdout);
-                io.write(str);
+                io.write_str(str);
             } else {
                 Cstdio io(path, "wb");
-                io.write(str);
+                io.write_str(str);
             }
         }
 

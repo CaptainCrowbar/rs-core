@@ -80,7 +80,7 @@ namespace RS {
         }
 
         explicit Xtag(std::string_view element, Cstdio& out) {
-            write_ = [&out] (std::string_view s) { out.write(s); };
+            write_ = [&out] (std::string_view s) { out.write_str(s); };
             start(element);
         }
 
