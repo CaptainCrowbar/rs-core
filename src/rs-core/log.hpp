@@ -281,7 +281,7 @@ namespace RS {
             }
 
             static const auto name_char = [] (char c) {
-                return ascii_isalnum(c) || c == '_' || static_cast<unsigned char>(c) >= 0x80;
+                return ascii_isalnum_w(c) || static_cast<unsigned char>(c) >= 0x80;
             };
 
             auto paren_pos = 0uz;

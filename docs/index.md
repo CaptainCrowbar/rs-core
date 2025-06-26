@@ -24,6 +24,7 @@ Requires C++23.
 * [`rs-core/log.hpp` -- Logging](log.html)
 * [`rs-core/random.hpp` -- Random number generators](random.html)
 * [`rs-core/scope.hpp` -- Scope guards](scope.html)
+* [`rs-core/string.hpp` -- String operations](string.html)
 * [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
 * [`rs-core/typename.hpp` -- Type names](typename.html)
 * [`rs-core/uuid.hpp` -- UUID class](uuid.html)

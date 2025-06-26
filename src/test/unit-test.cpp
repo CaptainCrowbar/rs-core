@@ -7,8 +7,6 @@
 
 using namespace RS::UnitTest;
 
-void test_rs_core_global_character_functions();
-void test_rs_core_global_case_conversion();
 void test_rs_core_global_range_functions();
 void test_rs_core_arithmetic_bitmask_functions();
 void test_rs_core_arithmetic_checked_cast();
@@ -41,6 +39,8 @@ void test_rs_core_log_context();
 void test_rs_core_log_function_context();
 void test_rs_core_random_pcg_engine();
 void test_rs_core_scope_guard();
+void test_rs_core_string_character_functions();
+void test_rs_core_string_case_conversion();
 void test_rs_core_terminal_escape_codes();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
@@ -55,8 +55,6 @@ int main(int argc, char** argv) {
     std::println("{}Running unit tests{}", xhead, xreset);
     std::println("{}{}{}", xrule, rule, xreset);
 
-    call_me_maybe(test_rs_core_global_character_functions, "test_rs_core_global_character_functions");
-    call_me_maybe(test_rs_core_global_case_conversion, "test_rs_core_global_case_conversion");
     call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
     call_me_maybe(test_rs_core_arithmetic_bitmask_functions, "test_rs_core_arithmetic_bitmask_functions");
     call_me_maybe(test_rs_core_arithmetic_checked_cast, "test_rs_core_arithmetic_checked_cast");
@@ -89,6 +87,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_log_function_context, "test_rs_core_log_function_context");
     call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
+    call_me_maybe(test_rs_core_string_character_functions, "test_rs_core_string_character_functions");
+    call_me_maybe(test_rs_core_string_case_conversion, "test_rs_core_string_case_conversion");
     call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");

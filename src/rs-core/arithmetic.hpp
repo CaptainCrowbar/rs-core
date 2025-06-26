@@ -2,6 +2,7 @@
 
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
+#include "rs-core/string.hpp"
 #include <cerrno>
 #include <cmath>
 #include <concepts>

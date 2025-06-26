@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.52
+    VERSION 0.1.53
     LANGUAGES CXX
 )
 
@@ -52,6 +52,7 @@ add_executable(${unittest}
     test/log-test.cpp
     test/random-test.cpp
     test/scope-test.cpp
+    test/string-test.cpp
     test/terminal-test.cpp
     test/typename-test.cpp
     test/uuid-test.cpp
