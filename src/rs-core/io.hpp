@@ -86,11 +86,19 @@ namespace RS {
         }
 
         inline Cstdio::Cstdio(const std::filesystem::path& path, const char* mode) {
-            errno = 0;
-            stream_ = std::fopen(path.c_str(), mode);
-            int err = errno;
-            if (stream_ == nullptr) {
-                throw std::system_error(std::error_code(err, std::system_category()), path.string());
+            if ((path.empty() || path == "-") && std::string_view{mode}.find('+') != npos) {
+                if (mode[0] == 'r') {
+                    stream_ = stdin;
+                } else {
+                    stream_ = stdout;
+                }
+            } else {
+                errno = 0;
+                stream_ = std::fopen(path.c_str(), mode);
+                int err = errno;
+                if (stream_ == nullptr) {
+                    throw std::system_error(std::error_code(err, std::system_category()), path.string());
+                }
             }
         }
 

@@ -51,7 +51,11 @@ explicit Cstdio::Cstdio(const std::filesystem::path& path,
     const char* mode = "rb");
 ```
 
-Constructor from a file path and I/O mode.
+Constructor from a file path and I/O mode. Behaviour is undefined if `mode` is
+a null pointer or an invalid mode string. If the path is `"-"` or an empty string,
+and the mode does not contain a plus sign,
+instead of opening a file this will attach the `Cstdio` object to standard input (if the mode starts with `"r"`)
+or standard output (if it starts with `"w"` or `"a"`).
 
 ```c++
 explicit Cstdio::Cstdio(std::FILE* stream) noexcept;
@@ -59,8 +63,8 @@ explicit Cstdio::Cstdio(std::FILE* stream) noexcept;
 
 Constructor from an existing stream handle. This is mainly intended to be used
 with the standard handles (`stdin,stdout,stderr`). If the handle is not one
-of these, the `Cstdio` object will take ownership of the stream and will
-close it on destruction.
+of these, and is not null, the `Cstdio` object will take ownership of the
+stream and will close it on destruction.
 
 ```c++
 Cstdio::Cstdio(Cstdio&& io) noexcept;
