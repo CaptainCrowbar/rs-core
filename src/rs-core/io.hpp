@@ -27,12 +27,13 @@ namespace RS {
             const std::string& operator*() const noexcept { return line_; }
             iterator& operator++();
             bool operator==(const iterator& i) const noexcept { return io_ == i.io_; }
+            bool operator==(std::nullptr_t) const noexcept { return io_ == nullptr; }
         private:
             Cstdio* io_{};
             std::string line_;
         };
 
-        using line_range = std::ranges::subrange<iterator>;
+        using line_range = std::ranges::subrange<iterator, std::nullptr_t>;
 
         Cstdio() = default;
         explicit Cstdio(const std::filesystem::path& path, const char* mode = "rb");
@@ -47,7 +48,7 @@ namespace RS {
         void flush();
         bool get(char& c);
         std::FILE* handle() const noexcept { return stream_; }
-        line_range lines();
+        line_range lines() { return {iterator{*this}, {}}; }
         void put(char c);
         std::size_t read(void* ptr, std::size_t len);
         std::size_t read_into(std::string& buf, std::size_t pos = 0);
@@ -118,10 +119,6 @@ namespace RS {
             }
             c = static_cast<char>(static_cast<unsigned char>(x));
             return true;
-        }
-
-        inline Cstdio::line_range Cstdio::lines() {
-            return {iterator{*this}, {}};
         }
 
         inline void Cstdio::put(char c) {
