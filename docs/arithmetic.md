@@ -56,7 +56,7 @@ namespace Literals {
 
 Defined for convenience.
 
-## Interpolation fucntions
+## Interpolation functions
 
 ```c++
 enum class Lerp: std::uint8_t {
