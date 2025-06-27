@@ -15,7 +15,7 @@
 
 namespace RS {
 
-    class Cstdio {
+    class IO {
 
     public:
 
@@ -23,17 +23,126 @@ namespace RS {
         public InputIterator<iterator, const std::string> {
         public:
             iterator() {}
-            explicit iterator(Cstdio& io);
+            explicit iterator(IO& io);
             const std::string& operator*() const noexcept { return line_; }
             iterator& operator++();
             bool operator==(const iterator& i) const noexcept { return io_ == i.io_; }
             bool operator==(std::nullptr_t) const noexcept { return io_ == nullptr; }
         private:
-            Cstdio* io_{};
+            IO* io_{};
             std::string line_;
         };
 
         using line_range = std::ranges::subrange<iterator, std::nullptr_t>;
+
+        IO() = default;
+        IO(const IO&) = delete;
+        IO(IO&&) = default;
+        virtual ~IO() = default;
+        IO& operator=(const IO&) = delete;
+        IO& operator=(IO&&) = default;
+
+        virtual bool can_seek() const noexcept = 0;
+        virtual void close() = 0;
+        virtual void flush() {}
+        virtual bool get(char& c) { return read(&c, 1) == 1; }
+        virtual void put(char c) { write(&c, 1); }
+        virtual std::size_t read(void* ptr, std::size_t len) = 0;
+        virtual std::string read_all();
+        virtual std::size_t read_into(std::string& buf, std::size_t pos = 0);
+        virtual std::string read_line();
+        virtual std::string read_str(std::size_t len);
+        virtual void seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR) = 0;
+        virtual std::ptrdiff_t tell() const = 0;
+        virtual std::size_t write(const void* ptr, std::size_t len) = 0;
+        virtual std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
+
+        line_range lines() { return {iterator{*this}, {}}; }
+
+    };
+
+        inline IO::iterator::iterator(IO& io):
+        io_(&io),
+        line_() {
+            ++*this;
+        }
+
+        inline IO::iterator& IO::iterator::operator++() {
+            line_ = io_->read_line();
+            if (line_.empty()) {
+                io_ = nullptr;
+            }
+            return *this;
+        }
+
+        inline std::string IO::read_all() {
+
+            static constexpr auto block_size = 4096uz;
+
+            std::string buf;
+
+            if (can_seek()) {
+
+                auto start = tell();
+                seek(0, SEEK_END);
+                auto signed_size = tell() - start;
+                seek(- signed_size, SEEK_CUR);
+                auto size = static_cast<std::size_t>(signed_size);
+                buf.resize(size);
+                read(buf.data(), size);
+
+            } else {
+
+                auto count = 0uz;
+
+                do {
+                    auto offset = buf.size();
+                    buf.resize(offset + block_size);
+                    auto count = read(buf.data() + offset, block_size);
+                    buf.resize(offset + count);
+                } while (count > 0);
+
+            }
+
+            if (buf.size() < block_size / 2) {
+                buf.shrink_to_fit();
+            }
+
+            return buf;
+
+        }
+
+        inline std::size_t IO::read_into(std::string& buf, std::size_t pos) {
+            if (pos < buf.size()) {
+                return read(buf.data() + pos, buf.size() - pos);
+            } else {
+                return 0;
+            }
+        }
+
+        inline std::string IO::read_line() {
+            std::string buf;
+            char c{};
+            while (get(c)) {
+                buf += c;
+                if (c == '\n') {
+                    break;
+                }
+            }
+            return buf;
+        }
+
+        inline std::string IO::read_str(std::size_t len) {
+            std::string str(len, '\0');
+            auto n = read_into(str);
+            str.resize(n);
+            return str;
+        }
+
+    class Cstdio:
+    public IO {
+
+    public:
 
         Cstdio() = default;
         explicit Cstdio(const std::filesystem::path& path, const char* mode = "rb");
@@ -42,23 +151,20 @@ namespace RS {
         Cstdio& operator=(Cstdio&& io) noexcept;
         Cstdio(const Cstdio&) = delete;
         Cstdio& operator=(const Cstdio&) = delete;
-        ~Cstdio() noexcept { close_stream(false); }
+        ~Cstdio() noexcept override { close_stream(false); }
 
-        void close() { close_stream(true); }
-        void flush();
-        bool get(char& c);
+        bool can_seek() const noexcept override { return std::fseek(stream_, 0, SEEK_CUR) == 0; }
+        void close() override { close_stream(true); }
+        void flush() override;
+        bool get(char& c) override;
+        void put(char c) override;
+        std::size_t read(void* ptr, std::size_t len) override;
+        std::string read_line() override;
+        void seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR) override;
+        std::ptrdiff_t tell() const override;
+        std::size_t write(const void* ptr, std::size_t len) override;
+
         std::FILE* handle() const noexcept { return stream_; }
-        line_range lines() { return {iterator{*this}, {}}; }
-        void put(char c);
-        std::size_t read(void* ptr, std::size_t len);
-        std::string read_all();
-        std::size_t read_into(std::string& buf, std::size_t pos = 0);
-        std::string read_line();
-        std::string read_str(std::size_t len);
-        void seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR);
-        std::ptrdiff_t tell() const;
-        std::size_t write(const void* ptr, std::size_t len);
-        std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
 
     private:
 
@@ -68,20 +174,6 @@ namespace RS {
         void close_stream(bool checked);
 
     };
-
-        inline Cstdio::iterator::iterator(Cstdio& io):
-        io_(&io),
-        line_() {
-            ++*this;
-        }
-
-        inline Cstdio::iterator& Cstdio::iterator::operator++() {
-            line_ = io_->read_line();
-            if (line_.empty()) {
-                io_ = nullptr;
-            }
-            return *this;
-        }
 
         inline Cstdio::Cstdio(const std::filesystem::path& path, const char* mode) {
             if ((path.empty() || path == "-") && std::string_view{mode}.find('+') != npos) {
@@ -141,51 +233,6 @@ namespace RS {
             return n;
         }
 
-        inline std::string Cstdio::read_all() {
-
-            static constexpr auto block_size = 4096uz;
-
-            std::string buf;
-
-            if (std::fseek(stream_, 0, SEEK_CUR) == 0) {
-
-                auto start = tell();
-                seek(0, SEEK_END);
-                auto signed_size = tell() - start;
-                seek(- signed_size, SEEK_CUR);
-                auto size = static_cast<std::size_t>(signed_size);
-                buf.resize(size);
-                read(buf.data(), size);
-
-            } else {
-
-                auto count = 0uz;
-
-                do {
-                    auto offset = buf.size();
-                    buf.resize(offset + block_size);
-                    auto count = read(buf.data() + offset, block_size);
-                    buf.resize(offset + count);
-                } while (count > 0);
-
-            }
-
-            if (buf.size() < block_size / 2) {
-                buf.shrink_to_fit();
-            }
-
-            return buf;
-
-        }
-
-        inline std::size_t Cstdio::read_into(std::string& buf, std::size_t pos) {
-            if (pos < buf.size()) {
-                return read(buf.data() + pos, buf.size() - pos);
-            } else {
-                return 0;
-            }
-        }
-
         inline std::string Cstdio::read_line() {
 
             static constexpr auto block_size = 256uz;
@@ -224,13 +271,6 @@ namespace RS {
 
             return buf;
 
-        }
-
-        inline std::string Cstdio::read_str(std::size_t len) {
-            std::string str(len, '\0');
-            auto n = read_into(str);
-            str.resize(n);
-            return str;
         }
 
         inline void Cstdio::seek(std::ptrdiff_t offset, int from) {
