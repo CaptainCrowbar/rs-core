@@ -213,11 +213,13 @@ void test_rs_core_string_xml_markup() {
 
     {
         std::string str;
-        TRY(str = Cstdio::read_file(test_file));
+        Cstdio in{test_file};
+        TRY(str = in.read_all());
         TEST_EQUAL(str, expected);
-        fs::remove(test_file);
-        TEST(! fs::exists(test_file));
     }
+
+    fs::remove(test_file);
+    TEST(! fs::exists(test_file));
 
     {
         std::string out;

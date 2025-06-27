@@ -53,6 +53,16 @@ void test_rs_core_io_cstdio_class() {
         TEST_EQUAL(s, "");
     }
 
+    {
+        Cstdio io(file);
+        TRY(s = io.read_all());
+        TEST_EQUAL(s,
+            "Hello world\n"
+            "Goodnight moon\n"
+            "Here comes the sun\n"
+        );
+    }
+
     TRY(fs::remove(file));
     TEST(! fs::exists(file));
     TEST_THROW(Cstdio(file), std::system_error, "No such file");
@@ -127,19 +137,5 @@ void test_rs_core_io_cstdio_line_iterator() {
     TRY(fs::remove(file));
     TEST(! fs::exists(file));
     TEST_THROW(Cstdio(file), std::system_error, "No such file");
-
-}
-
-void test_rs_core_io_cstdio_read_write_file() {
-
-    std::string s;
-
-    TRY(Cstdio::write_file("Hello world\n", file));
-    TEST(fs::exists(file));
-    TRY(s = Cstdio::read_file(file));
-    TEST_EQUAL(s, "Hello world\n");
-    TRY(fs::remove(file));
-    TEST(! fs::exists(file));
-    TEST_THROW(Cstdio::read_file(file), std::system_error, "No such file");
 
 }

@@ -132,6 +132,12 @@ number of bytes actually read (which may be zero if you are at the end of the
 stream).
 
 ```c++
+std::string Cstdio::read_all();
+```
+
+Read all data from the current read position to the end of the stream.
+
+```c++
 std::size_t Cstdio::read_into(std::string& buf, std::size_t pos = 0);
 ```
 
@@ -180,16 +186,3 @@ std::size_t Cstdio::write_str(std::string_view str);
 
 Writes a block of data to the stream. The return value is the number of bytes
 written (this is not guaranteed to be equal to `str.size()`).
-
-```c++
-static std::string Cstdio::read_file(const std::filesystem::path& path);
-```
-
-Reads the complete contents of a file into a string.
-
-```c++
-static void Cstdio::write_file(std::string_view str, const std::filesystem::path& path);
-```
-
-Writes the contents of a string into a file. Any existing file will be
-overwritten.

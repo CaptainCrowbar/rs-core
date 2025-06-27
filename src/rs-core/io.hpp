@@ -51,6 +51,7 @@ namespace RS {
         line_range lines() { return {iterator{*this}, {}}; }
         void put(char c);
         std::size_t read(void* ptr, std::size_t len);
+        std::string read_all();
         std::size_t read_into(std::string& buf, std::size_t pos = 0);
         std::string read_line();
         std::string read_str(std::size_t len);
@@ -58,9 +59,6 @@ namespace RS {
         std::ptrdiff_t tell() const;
         std::size_t write(const void* ptr, std::size_t len);
         std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
-
-        static std::string read_file(const std::filesystem::path& path);
-        static void write_file(std::string_view str, const std::filesystem::path& path);
 
     private:
 
@@ -143,6 +141,43 @@ namespace RS {
             return n;
         }
 
+        inline std::string Cstdio::read_all() {
+
+            static constexpr auto block_size = 4096uz;
+
+            std::string buf;
+
+            if (std::fseek(stream_, 0, SEEK_CUR) == 0) {
+
+                auto start = tell();
+                seek(0, SEEK_END);
+                auto signed_size = tell() - start;
+                seek(- signed_size, SEEK_CUR);
+                auto size = static_cast<std::size_t>(signed_size);
+                buf.resize(size);
+                read(buf.data(), size);
+
+            } else {
+
+                auto count = 0uz;
+
+                do {
+                    auto offset = buf.size();
+                    buf.resize(offset + block_size);
+                    auto count = read(buf.data() + offset, block_size);
+                    buf.resize(offset + count);
+                } while (count > 0);
+
+            }
+
+            if (buf.size() < block_size / 2) {
+                buf.shrink_to_fit();
+            }
+
+            return buf;
+
+        }
+
         inline std::size_t Cstdio::read_into(std::string& buf, std::size_t pos) {
             if (pos < buf.size()) {
                 return read(buf.data() + pos, buf.size() - pos);
@@ -216,53 +251,6 @@ namespace RS {
             auto n = std::fwrite(ptr, 1, len, stream_);
             check(errno);
             return n;
-        }
-
-        inline std::string Cstdio::read_file(const std::filesystem::path& path) {
-
-            static constexpr auto block_size = 4096uz;
-
-            std::string buf;
-
-            if (path.empty() || path == "-") {
-
-                Cstdio io(stdin);
-                auto count = 0uz;
-
-                do {
-                    auto offset = buf.size();
-                    buf.resize(offset + block_size);
-                    auto count = io.read(buf.data() + offset, block_size);
-                    buf.resize(offset + count);
-                } while (count > 0);
-
-            } else {
-
-                Cstdio io(path, "rb");
-                io.seek(0, SEEK_END);
-                auto size = static_cast<std::size_t>(io.tell());
-                io.seek(0, SEEK_SET);
-                buf.resize(size);
-                io.read(buf.data(), size);
-
-            }
-
-            if (buf.size() < block_size / 2) {
-                buf.shrink_to_fit();
-            }
-
-            return buf;
-
-        }
-
-        inline void Cstdio::write_file(std::string_view str, const std::filesystem::path& path) {
-            if (path.empty() || path == "-") {
-                Cstdio io(stdout);
-                io.write_str(str);
-            } else {
-                Cstdio io(path, "wb");
-                io.write_str(str);
-            }
         }
 
         inline void Cstdio::check(int err) const {
