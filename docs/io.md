@@ -224,3 +224,51 @@ std::FILE* Cstdio::handle() const noexcept;
 ```
 
 Returns the underlying `<cstdio>` stream handle.
+
+## StringBuffer class
+
+```c++
+class StringBuffer: public IO;
+```
+
+This class manages an internal string buffer, manipulating it using an I/O
+like interface.
+
+```c++
+StringBuffer::StringBuffer();
+```
+
+The default constructor initializes the buffer to an empty string.
+
+```c++
+StringBuffer::StringBuffer(StringBuffer&& sb);
+StringBuffer::~StringBuffer() noexcept override;
+StringBuffer& StringBuffer::operator=(StringBuffer&& sb);
+```
+
+Other life cycle operations.
+
+```c++
+void StringBuffer::close() override;
+```
+
+A string buffer has no concept of open vs closed; the `close()` function does
+nothing.
+
+```c++
+void StringBuffer::clear() noexcept;
+```
+
+Resets the buffer to an empty string.
+
+```c++
+bool StringBuffer::empty() const noexcept;
+```
+
+True if the buffer is currently empty.
+
+```c++
+std::string_view StringBuffer::view() const noexcept;
+```
+
+Returns a view over the internal buffer.

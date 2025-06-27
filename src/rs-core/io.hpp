@@ -2,10 +2,12 @@
 
 #include "rs-core/global.hpp"
 #include "rs-core/iterator.hpp"
+#include <algorithm>
 #include <cerrno>
 #include <compare>
 #include <cstddef>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <ranges>
 #include <string>
@@ -313,6 +315,94 @@ namespace RS {
                     check(err);
                 }
             }
+        }
+
+    class StringBuffer:
+    public IO {
+
+    public:
+
+        StringBuffer() = default;
+        StringBuffer(const StringBuffer&) = delete;
+        StringBuffer(StringBuffer&& sb);
+        ~StringBuffer() override = default;
+        StringBuffer& operator=(const StringBuffer&) = delete;
+        StringBuffer& operator=(StringBuffer&& sb);
+
+        bool can_seek() const noexcept override { return true; }
+        void close() override {}
+        std::size_t read(void* ptr, std::size_t len) override;
+        std::string read_all() override;
+        std::string read_line() override;
+        std::string read_str(std::size_t len) override;
+        void seek(std::ptrdiff_t offset, int from = SEEK_CUR) override;
+        std::ptrdiff_t tell() const override { return static_cast<std::ptrdiff_t>(pos_); }
+        std::size_t write(const void* ptr, std::size_t len) override;
+
+        void clear() noexcept;
+        bool empty() const noexcept { return buf_.empty(); }
+        std::string_view view() const noexcept { return buf_; }
+
+    private:
+
+        std::string buf_;
+        std::size_t pos_{};
+
+    };
+
+        inline std::size_t StringBuffer::read(void* ptr, std::size_t len) {
+            auto n = std::min(len, buf_.size() - pos_);
+            std::memcpy(ptr, buf_.data() + pos_, n);
+            pos_ += n;
+            return n;
+        }
+
+        inline std::string StringBuffer::read_all() {
+            auto result = buf_.substr(pos_);
+            pos_ = buf_.size();
+            return result;
+        }
+
+        inline std::string StringBuffer::read_line() {
+            auto next = buf_.find('\n', pos_);
+            if (next == npos) {
+                next = buf_.size();
+            } else {
+                ++next;
+            }
+            auto result = buf_.substr(pos_, next - pos_);
+            pos_ = next;
+            return result;
+        }
+
+        inline std::string StringBuffer::read_str(std::size_t len) {
+            auto n = std::min(len, buf_.size() - pos_);
+            auto result = buf_.substr(pos_, n);
+            pos_ += n;
+            return result;
+        }
+
+        inline void StringBuffer::seek(std::ptrdiff_t offset, int from) {
+            auto signed_pos = static_cast<std::ptrdiff_t>(pos_);
+            auto signed_size = static_cast<std::ptrdiff_t>(buf_.size());
+            switch (from) {
+                case SEEK_SET:  signed_pos = offset; break;
+                case SEEK_END:  signed_pos = signed_size - offset; break;
+                default:        signed_pos += offset; break;
+            }
+            pos_ = static_cast<std::size_t>(std::clamp(signed_pos, 0z, signed_size));
+        }
+
+        inline std::size_t StringBuffer::write(const void* ptr, std::size_t len) {
+            buf_.resize(pos_ + len);
+            std::memcpy(buf_.data() + pos_, ptr, len);
+            pos_ = buf_.size();
+            return len;
+        }
+
+        inline void StringBuffer::clear() noexcept {
+            buf_.clear();
+            pos_ = 0;
         }
 
 }
