@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <format>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -60,6 +61,18 @@ namespace RS {
         virtual std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
 
         line_range lines() { return {iterator{*this}, {}}; }
+
+        template <typename... Args>
+            std::size_t print(std::format_string<const Args&...> fmt, const Args&... args) {
+                return write_str(std::format(fmt, args...));
+            }
+
+        template <typename... Args>
+            std::size_t println(std::format_string<const Args&...> fmt, const Args&... args) {
+                auto n = write_str(std::format(fmt, args...));
+                put('\n');
+                return n + 1;
+            }
 
     };
 
@@ -341,6 +354,7 @@ namespace RS {
 
         void clear() noexcept;
         bool empty() const noexcept { return buf_.empty(); }
+        std::size_t size() const noexcept { return buf_.size(); }
         std::string_view view() const noexcept { return buf_; }
 
     private:

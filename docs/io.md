@@ -158,6 +158,18 @@ IO::line_range IO::lines();
 Returns an iterator range over the lines in an input stream, starting at the
 current read position.
 
+```c++
+template <typename... Args>
+    std::size_t IO::print(std::format_string<const Args&...> fmt,
+        const Args&... args);
+template <typename... Args>
+    std::size_t IO::println(std::format_string<const Args&...> fmt,
+        const Args&... args);
+```
+
+Write formatted data to the stream. The return value is the number of bytes
+written.
+
 ## Cstdio class
 
 ```c++
@@ -263,9 +275,10 @@ Resets the buffer to an empty string.
 
 ```c++
 bool StringBuffer::empty() const noexcept;
+std::size_t StringBuffer::size() const noexcept;
 ```
 
-True if the buffer is currently empty.
+Query the buffer's current size.
 
 ```c++
 std::string_view StringBuffer::view() const noexcept;

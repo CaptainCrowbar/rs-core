@@ -103,6 +103,61 @@ void test_rs_core_io_cstdio_byte_io() {
 
 }
 
+void test_rs_core_io_cstdio_formatting() {
+
+    std::string s;
+    auto n = 0uz;
+
+    {
+        Cstdio io(file, "wb");
+        TRY(n = io.print("Hello world\n"));
+        TEST_EQUAL(n, 12u);
+        TRY(n = io.print("Answer {}\n", 42));
+        TEST_EQUAL(n, 10u);
+        TRY(n = io.print("Agent {} ❤️ {}\n", 86, 99));
+        TEST_EQUAL(n, 19u);
+    }
+
+    TEST(fs::exists(file));
+
+    {
+        Cstdio io(file);
+        TRY(s = io.read_all());
+        TEST_EQUAL(s,
+            "Hello world\n"
+            "Answer 42\n"
+            "Agent 86 ❤️ 99\n"
+        );
+    }
+
+    {
+        Cstdio io(file, "wb");
+        TRY(n = io.println("Hello world"));
+        TEST_EQUAL(n, 12u);
+        TRY(n = io.println("Answer {}", 42));
+        TEST_EQUAL(n, 10u);
+        TRY(n = io.println("Agent {} ❤️ {}", 86, 99));
+        TEST_EQUAL(n, 19u);
+    }
+
+    TEST(fs::exists(file));
+
+    {
+        Cstdio io(file);
+        TRY(s = io.read_all());
+        TEST_EQUAL(s,
+            "Hello world\n"
+            "Answer 42\n"
+            "Agent 86 ❤️ 99\n"
+        );
+    }
+
+    TRY(fs::remove(file));
+    TEST(! fs::exists(file));
+    TEST_THROW(Cstdio(file), std::system_error, "No such file");
+
+}
+
 void test_rs_core_io_cstdio_line_iterator() {
 
     std::string s;
@@ -208,6 +263,51 @@ void test_rs_core_io_string_buffer_byte_io() {
     TEST(buf.get(c));  TEST_EQUAL(c, '\n');
 
     TEST(! buf.get(c));
+
+}
+
+void test_rs_core_io_string_buffer_formatting() {
+
+    StringBuffer buf;
+    std::string s;
+    auto n = 0uz;
+    auto z = 0z;
+
+    TRY(n = buf.print("Hello world\n"));
+    TEST_EQUAL(n, 12u);
+    TRY(n = buf.print("Answer {}\n", 42));
+    TEST_EQUAL(n, 10u);
+    TRY(n = buf.print("Agent {} ❤️ {}\n", 86, 99));
+    TEST_EQUAL(n, 19u);
+    TRY(z = buf.tell());
+    TEST_EQUAL(z, 41);
+
+    TRY(buf.seek(0, SEEK_SET));
+    TRY(s = buf.read_all());
+    TEST_EQUAL(s,
+        "Hello world\n"
+        "Answer 42\n"
+        "Agent 86 ❤️ 99\n"
+    );
+
+    TRY(buf.clear());
+    TEST(buf.empty());
+    TRY(n = buf.println("Hello world"));
+    TEST_EQUAL(n, 12u);
+    TRY(n = buf.println("Answer {}", 42));
+    TEST_EQUAL(n, 10u);
+    TRY(n = buf.println("Agent {} ❤️ {}", 86, 99));
+    TEST_EQUAL(n, 19u);
+    TRY(z = buf.tell());
+    TEST_EQUAL(z, 41);
+
+    TRY(buf.seek(0, SEEK_SET));
+    TRY(s = buf.read_all());
+    TEST_EQUAL(s,
+        "Hello world\n"
+        "Answer 42\n"
+        "Agent 86 ❤️ 99\n"
+    );
 
 }
 
