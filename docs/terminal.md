@@ -42,68 +42,6 @@ Xterm& Xterm::operator=(Xterm&& xt) noexcept;
 
 Other life cycle operations.
 
-```c++
-bool Xterm::is_colour() const noexcept;
-```
-
-Returns the colour flag supplied to the constructor.
-
-### Terminal control sequences
-
-```c++
-using Xterm::colour = std::array<int, 3>;
-```
-
-This can optionally be used to hold a colour (see below).
-
-```c++
-std::string_view Xterm::reset() const noexcept;;       // esc [0m
-std::string_view Xterm::bold() const noexcept;;        // esc [1m
-std::string_view Xterm::under() const noexcept;;       // esc [4m
-std::string_view Xterm::bold_off() const noexcept;;    // esc [22m
-std::string_view Xterm::under_off() const noexcept;;   // esc [24m
-std::string_view Xterm::colour_off() const noexcept;;  // esc [39m
-std::string_view Xterm::black() const noexcept;;       // esc [30m
-std::string_view Xterm::red() const noexcept;;         // esc [31m
-std::string_view Xterm::green() const noexcept;;       // esc [32m
-std::string_view Xterm::yellow() const noexcept;;      // esc [33m
-std::string_view Xterm::blue() const noexcept;;        // esc [34m
-std::string_view Xterm::magenta() const noexcept;;     // esc [35m
-std::string_view Xterm::cyan() const noexcept;;        // esc [36m
-std::string_view Xterm::white() const noexcept;;       // esc [37m
-std::string_view Xterm::black_bg() const noexcept;;    // esc [40m
-std::string_view Xterm::red_bg() const noexcept;;      // esc [41m
-std::string_view Xterm::green_bg() const noexcept;;    // esc [42m
-std::string_view Xterm::yellow_bg() const noexcept;;   // esc [43m
-std::string_view Xterm::blue_bg() const noexcept;;     // esc [44m
-std::string_view Xterm::magenta_bg() const noexcept;;  // esc [45m
-std::string_view Xterm::cyan_bg() const noexcept;;     // esc [46m
-std::string_view Xterm::white_bg() const noexcept;;    // esc [47m
-```
-
-Standard escape sequences. All of these will return an empty string if
-`is_colour()` is false.
-
-```c++
-std::string Xterm::grey(int y) const;
-std::string Xterm::grey_bg(int y) const;
-```
-
-These return the escape codes for a greyscale foreground or background,
-assuming at least a 256 colour terminal. The grey index will be clamped to
-the range 0-23.
-
-```c++
-std::string Xterm::rgb(int r, int g, int b) const;
-std::string Xterm::rgb(colour c) const;
-std::string Xterm::rgb_bg(int r, int g, int b) const;
-std::string Xterm::rgb_bg(colour c) const;
-```
-
-These return the escape codes for a coloured foreground or background,
-assuming at least a 256 colour terminal. Each of the RGB indices will be
-clamped to the range 0-5.
-
 ### Terminal properties
 
 ```c++
@@ -118,6 +56,12 @@ The dark or light mode indicator returned from `guess_mode().` This is
 imported into the `Xterm` class (`using enum XtermMode`).
 
 ```c++
+bool Xterm::is_colour() const noexcept;
+```
+
+Returns the colour flag supplied to the constructor.
+
+```c++
 static std::size_t Xterm::columns() noexcept;
 static std::size_t Xterm::lines() noexcept;
 ```
@@ -130,15 +74,93 @@ not available, default values of 80 columns and 25 lines will be assumed.
 static XtermMode Xterm::guess_mode() noexcept;
 ```
 
-Attempts to determine whether the output terminal. This checks the `COLORFGBG`
-environment variable, which is available on most Unix terminals but probably
-not reliable on Windows. It will return `unknown` if `is_tty(stdout)` is
-false. or if the variable is not available or its format is not recognized.
+Attempts to determine whether the output terminal is in light or dark mode.
+This checks the `COLORFGBG` environment variable, which is available on most
+Unix terminals but probably not reliable on Windows. It will return `unknown`
+if `is_tty(stdout)` is false, or if the variable is not available or its
+format is not recognized.
 
 ```c++
-static bool Xterm::is_tty(FILE* stream) noexcept;
+static bool Xterm::is_tty(FILE* stream = stdout) noexcept;
+static bool Xterm::is_tty(int fd) noexcept;
 ```
 
 Query whether the standard I/O streams (`stdin,stdout,stderr`) are connected
-to a terminal. This will always return false if the argument is not one of
-the three standard streams.
+to a terminal. The first version will always return false if the argument is
+not one of the three standard streams.
+
+### Cursor control sequences
+
+```c++
+std::string_view left() const noexcept           // esc [D
+std::string_view right() const noexcept          // esc [C
+std::string_view up() const noexcept             // esc [A
+std::string_view down() const noexcept           // esc [B
+std::string left(int n) const                    // esc [ <n> D
+std::string right(int n) const                   // esc [ <n> C
+std::string up(int n) const                      // esc [ <n> A
+std::string down(int n) const                    // esc [ <n> B
+std::string move_to(int x, int y) const          // esc [ <y> ; <x> H
+std::string_view save_position() const noexcept  // esc [s
+std::string_view load_position() const noexcept  // esc [u
+std::string_view erase_left() const noexcept     // esc [1K
+std::string_view erase_right() const noexcept    // esc [K
+std::string_view erase_above() const noexcept    // esc [1J
+std::string_view erase_below() const noexcept    // esc [J
+std::string_view erase_line() const noexcept     // esc [2K
+std::string_view clear_screen() const noexcept   // esc [2J
+```
+
+Standard escape sequences.
+
+### Format control sequences
+
+All of these functions will return an empty string if `is_colour()` is false.
+
+```c++
+std::string_view Xterm::reset() const noexcept;       // esc [0m
+std::string_view Xterm::bold() const noexcept;        // esc [1m
+std::string_view Xterm::under() const noexcept;       // esc [4m
+std::string_view Xterm::bold_off() const noexcept;    // esc [22m
+std::string_view Xterm::under_off() const noexcept;   // esc [24m
+std::string_view Xterm::colour_off() const noexcept;  // esc [39m
+std::string_view Xterm::black() const noexcept;       // esc [30m
+std::string_view Xterm::red() const noexcept;         // esc [31m
+std::string_view Xterm::green() const noexcept;       // esc [32m
+std::string_view Xterm::yellow() const noexcept;      // esc [33m
+std::string_view Xterm::blue() const noexcept;        // esc [34m
+std::string_view Xterm::magenta() const noexcept;     // esc [35m
+std::string_view Xterm::cyan() const noexcept;        // esc [36m
+std::string_view Xterm::white() const noexcept;       // esc [37m
+std::string_view Xterm::black_bg() const noexcept;    // esc [40m
+std::string_view Xterm::red_bg() const noexcept;      // esc [41m
+std::string_view Xterm::green_bg() const noexcept;    // esc [42m
+std::string_view Xterm::yellow_bg() const noexcept;   // esc [43m
+std::string_view Xterm::blue_bg() const noexcept;     // esc [44m
+std::string_view Xterm::magenta_bg() const noexcept;  // esc [45m
+std::string_view Xterm::cyan_bg() const noexcept;     // esc [46m
+std::string_view Xterm::white_bg() const noexcept;    // esc [47m
+```
+
+Standard escape sequences.
+
+```c++
+std::string Xterm::grey(int y) const;
+std::string Xterm::grey_bg(int y) const;
+```
+
+These return the escape codes for a greyscale foreground or background,
+assuming at least a 256 colour terminal. The grey index will be clamped to
+the range 0-23.
+
+```c++
+using Xterm::colour = std::array<int, 3>;
+std::string Xterm::rgb(int r, int g, int b) const;
+std::string Xterm::rgb(colour c) const;
+std::string Xterm::rgb_bg(int r, int g, int b) const;
+std::string Xterm::rgb_bg(colour c) const;
+```
+
+These return the escape codes for a coloured foreground or background,
+assuming at least a 256 colour terminal. Each of the RGB indices will be
+clamped to the range 0-5.

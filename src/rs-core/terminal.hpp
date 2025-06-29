@@ -43,7 +43,37 @@ namespace RS {
         Xterm() noexcept: colour_(is_tty(stdout)) {}
         explicit Xterm(bool use_colour) noexcept: colour_(use_colour) {}
 
+        // Terminal properties
+
         bool is_colour() const noexcept { return colour_; }
+
+        static std::size_t columns() noexcept { return getenv_size("COLUMNS", 80); }
+        static std::size_t lines() noexcept { return getenv_size("LINES", 25); }
+        static XtermMode guess_mode() noexcept;
+        static bool is_tty(std::FILE* stream = stdout) noexcept;
+        static bool is_tty(int fd) noexcept;
+
+        // Cursor control sequences
+
+        std::string_view left() const noexcept           { return "\x1b[D"; }
+        std::string_view right() const noexcept          { return "\x1b[C"; }
+        std::string_view up() const noexcept             { return "\x1b[A"; }
+        std::string_view down() const noexcept           { return "\x1b[B"; }
+        std::string left(int n) const                    { return "\x1b[" + std::to_string(n) + "D"; }
+        std::string right(int n) const                   { return "\x1b[" + std::to_string(n) + "C"; }
+        std::string up(int n) const                      { return "\x1b[" + std::to_string(n) + "A"; }
+        std::string down(int n) const                    { return "\x1b[" + std::to_string(n) + "B"; }
+        std::string move_to(int x, int y) const          { return "\x1b[" + std::to_string(y) + ";" + std::to_string(x) + "H"; }
+        std::string_view save_position() const noexcept  { return "\x1b[s"; }
+        std::string_view load_position() const noexcept  { return "\x1b[u"; }
+        std::string_view erase_left() const noexcept     { return "\x1b[1K"; }
+        std::string_view erase_right() const noexcept    { return "\x1b[K"; }
+        std::string_view erase_above() const noexcept    { return "\x1b[1J"; }
+        std::string_view erase_below() const noexcept    { return "\x1b[J"; }
+        std::string_view erase_line() const noexcept     { return "\x1b[2K"; }
+        std::string_view clear_screen() const noexcept   { return "\x1b[2J"; }
+
+        // Format control sequences
 
         std::string_view reset() const noexcept       { return colour_ ? "\x1b[0m" : ""; }
         std::string_view bold() const noexcept        { return colour_ ? "\x1b[1m" : ""; }
@@ -77,11 +107,6 @@ namespace RS {
         std::string rgb_bg(int r, int g, int b) const;
         std::string rgb(colour c) const { return rgb(c[0], c[1], c[2]); }
         std::string rgb_bg(colour c) const { return rgb_bg(c[0], c[1], c[2]); }
-
-        static std::size_t columns() noexcept { return getenv_size("COLUMNS", 80); }
-        static std::size_t lines() noexcept { return getenv_size("LINES", 25); }
-        static XtermMode guess_mode() noexcept;
-        static bool is_tty(std::FILE* stream) noexcept;
 
     private:
 
@@ -141,19 +166,18 @@ namespace RS {
         }
 
         inline bool Xterm::is_tty(std::FILE* stream) noexcept {
-
-            int fd;
-
             if (stream == stdin) {
-                fd = 0;
+                return is_tty(0);
             } else if (stream == stdout) {
-                fd = 1;
+                return is_tty(1);
             } else if (stream == stderr) {
-                fd = 2;
+                return is_tty(2);
             } else {
                 return false;
             }
+        }
 
+        inline bool Xterm::is_tty(int fd) noexcept {
             #ifdef _WIN32
                 static constexpr auto std_input_handle = static_cast<unsigned long>(-10);
                 auto handle = GetStdHandle(std_input_handle - fd);
@@ -162,7 +186,6 @@ namespace RS {
             #else
                 return isatty(fd) != 0;
             #endif
-
         }
 
         inline std::size_t Xterm::getenv_size(const char* name, std::size_t default_value) noexcept {
