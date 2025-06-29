@@ -21,7 +21,7 @@ void test_rs_core_io_cstdio_class() {
     auto z = 0z;
 
     {
-        Cstdio io(file, "wb");
+        Cstdio io(file, IO::write_only);
         TRY(n = io.write_str("Hello world\n"));
         TEST_EQUAL(n, 12u);
         TRY(n = io.write_str("Goodnight moon\n"));
@@ -36,7 +36,7 @@ void test_rs_core_io_cstdio_class() {
         Cstdio io(file);
         TRY(z = io.tell());
         TEST_EQUAL(z, 0);
-        TRY(io.seek(0, SEEK_END));
+        TRY(io.seek(0, IO::end));
         TRY(z = io.tell());
         TEST_EQUAL(z, 46);
     }
@@ -75,7 +75,7 @@ void test_rs_core_io_cstdio_byte_io() {
     char c{};
 
     {
-        Cstdio io(file, "wb");
+        Cstdio io(file, IO::write_only);
         TRY(io.put('H'));
         TRY(io.put('e'));
         TRY(io.put('l'));
@@ -109,7 +109,7 @@ void test_rs_core_io_cstdio_formatting() {
     auto n = 0uz;
 
     {
-        Cstdio io(file, "wb");
+        Cstdio io(file, IO::write_only);
         TRY(n = io.print("Hello world\n"));
         TEST_EQUAL(n, 12u);
         TRY(n = io.print("Answer {}\n", 42));
@@ -131,7 +131,7 @@ void test_rs_core_io_cstdio_formatting() {
     }
 
     {
-        Cstdio io(file, "wb");
+        Cstdio io(file, IO::write_only);
         TRY(n = io.println("Hello world"));
         TEST_EQUAL(n, 12u);
         TRY(n = io.println("Answer {}", 42));
@@ -165,7 +165,7 @@ void test_rs_core_io_cstdio_line_iterator() {
     IO::iterator i;
 
     {
-        Cstdio io(file, "wb");
+        Cstdio io(file, IO::write_only);
         TRY(io.write_str("Hello world\n"));
         TRY(io.write_str("Goodnight moon\n"));
         TRY(io.write_str("Here comes the sun\n"));
@@ -212,14 +212,14 @@ void test_rs_core_io_string_buffer_class() {
     TRY(z = buf.tell());
     TEST_EQUAL(z, 46);
 
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
     TRY(z = buf.tell());
     TEST_EQUAL(z, 0);
-    TRY(buf.seek(0, SEEK_END));
+    TRY(buf.seek(0, IO::end));
     TRY(z = buf.tell());
     TEST_EQUAL(z, 46);
 
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
     TRY(s = buf.read_str(12));
     TEST_EQUAL(s, "Hello world\n");
     TRY(s = buf.read_str(15));
@@ -229,7 +229,7 @@ void test_rs_core_io_string_buffer_class() {
     TRY(s = buf.read_str(100));
     TEST_EQUAL(s, "");
 
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
     TRY(s = buf.read_all());
     TEST_EQUAL(s,
         "Hello world\n"
@@ -253,7 +253,7 @@ void test_rs_core_io_string_buffer_byte_io() {
     TRY(buf.put('\n'));
     TRY(z = buf.tell());
     TEST_EQUAL(z, 6);
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
 
     TEST(buf.get(c));  TEST_EQUAL(c, 'H');
     TEST(buf.get(c));  TEST_EQUAL(c, 'e');
@@ -282,7 +282,7 @@ void test_rs_core_io_string_buffer_formatting() {
     TRY(z = buf.tell());
     TEST_EQUAL(z, 41);
 
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
     TRY(s = buf.read_all());
     TEST_EQUAL(s,
         "Hello world\n"
@@ -301,7 +301,7 @@ void test_rs_core_io_string_buffer_formatting() {
     TRY(z = buf.tell());
     TEST_EQUAL(z, 41);
 
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
     TRY(s = buf.read_all());
     TEST_EQUAL(s,
         "Hello world\n"
@@ -321,7 +321,7 @@ void test_rs_core_io_string_buffer_line_iterator() {
     TRY(buf.write_str("Hello world\n"));
     TRY(buf.write_str("Goodnight moon\n"));
     TRY(buf.write_str("Here comes the sun\n"));
-    TRY(buf.seek(0, SEEK_SET));
+    TRY(buf.seek(0, IO::set));
 
     TRY(lines = buf.lines());
     TRY(i = lines.begin());

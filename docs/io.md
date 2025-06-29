@@ -12,6 +12,30 @@ namespace RS;
 * TOC
 {:toc}
 
+## Supporting types
+
+```c++
+enum class IOMode: int {
+    read_only,
+    write_only,
+    read_write,
+    append,
+};
+```
+
+Used in I/O class constructors to indicate the read/write mode. Some classes
+may also allow other modes specific to that class.
+
+```c++
+enum class IOSeek: int {
+    current  = SEEK_CUR,  // Relative to the current position
+    end      = SEEK_END,  // Relative to the beginning of the stream
+    set      = SEEK_SET,  // Relative to the end of the stream
+};
+```
+
+Used in `IO:seek()` to indicate where to seek from.
+
 ## IO class
 
 ```c++
@@ -27,6 +51,13 @@ call fails.
 
 In derived classes, functions overriding base class virtual functions are
 documented only where they add significant behavioural details.
+
+```c++
+using enum IOMode;
+using enum IOSeek;
+```
+
+Imported for convenience.
 
 ```c++
 class IO::iterator;
@@ -56,8 +87,8 @@ Life cycle operations.
 virtual bool IO::can_seek() const noexcept;
 ```
 
-Indicates whether or not the stream is seekable. For some I/O channel types
-this may not be completely reliable.
+Indicates whether or not the stream is seekable. This does not guarantee that
+any particular call to `seek()` will work.
 
 ```c++
 virtual void IO::close();
@@ -78,6 +109,25 @@ virtual bool IO::get(char& c);
 
 Reads one byte from the file, returning true on a successful read. If the read
 fails the argument will be left unchanged.
+
+```c++
+IO::line_range IO::lines();
+```
+
+Returns an iterator range over the lines in an input stream, starting at the
+current read position.
+
+```c++
+template <typename... Args>
+    std::size_t IO::print(std::format_string<const Args&...> fmt,
+        const Args&... args);
+template <typename... Args>
+    std::size_t IO::println(std::format_string<const Args&...> fmt,
+        const Args&... args);
+```
+
+Write formatted data to the stream. The return value is the number of bytes
+written.
 
 ```c++
 virtual void IO::put(char c);
@@ -117,19 +167,16 @@ first. If the stream actually contains binary data, not text, this may read a
 large amount of data looking for a line feed.
 
 ```c++
-virtual std::string IO::read_str(std::size_t len);
+std::string IO::read_str(std::size_t len);
 ```
 
 Reads up to `len` bytes and returns the data as a string.
 
 ```c++
-virtual void IO::seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR);
+virtual void IO::seek(std::ptrdiff_t offset = 0, IOSeek from = current);
 ```
 
-Seek through the stream, if possible. The `from` argument must be one of the
-standard seek start positions (`SEEK_CUR,SEEK_END,SEEK_SET`); individual
-derived classes will translate these into the appropriate behaviour for their
-I/O channel type.
+Seeks to a different position in the stream, if possible.
 
 ```c++
 virtual std::ptrdiff_t IO::tell() const;
@@ -145,30 +192,11 @@ Writes a block of data to the stream. The return value is the number of bytes
 written (this is not guaranteed to be equal to `len`).
 
 ```c++
-virtual std::size_t IO::write_str(std::string_view str);
+std::size_t IO::write_str(std::string_view str);
 ```
 
 Writes a block of data to the stream. The return value is the number of bytes
 written (this is not guaranteed to be equal to `str.size()`).
-
-```c++
-IO::line_range IO::lines();
-```
-
-Returns an iterator range over the lines in an input stream, starting at the
-current read position.
-
-```c++
-template <typename... Args>
-    std::size_t IO::print(std::format_string<const Args&...> fmt,
-        const Args&... args);
-template <typename... Args>
-    std::size_t IO::println(std::format_string<const Args&...> fmt,
-        const Args&... args);
-```
-
-Write formatted data to the stream. The return value is the number of bytes
-written.
 
 ## Cstdio class
 
@@ -188,14 +216,16 @@ The default constructor sets the internal stream to a null pointer.
 
 ```c++
 explicit Cstdio::Cstdio(const std::filesystem::path& path,
-    const char* mode = "rb");
+    IOMode mode = read_only);
+explicit Cstdio::Cstdio(const std::filesystem::path& path,
+    const char* mode);
 ```
 
-Constructor from a file path and I/O mode. Behaviour is undefined if `mode` is
-a null pointer or an invalid mode string. If the path is `"-"` or an empty
-string, and the mode does not contain a plus sign, instead of opening a file
-this will attach the `Cstdio` object to standard input (if the mode starts
-with `"r"`) or standard output (if it starts with `"w"` or `"a"`).
+Constructor from a file path and I/O mode. For the second version, behaviour
+is undefined if `mode` is a null pointer or an invalid mode string. If the
+path is `"-"` or an empty string, and the mode is not a read-write mode,
+instead of opening a file this will attach the `Cstdio` object to standard
+input or output.
 
 ```c++
 explicit Cstdio::Cstdio(std::FILE* stream) noexcept;
@@ -250,7 +280,8 @@ like interface.
 StringBuffer::StringBuffer();
 ```
 
-The default constructor initializes the buffer to an empty string.
+The default constructor initializes the buffer to an empty string. A
+`StringBuffer` is always opened in read-write mode.
 
 ```c++
 StringBuffer::StringBuffer(StringBuffer&& sb);

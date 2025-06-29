@@ -166,7 +166,7 @@ namespace RS {
 
                 if (flag) {
                     if (! path_.empty()) {
-                        out_ = Cstdio{path_, append_mode ? "ab" : "wb"};
+                        out_ = Cstdio{path_, append_mode ? IO::append : IO::write_only};
                     }
                     thread_ = std::thread{&Log::payload, this};
                 }

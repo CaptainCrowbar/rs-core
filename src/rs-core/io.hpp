@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/iterator.hpp"
 #include <algorithm>
@@ -18,9 +19,25 @@
 
 namespace RS {
 
+    RS_ENUM(IOMode, int,
+        read_only,
+        write_only,
+        read_write,
+        append,
+    )
+
+    RS_ENUM(IOSeek, int,
+        current  = SEEK_CUR,
+        end      = SEEK_END,
+        set      = SEEK_SET,
+    )
+
     class IO {
 
     public:
+
+        using enum IOMode;
+        using enum IOSeek;
 
         class iterator:
         public InputIterator<iterator, const std::string> {
@@ -55,7 +72,7 @@ namespace RS {
         virtual std::size_t read_into(std::string& buf, std::size_t pos = 0);
         virtual std::string read_line();
         virtual std::string read_str(std::size_t len);
-        virtual void seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR) = 0;
+        virtual void seek(std::ptrdiff_t offset = 0, IOSeek from = current) = 0;
         virtual std::ptrdiff_t tell() const = 0;
         virtual std::size_t write(const void* ptr, std::size_t len) = 0;
         virtual std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
@@ -99,9 +116,9 @@ namespace RS {
             if (can_seek()) {
 
                 auto start = tell();
-                seek(0, SEEK_END);
+                seek(0, end);
                 auto signed_size = tell() - start;
-                seek(- signed_size, SEEK_CUR);
+                seek(- signed_size, current);
                 auto size = static_cast<std::size_t>(signed_size);
                 buf.resize(size);
                 read(buf.data(), size);
@@ -160,7 +177,8 @@ namespace RS {
     public:
 
         Cstdio() = default;
-        explicit Cstdio(const std::filesystem::path& path, const char* mode = "rb");
+        explicit Cstdio(const std::filesystem::path& path, IOMode mode = read_only);
+        explicit Cstdio(const std::filesystem::path& path, const char* mode);
         explicit Cstdio(std::FILE* stream) noexcept: stream_(stream) {}
         Cstdio(Cstdio&& io) noexcept: stream_(std::exchange(io.stream_, nullptr)) {}
         Cstdio& operator=(Cstdio&& io) noexcept;
@@ -175,7 +193,7 @@ namespace RS {
         void put(char c) override;
         std::size_t read(void* ptr, std::size_t len) override;
         std::string read_line() override;
-        void seek(std::ptrdiff_t offset = 0, int from = SEEK_CUR) override;
+        void seek(std::ptrdiff_t offset = 0, IOSeek from = current) override;
         std::ptrdiff_t tell() const override;
         std::size_t write(const void* ptr, std::size_t len) override;
 
@@ -188,7 +206,21 @@ namespace RS {
         void check(int err) const;
         void close_stream(bool checked);
 
+        static const char* translate_mode(IOMode mode) noexcept;
+
     };
+
+        inline const char* Cstdio::translate_mode(IOMode mode) noexcept {
+            switch (mode) {
+                case read_only:   return "rb";
+                case write_only:  return "wb";
+                case read_write:  return "rb+";
+                case append:      return "ab";
+            }
+        }
+
+        inline Cstdio::Cstdio(const std::filesystem::path& path, IOMode mode):
+        Cstdio(path, translate_mode(mode)) {}
 
         inline Cstdio::Cstdio(const std::filesystem::path& path, const char* mode) {
             if ((path.empty() || path == "-") && std::string_view{mode}.find('+') != npos) {
@@ -288,9 +320,9 @@ namespace RS {
 
         }
 
-        inline void Cstdio::seek(std::ptrdiff_t offset, int from) {
+        inline void Cstdio::seek(std::ptrdiff_t offset, IOSeek from) {
             errno = 0;
-            std::fseek(stream_, offset, from);
+            std::fseek(stream_, offset, static_cast<int>(from));
             check(errno);
         }
 
@@ -348,7 +380,7 @@ namespace RS {
         std::string read_all() override;
         std::string read_line() override;
         std::string read_str(std::size_t len) override;
-        void seek(std::ptrdiff_t offset, int from = SEEK_CUR) override;
+        void seek(std::ptrdiff_t offset, IOSeek from = current) override;
         std::ptrdiff_t tell() const override { return static_cast<std::ptrdiff_t>(pos_); }
         std::size_t write(const void* ptr, std::size_t len) override;
 
@@ -396,13 +428,13 @@ namespace RS {
             return result;
         }
 
-        inline void StringBuffer::seek(std::ptrdiff_t offset, int from) {
+        inline void StringBuffer::seek(std::ptrdiff_t offset, IOSeek from) {
             auto signed_pos = static_cast<std::ptrdiff_t>(pos_);
             auto signed_size = static_cast<std::ptrdiff_t>(buf_.size());
             switch (from) {
-                case SEEK_SET:  signed_pos = offset; break;
-                case SEEK_END:  signed_pos = signed_size - offset; break;
-                default:        signed_pos += offset; break;
+                case set:  signed_pos = offset; break;
+                case end:  signed_pos = signed_size - offset; break;
+                default:   signed_pos += offset; break;
             }
             pos_ = static_cast<std::size_t>(std::clamp(signed_pos, 0z, signed_size));
         }

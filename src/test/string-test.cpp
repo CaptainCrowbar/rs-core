@@ -191,7 +191,7 @@ void test_rs_core_string_xml_markup() {
     }
 
     {
-        Cstdio out(test_file, "wb");
+        Cstdio out(test_file, IO::write_only);
         {
             Xtag h1;
             TRY(h1 = Xtag("<h1>\n", out));
