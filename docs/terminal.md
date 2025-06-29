@@ -92,23 +92,23 @@ not one of the three standard streams.
 ### Cursor control sequences
 
 ```c++
-std::string_view left() const noexcept           // esc [D
-std::string_view right() const noexcept          // esc [C
-std::string_view up() const noexcept             // esc [A
-std::string_view down() const noexcept           // esc [B
-std::string left(int n) const                    // esc [ <n> D
-std::string right(int n) const                   // esc [ <n> C
-std::string up(int n) const                      // esc [ <n> A
-std::string down(int n) const                    // esc [ <n> B
-std::string move_to(int x, int y) const          // esc [ <y> ; <x> H
-std::string_view save_position() const noexcept  // esc [s
-std::string_view load_position() const noexcept  // esc [u
-std::string_view erase_left() const noexcept     // esc [1K
-std::string_view erase_right() const noexcept    // esc [K
-std::string_view erase_above() const noexcept    // esc [1J
-std::string_view erase_below() const noexcept    // esc [J
-std::string_view erase_line() const noexcept     // esc [2K
-std::string_view clear_screen() const noexcept   // esc [2J
+static std::string_view left() noexcept           // esc [D
+static std::string_view right() noexcept          // esc [C
+static std::string_view up() noexcept             // esc [A
+static std::string_view down() noexcept           // esc [B
+static std::string left(int n)                    // esc [ <n> D
+static std::string right(int n)                   // esc [ <n> C
+static std::string up(int n)                      // esc [ <n> A
+static std::string down(int n)                    // esc [ <n> B
+static std::string move_to(int x, int y)          // esc [ <y> ; <x> H
+static std::string_view save_position() noexcept  // esc [s
+static std::string_view load_position() noexcept  // esc [u
+static std::string_view erase_left() noexcept     // esc [1K
+static std::string_view erase_right() noexcept    // esc [K
+static std::string_view erase_above() noexcept    // esc [1J
+static std::string_view erase_below() noexcept    // esc [J
+static std::string_view erase_line() noexcept     // esc [2K
+static std::string_view clear_screen() noexcept   // esc [2J
 ```
 
 Standard escape sequences.

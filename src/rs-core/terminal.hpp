@@ -55,23 +55,23 @@ namespace RS {
 
         // Cursor control sequences
 
-        std::string_view left() const noexcept           { return "\x1b[D"; }
-        std::string_view right() const noexcept          { return "\x1b[C"; }
-        std::string_view up() const noexcept             { return "\x1b[A"; }
-        std::string_view down() const noexcept           { return "\x1b[B"; }
-        std::string left(int n) const                    { return "\x1b[" + std::to_string(n) + "D"; }
-        std::string right(int n) const                   { return "\x1b[" + std::to_string(n) + "C"; }
-        std::string up(int n) const                      { return "\x1b[" + std::to_string(n) + "A"; }
-        std::string down(int n) const                    { return "\x1b[" + std::to_string(n) + "B"; }
-        std::string move_to(int x, int y) const          { return "\x1b[" + std::to_string(y) + ";" + std::to_string(x) + "H"; }
-        std::string_view save_position() const noexcept  { return "\x1b[s"; }
-        std::string_view load_position() const noexcept  { return "\x1b[u"; }
-        std::string_view erase_left() const noexcept     { return "\x1b[1K"; }
-        std::string_view erase_right() const noexcept    { return "\x1b[K"; }
-        std::string_view erase_above() const noexcept    { return "\x1b[1J"; }
-        std::string_view erase_below() const noexcept    { return "\x1b[J"; }
-        std::string_view erase_line() const noexcept     { return "\x1b[2K"; }
-        std::string_view clear_screen() const noexcept   { return "\x1b[2J"; }
+        static std::string_view left() noexcept           { return "\x1b[D"; }
+        static std::string_view right() noexcept          { return "\x1b[C"; }
+        static std::string_view up() noexcept             { return "\x1b[A"; }
+        static std::string_view down() noexcept           { return "\x1b[B"; }
+        static std::string left(int n)                    { return "\x1b[" + std::to_string(n) + "D"; }
+        static std::string right(int n)                   { return "\x1b[" + std::to_string(n) + "C"; }
+        static std::string up(int n)                      { return "\x1b[" + std::to_string(n) + "A"; }
+        static std::string down(int n)                    { return "\x1b[" + std::to_string(n) + "B"; }
+        static std::string move_to(int x, int y)          { return "\x1b[" + std::to_string(y) + ";" + std::to_string(x) + "H"; }
+        static std::string_view save_position() noexcept  { return "\x1b[s"; }
+        static std::string_view load_position() noexcept  { return "\x1b[u"; }
+        static std::string_view erase_left() noexcept     { return "\x1b[1K"; }
+        static std::string_view erase_right() noexcept    { return "\x1b[K"; }
+        static std::string_view erase_above() noexcept    { return "\x1b[1J"; }
+        static std::string_view erase_below() noexcept    { return "\x1b[J"; }
+        static std::string_view erase_line() noexcept     { return "\x1b[2K"; }
+        static std::string_view clear_screen() noexcept   { return "\x1b[2J"; }
 
         // Format control sequences
 
