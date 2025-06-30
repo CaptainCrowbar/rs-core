@@ -92,7 +92,7 @@ not one of the three standard streams.
 ### Cursor control sequences
 
 ```c++
-static std::string_view home() noexcept           // esc [H
+static std::string_view home() noexcept           // esc [E
 static std::string_view left() noexcept           // esc [D
 static std::string_view right() noexcept          // esc [C
 static std::string_view up() noexcept             // esc [A
