@@ -55,6 +55,7 @@ namespace RS {
 
         // Cursor control sequences
 
+        static std::string_view home() noexcept           { return "\x1b[H"; }
         static std::string_view left() noexcept           { return "\x1b[D"; }
         static std::string_view right() noexcept          { return "\x1b[C"; }
         static std::string_view up() noexcept             { return "\x1b[A"; }
