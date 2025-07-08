@@ -8,6 +8,15 @@
 using namespace RS::UnitTest;
 
 void test_rs_core_global_range_functions();
+void test_rs_core_alias_constructors();
+void test_rs_core_alias_conversions();
+void test_rs_core_alias_arithmetic_operators();
+void test_rs_core_alias_bitwise_operators();
+void test_rs_core_alias_comparison_operators();
+void test_rs_core_alias_range_access();
+void test_rs_core_alias_string_functions();
+void test_rs_core_alias_formatting();
+void test_rs_core_alias_hashing();
 void test_rs_core_arithmetic_bitmask_functions();
 void test_rs_core_arithmetic_checked_cast();
 void test_rs_core_arithmetic_interpolation();
@@ -63,6 +72,15 @@ int main(int argc, char** argv) {
     std::println("{}{}{}", xrule, rule, xreset);
 
     call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
+    call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
+    call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");
+    call_me_maybe(test_rs_core_alias_arithmetic_operators, "test_rs_core_alias_arithmetic_operators");
+    call_me_maybe(test_rs_core_alias_bitwise_operators, "test_rs_core_alias_bitwise_operators");
+    call_me_maybe(test_rs_core_alias_comparison_operators, "test_rs_core_alias_comparison_operators");
+    call_me_maybe(test_rs_core_alias_range_access, "test_rs_core_alias_range_access");
+    call_me_maybe(test_rs_core_alias_string_functions, "test_rs_core_alias_string_functions");
+    call_me_maybe(test_rs_core_alias_formatting, "test_rs_core_alias_formatting");
+    call_me_maybe(test_rs_core_alias_hashing, "test_rs_core_alias_hashing");
     call_me_maybe(test_rs_core_arithmetic_bitmask_functions, "test_rs_core_arithmetic_bitmask_functions");
     call_me_maybe(test_rs_core_arithmetic_checked_cast, "test_rs_core_arithmetic_checked_cast");
     call_me_maybe(test_rs_core_arithmetic_interpolation, "test_rs_core_arithmetic_interpolation");

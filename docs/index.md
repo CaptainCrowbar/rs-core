@@ -14,6 +14,7 @@ Requires C++23.
 ## Index of headers
 
 * [`rs-core/global.hpp` -- Global utilities](global.html)
+* [`rs-core/alias.hpp` -- Hard type alias](alias.html)
 * [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
 * [`rs-core/constants.hpp` -- Physical constants](constants.html)
 * [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
