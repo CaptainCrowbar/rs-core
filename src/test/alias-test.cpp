@@ -136,8 +136,8 @@ void test_rs_core_alias_conversions() {
 
     using AS1 = Alias<std::string, Tag1>;
     using AS2 = Alias<std::string, Tag2>;
-    using AS3 = Alias<std::string, Tag3, AliasFlags::construct>;
-    using AS4 = Alias<std::string, Tag4, AliasFlags::convert>;
+    using AS3 = Alias<std::string, Tag3, AliasFlags::implicit_to_alias>;
+    using AS4 = Alias<std::string, Tag4, AliasFlags::implicit_from_alias>;
 
     TEST((std::constructible_from<AS1, std::string>));  TEST((std::constructible_from<std::string, AS1>));
     TEST((std::constructible_from<AS2, std::string>));  TEST((std::constructible_from<std::string, AS2>));
@@ -272,7 +272,7 @@ void test_rs_core_alias_comparison_operators() {
     class Tag2;
 
     using AS = Alias<std::string, Tag1>;
-    using ASC = Alias<std::string, Tag2, AliasFlags::compare>;
+    using ASC = Alias<std::string, Tag2, AliasFlags::cross_compare>;
 
     TEST(! std::equality_comparable<AliasDefaultCopy>);
     TEST(! std::totally_ordered<AliasDefaultCopy>);

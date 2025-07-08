@@ -16,10 +16,10 @@ namespace RS;
 
 ```c++
 enum class AliasFlags: uint8_t {
-    none       = 0,
-    compare    = 1, // Generate comparison operators between T and Alias
-    construct  = 2, // Generate implicit conversion from T to Alias
-    convert    = 4, // Generate implicit conversion from Alias to T
+    none,
+    cross_compare,        // Define comparison operators between T and Alias
+    implicit_from_alias,  // Define implicit conversion from Alias to T
+    implicit_to_alias,    // Define implicit conversion from T to Alias
 };
 ```
 
@@ -41,9 +41,9 @@ which are used to access the underlying `T` value.
 
 Most of the member functions of `T` can be called using the arrow operator. A
 few are explicitly implemented as special cases, providing direct member
-functions of `Alias`(for example, if `T` has a `substr()` function, we expect
-`Alias::substr()` to return another `Alias` instead of the plain `T` that
-`Alias->substr()` would return).
+functions of `Alias` (for example, if `T` has a `substr()` function, we
+expect `Alias::substr()` to return another `Alias` instead of the plain `T`
+that `Alias->substr()` would return).
 
 Explicit conversion operators always exist in both directions between `T` and
 `Alias<T>`, and between different instantiations of `Alias` for the same
@@ -58,19 +58,19 @@ incomplete dummy types can be created to give aliases a unique identity.
 The third template argument, `Flags`, specifies optional behaviour for the
 alias:
 
-* `AliasFlags::compare` -- If this is supplied, heterogeneous comparison
+* `AliasFlags::cross_compare` -- If this is supplied, heterogeneous comparison
   operators between `Alias<T>` and `T` will be defined. By default, only
   homogeneous comparison operators are defined. This has no effect if `T` is
   not comparable.
-* `AliasFlags::construct` -- If this is supplied, an implicit conversion
-  constructor from `T` to `Alias<T>` is defined. By default, this conversion
-  is explicit.
-* `AliasFlags::convert` -- If this is supplied, an implicit conversion
-  operator from `Alias<T>` to `T` is defined. By default, this conversion is
-  explicit.
+* `AliasFlags::implicit_from_alias` -- If this is supplied, an implicit
+  conversion operator from `Alias<T>` to `T` is defined. By default, this
+  conversion is explicit.
+* `AliasFlags::implicit_to_alias` -- If this is supplied, an implicit
+  conversion constructor from `T` to `Alias<T>` is defined. By default, this
+  conversion is explicit.
 
-Combining `construct` and `convert` is legal but likely to lead to ambiguous
-overload resolution issues.
+Combining `implicit_to_alias` and `implicit_from_alias` is legal but likely to
+lead to ambiguous overload resolution issues.
 
 Behaviour is undefined if instantiations of `Alias` exist with the same
 underlying type and tag type but different flags.
@@ -121,7 +121,8 @@ Alias& Alias::operator=(T&& t);
 
 Conversions from a `T` to an `Alias.` Explicit conversion constructors are
 always defined; implicit conversions and assignment operators are defined if
-the `construct` flag is present and `T` has the necessary properties.
+the `implicit_to_alias` flag is present and `T` has the necessary
+properties.
 
 ```c++
 template <typename Tag2, AliasFlags F2>
@@ -156,7 +157,7 @@ Destructor.
 
 Conversion operator from an `Alias` to a `T`. The explicit conversion operator
 is always defined; an implicit conversion operator is defined if the
-`convert` flag is present.
+`implicit_from_alias` flag is present.
 
 ```c++
 [optionally explicit] Alias::operator bool() const;
@@ -245,8 +246,9 @@ bool operator>=(const T& t, const Alias& a);
 [comparison type] operator<=>(const T& t, const Alias& a);
 ```
 
-Homogeneous comparison operators. Each of these is defined if the `compare`
-flag is present and the corresponding operator is defined for `T`.
+Homogeneous comparison operators. Each of these is defined if the
+`cross_compare` flag is present and the corresponding operator is defined for
+`T`.
 
 ### Range access
 

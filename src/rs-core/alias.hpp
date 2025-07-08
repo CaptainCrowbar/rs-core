@@ -19,26 +19,21 @@ namespace RS {
 
     namespace Detail {
 
-        template <typename T> concept Reference = std::is_reference_v<T>;
-        template <typename T> concept NonReference = ! std::is_reference_v<T>;
-
+        template <typename T> concept Formattable = requires { std::formatter<std::remove_cvref_t<T>>(); };
         template <typename T> struct MutableReferenceType: std::false_type {};
         template <typename T> struct MutableReferenceType<T&>: std::true_type {};
         template <typename T> struct MutableReferenceType<const T&>: std::false_type {};
         template <typename T> concept MutableReference = MutableReferenceType<T>::value;
-
-        template <typename T>
-        concept Formattable = requires {
-            std::formatter<std::remove_cvref_t<T>>();
-        };
+        template <typename T> concept Reference = std::is_reference_v<T>;
+        template <typename T> concept NonReference = ! std::is_reference_v<T>;
 
     }
 
     RS_BITMASK(AliasFlags, std::uint8_t,
-        none       = 0,
-        compare    = 1,
-        construct  = 2,
-        convert    = 4,
+        none                 = 0,
+        cross_compare        = 1,  // Heterogeneous comparison operators
+        implicit_from_alias  = 2,  // Implicit conversion from Alias to T
+        implicit_to_alias    = 4,  // Implicit conversion from T to Alias
     )
 
     template <typename T, typename Tag = void, AliasFlags Flags = AliasFlags::none>
@@ -46,9 +41,9 @@ namespace RS {
 
     private:
 
-        static constexpr bool compare_heterogeneous = has_bit(Flags, AliasFlags::compare);
-        static constexpr bool implicit_construct = has_bit(Flags, AliasFlags::construct);
-        static constexpr bool implicit_convert = has_bit(Flags, AliasFlags::convert);
+        static constexpr bool cross_compare = has_bit(Flags, AliasFlags::cross_compare);
+        static constexpr bool implicit_to_alias = has_bit(Flags, AliasFlags::implicit_to_alias);
+        static constexpr bool implicit_from_alias = has_bit(Flags, AliasFlags::implicit_from_alias);
 
         T value_;
 
@@ -76,12 +71,12 @@ namespace RS {
             Alias& operator=(Alias&& a) { value_ = std::move(a.value_); return *this; }
 
         template <bool OK = std::copyable<T>, std::enable_if_t<OK, int> = 0>
-            explicit(! implicit_construct) Alias(const T& t): value_(t) {}
+            explicit(! implicit_to_alias) Alias(const T& t): value_(t) {}
         template <bool OK = std::movable<T>, std::enable_if_t<OK, int> = 0>
-            explicit(! implicit_construct) Alias(T&& t): value_(std::move(t)) {}
-        template <bool OK = implicit_construct && std::copyable<T>, std::enable_if_t<OK, int> = 0>
+            explicit(! implicit_to_alias) Alias(T&& t): value_(std::move(t)) {}
+        template <bool OK = implicit_to_alias && std::copyable<T>, std::enable_if_t<OK, int> = 0>
             Alias& operator=(const T& t) { value_ = t; return *this; }
-        template <bool OK = implicit_construct && std::movable<T>, std::enable_if_t<OK, int> = 0>
+        template <bool OK = implicit_to_alias && std::movable<T>, std::enable_if_t<OK, int> = 0>
             Alias& operator=(T&& t) { value_ = std::move(t); return *this; }
 
         template <typename Tag2, AliasFlags F2, bool OK = std::copyable<T>, std::enable_if_t<OK, int> = 0>
@@ -94,7 +89,7 @@ namespace RS {
 
         // Conversion operators
 
-        explicit(! implicit_convert) operator T() const { return value_; }
+        explicit(! implicit_from_alias) operator T() const { return value_; }
 
         template <bool OK = std::constructible_from<bool, T>, std::enable_if_t<OK, int> = 0>
             explicit(! std::convertible_to<T, bool>) operator bool() const { return bool(value_); }
@@ -172,9 +167,9 @@ namespace RS {
             friend bool operator==(const Alias& a, const Alias& b) { return a.value_ == b.value_; }
         template <bool OK = std::three_way_comparable<T>, std::enable_if_t<OK, int> = 0>
             friend auto operator<=>(const Alias& a, const Alias& b) { return a.value_ <=> b.value_; }
-        template <bool OK = std::equality_comparable<T> && compare_heterogeneous, std::enable_if_t<OK, int> = 0>
+        template <bool OK = std::equality_comparable<T> && cross_compare, std::enable_if_t<OK, int> = 0>
             friend bool operator==(const Alias& a, const T& t) { return a.value_ == t; }
-        template <bool OK = std::three_way_comparable<T> && compare_heterogeneous, std::enable_if_t<OK, int> = 0>
+        template <bool OK = std::three_way_comparable<T> && cross_compare, std::enable_if_t<OK, int> = 0>
             friend auto operator<=>(const Alias& a, const T& t) { return a.value_ <=> t; }
 
         // Range access
