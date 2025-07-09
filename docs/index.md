@@ -1,4 +1,4 @@
-# Rs Core
+# Core Utilities Library
 
 By Ross Smith
 
@@ -7,9 +7,10 @@ _[GitHub repository](https://github.com/CaptainCrowbar/rs-core)_
 ## Introduction
 
 This is a set of basic utilities that I use throughout my C++ code, collected
-here to avoid widespread duplication.
+here to avoid widespread duplication. Basically I put stuff in here when I
+get tired of re-implementing it in multiple projects.
 
-Requires C++23.
+Requires C++23. Not yet tested on all compilers.
 
 ## Index of headers
 
