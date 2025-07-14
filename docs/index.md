@@ -24,6 +24,7 @@ Requires C++23. Not yet tested on all compilers.
 * [`rs-core/io.hpp` -- I/O utilities](io.html)
 * [`rs-core/iterator.hpp` -- Iterator base classes](iterator.html)
 * [`rs-core/log.hpp` -- Logging](log.html)
+* [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
 * [`rs-core/random.hpp` -- Random number generators](random.html)
 * [`rs-core/scope.hpp` -- Scope guards](scope.html)
 * [`rs-core/string.hpp` -- String operations](string.html)
