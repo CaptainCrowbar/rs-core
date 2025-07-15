@@ -288,8 +288,10 @@ decimal; the result is unspecified if both are present.
 ## Multiple precision integer literals
 
 ```c++
-Natural operator""_N(const char* raw);
-Integer operator""_Z(const char* raw);
+namespace Literals {
+    Natural operator""_N(const char* raw);
+    Integer operator""_Z(const char* raw);
+};
 ```
 
 Custom literals.

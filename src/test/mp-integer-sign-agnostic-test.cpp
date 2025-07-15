@@ -8,6 +8,8 @@ using namespace RS;
 
 void test_rs_core_mp_integer_literals() {
 
+    using namespace RS::Literals;
+
     Natural n;
     Integer z;
 

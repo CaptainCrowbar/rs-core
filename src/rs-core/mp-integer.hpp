@@ -869,8 +869,12 @@ namespace RS {
 
     // Literals
 
-    inline Natural operator""_N(const char* raw) { return Natural(raw, 0); }
-    inline Integer operator""_Z(const char* raw) { return Integer(raw, 0); }
+    namespace Literals {
+
+        inline Natural operator""_N(const char* raw) { return Natural(raw, 0); }
+        inline Integer operator""_Z(const char* raw) { return Integer(raw, 0); }
+
+    }
 
 }
 
