@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.71
+    VERSION 0.1.72
     LANGUAGES CXX
 )
 
@@ -44,6 +44,7 @@ add_executable(${unittest}
     test/global-test.cpp
     test/alias-test.cpp
     test/arithmetic-test.cpp
+    test/character-test.cpp
     test/constants-test.cpp
     test/enum-test.cpp
     test/format-test.cpp
@@ -51,6 +52,7 @@ add_executable(${unittest}
     test/io-test.cpp
     test/iterator-test.cpp
     test/log-test.cpp
+    test/markup-test.cpp
     test/mp-integer-sign-agnostic-test.cpp
     test/mp-integer-signed-arithmetic-test.cpp
     test/mp-integer-signed-conversion-test.cpp
@@ -58,7 +60,6 @@ add_executable(${unittest}
     test/mp-integer-unsigned-conversion-test.cpp
     test/random-test.cpp
     test/scope-test.cpp
-    test/string-test.cpp
     test/terminal-test.cpp
     test/typename-test.cpp
     test/uuid-test.cpp
