@@ -28,6 +28,7 @@ Requires C++23. Not yet tested on all compilers.
 * [`rs-core/markup.hpp` -- Text markup](markup.html)
 * [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
 * [`rs-core/random.hpp` -- Random number generators](random.html)
+* [`rs-core/rational.hpp` -- Rational numbers](rational.html)
 * [`rs-core/scope.hpp` -- Scope guards](scope.html)
 * [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
 * [`rs-core/typename.hpp` -- Type names](typename.html)

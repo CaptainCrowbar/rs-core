@@ -12,6 +12,32 @@ namespace RS;
 * TOC
 {:toc}
 
+## Arithmetic functions
+
+```c++
+template <typename T>
+    constexpr std::pair<T, T> euclidean_divide(T x, T y);
+```
+
+Returns the quotient and remainder under Euclidean division, in which the
+remainder is always positive if the division is not exact. Behaviour is
+undefined if the divisor is zero or if the correct result is outside the
+range of the type.
+
+```c++
+template <typename T> constexpr T gcd(const T& x, const T& y);
+template <typename T> constexpr T lcm(const T& x, const T& y);
+```
+
+Greatest common divisor and least common multiple algorithms. Generalized
+versions are provided here because the standard library versions are
+restricted to primitive types.
+
+If `T` is signed, the signs of the arguments are ignored. The `gcd()` function
+will return zero if both arguments are zero; `lcm()` will return zero if
+either argument is zero. For the `lcm()` function, behaviour is undefined if
+the correct result would be out of range for the type.
+
 ## Bitmask operations
 
 ```c++

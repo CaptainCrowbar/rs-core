@@ -3,6 +3,7 @@
 #include "rs-core/character.hpp"
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
+#include <algorithm>
 #include <cerrno>
 #include <cmath>
 #include <concepts>
@@ -15,8 +16,89 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 namespace RS {
+
+    // Arithmetic functions
+
+    template <typename T>
+    constexpr std::pair<T, T> euclidean_divide(T x, T y) {
+
+        T q, r;
+
+        if constexpr (std::floating_point<T>) {
+
+            q = x / y;
+            auto negative = q < T{0};
+            q = std::abs(q);
+
+            if (q <= static_cast<T>(std::numeric_limits<std::uintmax_t>::max())) {
+                q = static_cast<T>(static_cast<std::uintmax_t>(q));
+            }
+
+            if (negative) {
+                q = - q;
+            }
+
+            r = x - q * y;
+
+        } else {
+
+            q = x / y;
+            r = x % y;
+
+        }
+
+        if (r < T{0}) {
+            if (y < T{0}) {
+                q += T{1};
+                r -= y;
+            } else {
+                q -= T{1};
+                r += y;
+            }
+        }
+
+        return {q, r};
+
+    }
+
+    template <typename T>
+    constexpr T gcd(const T& x, const T& y) {
+
+        auto a = x < T{0} ? T{0} - x : x;
+        auto b = y < T{0} ? T{0} - y : y;
+
+        if (a < b) {
+            std::swap(a, b);
+        }
+
+        T r;
+
+        while (b != T{0}) {
+            r = a % b;
+            if (r == T{0}) {
+                return b;
+            }
+            a = std::move(b);
+            b = std::move(r);
+        }
+
+        return a;
+
+    }
+
+    template <typename T>
+    constexpr T lcm(const T& x, const T& y) {
+        if (x == T{0} || y == T{0}) {
+            return T{0};
+        } else {
+            auto div = gcd(x, y);
+            auto z = (x / div) * y;
+            return z < T{0} ? T{0} - z : z;
+        }
+    }
 
     // Bitmask functions
 
