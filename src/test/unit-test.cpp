@@ -73,6 +73,7 @@ void test_rs_core_mp_integer_unsigned_conversion_from_integer();
 void test_rs_core_mp_integer_unsigned_conversion_to_string();
 void test_rs_core_mp_integer_unsigned_conversion_from_string();
 void test_rs_core_random_pcg_engine();
+void test_rs_core_random_device_64_engine();
 void test_rs_core_rational_int_construction();
 void test_rs_core_rational_int_properties();
 void test_rs_core_rational_int_arithmetic();
@@ -166,6 +167,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_to_string, "test_rs_core_mp_integer_unsigned_conversion_to_string");
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_from_string, "test_rs_core_mp_integer_unsigned_conversion_from_string");
     call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
+    call_me_maybe(test_rs_core_random_device_64_engine, "test_rs_core_random_device_64_engine");
     call_me_maybe(test_rs_core_rational_int_construction, "test_rs_core_rational_int_construction");
     call_me_maybe(test_rs_core_rational_int_properties, "test_rs_core_rational_int_properties");
     call_me_maybe(test_rs_core_rational_int_arithmetic, "test_rs_core_rational_int_arithmetic");

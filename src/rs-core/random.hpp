@@ -2,6 +2,7 @@
 
 #include "rs-core/global.hpp"
 #include <cstdint>
+#include <random>
 
 namespace RS {
 
@@ -120,5 +121,9 @@ namespace RS {
             state_ = state_ + delta_;
             (*this)();
         }
+
+    // 64-bit random device
+
+    using RandomDevice64 = std::independent_bits_engine<std::random_device, 64, std::uint64_t>;
 
 }

@@ -12,7 +12,9 @@ namespace RS;
 * TOC
 {:toc}
 
-## PCG engine
+## Random number engines
+
+### PCG engine
 
 ```c++
 class Pcg;
@@ -70,3 +72,12 @@ constexpr static std::uint64_t Pcg::max() noexcept;
 ```
 
 Minimum and maximum values.
+
+### RandomDevice64 engine
+
+```c++
+class RandomDevice64;
+```
+
+This performs the same function as `std::random_device` but generates 64-bit
+integers instead of 32-bit.

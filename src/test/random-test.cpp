@@ -1,5 +1,6 @@
 #include "rs-core/random.hpp"
 #include "rs-core/unit-test.hpp"
+#include <cmath>
 #include <cstdint>
 #include <vector>
 
@@ -33,5 +34,34 @@ void test_rs_core_random_pcg_engine() {
         TRY(x = rng());
         TEST_EQUAL(x, y);
     }
+
+}
+
+void test_rs_core_random_device_64_engine() {
+
+    static constexpr auto n = 10'000;
+    static constexpr auto nx = static_cast<double>(n);
+    static const auto range = std::ldexp(1.0, 64);
+    static const auto expect_mean = 0.5 * range;
+    static const auto expect_sd = range / std::sqrt(12.0);
+    static const auto tolerance = range / std::sqrt(nx);
+
+    RandomDevice64 rng;
+    auto x = 0.0;
+    auto sum = 0.0;
+    auto sum2 = 0.0;
+
+    for (auto i = 0; i < n; ++i) {
+        TRY(x = rng());
+        auto y = static_cast<double>(x);
+        sum += y;
+        sum2 += y * y;
+    }
+
+    auto mean = sum / nx;
+    auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+    TEST_NEAR(mean, expect_mean, tolerance);
+    TEST_NEAR(sd, expect_sd, tolerance);
 
 }
