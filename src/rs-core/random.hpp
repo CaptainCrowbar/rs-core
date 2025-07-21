@@ -393,4 +393,25 @@ namespace RS {
             }
         }
 
+    // Random algorithms
+
+    template <std::ranges::random_access_range R, std::uniform_random_bit_generator RNG>
+    void shuffle(R& range, RNG& rng) {
+
+        auto size = std::ranges::size(range);
+
+        if (size < 2) {
+            return;
+        }
+
+        for (auto i = 0uz; i < size - 1; ++i) {
+            UniformInteger<std::size_t> dist(i, size - 1);
+            auto j = dist(rng);
+            if (i != j) {
+                std::swap(range[i], range[j]);
+            }
+        }
+
+    }
+
 }

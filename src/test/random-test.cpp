@@ -1,8 +1,10 @@
 #include "rs-core/random.hpp"
 #include "rs-core/unit-test.hpp"
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <map>
+#include <ranges>
 #include <string>
 #include <vector>
 
@@ -541,6 +543,24 @@ void test_rs_core_random_weighted_choice() {
         TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
         TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
 
+    }
+
+}
+
+void test_rs_core_random_shuffle() {
+
+    static constexpr auto iterations = 10'000;
+
+    std::string s = "abcdefghij";
+    Pcg rng(42);
+
+    for (auto i = 0; i < iterations; ++i) {
+        auto t = s;
+        TRY(shuffle(t, rng));
+        TEST(t != s);
+        TEST_EQUAL(t.size(), s.size());
+        std::ranges::sort(t);
+        TEST_EQUAL(t, s);
     }
 
 }

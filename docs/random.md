@@ -12,6 +12,19 @@ namespace RS;
 * TOC
 {:toc}
 
+## Introduction
+
+Several of the classes and functions here are functional duplicates of
+standard library features. These are supplied here because the C++ standard
+usually does not specify a particular algorithm for a given random number
+distribution, only its statistical properties, and I frequently want to be
+able to reliably produce the same pseudo-random sequence on different
+computers and C++ implementations. This is not actually possible for floating
+point distributions, because of the nondeterministic nature of floating point
+arithmetic, but some floating point distributions are duplicated here anyway
+because the standard versions inconveniently have a non-`const` function call
+operator.
+
 ## Random number engines
 
 ### PCG engine
@@ -213,3 +226,13 @@ The `size()` function returns the number of items in the list (note that this
 may include duplicate `T` values). Entries that were discarded because the
 weight was not positive are not counted. Behaviour is undefined if the
 function call operator is called on an empty list.
+
+## Random algorithms
+
+```c++
+template <std::ranges::random_access_range R,
+        std::uniform_random_bit_generator RNG>
+    void shuffle(R& range, RNG& rng);
+```
+
+Shuffles an array into random order.

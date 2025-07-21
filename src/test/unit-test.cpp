@@ -78,6 +78,7 @@ void test_rs_core_random_uniform_integer();
 void test_rs_core_random_uniform_real();
 void test_rs_core_random_choice();
 void test_rs_core_random_weighted_choice();
+void test_rs_core_random_shuffle();
 void test_rs_core_rational_int_construction();
 void test_rs_core_rational_int_properties();
 void test_rs_core_rational_int_arithmetic();
@@ -176,6 +177,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_uniform_real, "test_rs_core_random_uniform_real");
     call_me_maybe(test_rs_core_random_choice, "test_rs_core_random_choice");
     call_me_maybe(test_rs_core_random_weighted_choice, "test_rs_core_random_weighted_choice");
+    call_me_maybe(test_rs_core_random_shuffle, "test_rs_core_random_shuffle");
     call_me_maybe(test_rs_core_rational_int_construction, "test_rs_core_rational_int_construction");
     call_me_maybe(test_rs_core_rational_int_properties, "test_rs_core_rational_int_properties");
     call_me_maybe(test_rs_core_rational_int_arithmetic, "test_rs_core_rational_int_arithmetic");
