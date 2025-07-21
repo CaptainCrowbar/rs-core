@@ -89,6 +89,7 @@ integers instead of 32-bit.
 ```c++
 template <std::integral T>
 class UniformInteger {
+    using result_type = T;
     UniformInteger() noexcept;
     explicit UniformInteger(T range) noexcept;
     explicit UniformInteger(T min, T max) noexcept;
@@ -118,6 +119,7 @@ inclusive; the bounds will be swapped if they are in the wrong order.
 ```c++
 template <std::floating_point T>
 class UniformReal {
+    using result_type = T;
     UniformReal() noexcept;
     explicit UniformReal(T range) noexcept;
     explicit UniformReal(T min, T max) noexcept;
@@ -152,6 +154,7 @@ can be returned.
 ```c++
 template <std::regular T>
 class RandomChoice {
+    using result_type = T;
     RandomChoice();
     RandomChoice(std::initializer_list<T> list);
     template <std::ranges::range R>
@@ -184,6 +187,8 @@ is called on an empty list.
 template <std::regular T, typename W = int>
 requires std::integral<W> || std::floating_point<W>
 class WeightedChoice {
+    using result_type = T;
+    using weight_type = W;
     WeightedChoice();
     WeightedChoice(std::initializer_list<std::pair<T, W>> list);
     WeightedChoice(const WeightedChoice& wc);

@@ -145,6 +145,8 @@ namespace RS {
 
     public:
 
+        using result_type = T;
+
         UniformInteger() noexcept;
         explicit UniformInteger(T range) noexcept; // UB if range<=0
         explicit UniformInteger(T min, T max) noexcept;
@@ -226,6 +228,8 @@ namespace RS {
 
     public:
 
+        using result_type = T;
+
         UniformReal() = default;
         explicit UniformReal(T range) noexcept: UniformReal(T{0}, range) {}
         explicit UniformReal(T min, T max) noexcept;
@@ -267,6 +271,8 @@ namespace RS {
     class RandomChoice {
 
     public:
+
+        using result_type = T;
 
         RandomChoice() = default;
         RandomChoice(std::initializer_list<T> list): vec_(list) { update(); }
@@ -324,6 +330,9 @@ namespace RS {
     class WeightedChoice {
 
     public:
+
+        using result_type = T;
+        using weight_type = W;
 
         WeightedChoice() = default;
         WeightedChoice(std::initializer_list<std::pair<T, W>> list);
