@@ -1,8 +1,19 @@
 #pragma once
 
 #include "rs-core/global.hpp"
+#include <algorithm>
+#include <bit>
+#include <concepts>
+#include <cstddef>
 #include <cstdint>
+#include <initializer_list>
+#include <iterator>
+#include <limits>
+#include <map>
 #include <random>
+#include <ranges>
+#include <utility>
+#include <vector>
 
 namespace RS {
 
@@ -85,6 +96,7 @@ namespace RS {
         }
 
         constexpr std::uint64_t operator()() noexcept;
+
         constexpr void seed(std::uint64_t s) noexcept { seed(0, s, 0, 0); }
         constexpr void seed(std::uint64_t s0, std::uint64_t s1) noexcept { seed(s0, s1, 0, 0); }
         constexpr void seed(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
@@ -125,5 +137,251 @@ namespace RS {
     // 64-bit random device
 
     using RandomDevice64 = std::independent_bits_engine<std::random_device, 64, std::uint64_t>;
+
+    // Uniform integer distribution
+
+    template <std::integral T>
+    class UniformInteger {
+
+    public:
+
+        UniformInteger() noexcept;
+        explicit UniformInteger(T range) noexcept; // UB if range<=0
+        explicit UniformInteger(T min, T max) noexcept;
+
+        template <std::uniform_random_bit_generator RNG>
+            T operator()(RNG& rng) const;
+
+        T min() const noexcept { return min_; }
+        T max() const noexcept;
+
+    private:
+
+        T min_{0};
+        std::uint64_t range_{0};
+        std::uint64_t threshold_{0}; // Highest multiple of range that fits in a uint64_t
+
+        void update() noexcept;
+
+    };
+
+        template <std::integral T>
+        UniformInteger<T>::UniformInteger() noexcept:
+        min_(0),
+        range_(static_cast<std::uint64_t>(std::numeric_limits<T>::max()) + 1) {
+            update();
+        }
+
+        template <std::integral T>
+        UniformInteger<T>::UniformInteger(T range) noexcept:
+        min_(0),
+        range_(static_cast<std::uint64_t>(range)) {
+            update();
+        }
+
+        template <std::integral T>
+        UniformInteger<T>::UniformInteger(T min, T max) noexcept {
+            if (min > max) {
+                std::swap(min, max);
+            }
+            min_ = min;
+            range_ = static_cast<std::uint64_t>(max - min) + 1;
+            update();
+        }
+
+        template <std::integral T>
+        template <std::uniform_random_bit_generator RNG>
+        T UniformInteger<T>::operator()(RNG& rng) const {
+            std::uint64_t x;
+            do {
+                x = rng();
+            } while (threshold_ != 0 && x >= threshold_);
+            if (range_ != 0) {
+                x %= range_;
+            }
+            return min_ + static_cast<T>(x);
+        }
+
+        template <std::integral T>
+        T UniformInteger<T>::max() const noexcept {
+            auto half_range = range_ / 2;
+            auto t1 = static_cast<T>(half_range);
+            auto t2 = static_cast<T>(range_ - half_range - 1);
+            return min_ + t1 + t2;
+        }
+
+        template <std::integral T>
+        void UniformInteger<T>::update() noexcept {
+            if (! std::has_single_bit(range_)) {
+                auto max64 = std::numeric_limits<std::uint64_t>::max();
+                auto rem = max64 % range_;
+                threshold_ = max64 - rem;
+            }
+        }
+
+    // Uniform floating point distribution
+
+    template <std::floating_point T>
+    class UniformReal {
+
+    public:
+
+        UniformReal() = default;
+        explicit UniformReal(T range) noexcept: UniformReal(T{0}, range) {}
+        explicit UniformReal(T min, T max) noexcept;
+
+        template <std::uniform_random_bit_generator RNG>
+            T operator()(RNG& rng) const;
+
+        T min() const noexcept { return min_; }
+        T max() const noexcept { return min_ + range_; }
+
+    private:
+
+        T min_{0};
+        T range_{1};
+
+    };
+
+        template <std::floating_point T>
+        UniformReal<T>::UniformReal(T min, T max) noexcept {
+            if (min > max) {
+                std::swap(min, max);
+            }
+            min_ = min;
+            range_ = max - min;
+        }
+
+        template <std::floating_point T>
+        template <std::uniform_random_bit_generator RNG>
+        T UniformReal<T>::operator()(RNG& rng) const {
+            auto x = rng() - rng.min();
+            auto y = rng.max() - rng.min();
+            auto z = static_cast<T>(x) / static_cast<T>(y);
+            return min_ + range_ * z;
+        }
+
+    // Random choice class
+
+    template <std::regular T>
+    class RandomChoice {
+
+    public:
+
+        RandomChoice() = default;
+        RandomChoice(std::initializer_list<T> list): vec_(list) { update(); }
+        template <std::ranges::range R>
+            requires std::convertible_to<std::ranges::range_value_t<R>, T>
+            explicit RandomChoice(const R& r):
+            vec_(std::from_range, r) { update(); }
+
+        template <std::uniform_random_bit_generator RNG>
+            const T& operator()(RNG& rng) const; // UB if empty
+
+        void insert(const T& t) { vec_.push_back(t); update(); }
+        std::size_t size() const noexcept { return vec_.size(); }
+        bool empty() const noexcept { return vec_.empty(); }
+
+    private:
+
+        using size_dist = UniformInteger<std::size_t>;
+
+        std::vector<T> vec_;
+        size_dist dist_;
+
+        void update();
+
+    };
+
+        template <std::regular T>
+        template <std::uniform_random_bit_generator RNG>
+        const T& RandomChoice<T>::operator()(RNG& rng) const {
+            auto i = dist_(rng);
+            return vec_[i];
+        }
+
+        template <std::regular T>
+        void RandomChoice<T>::update() {
+            dist_ = size_dist{vec_.size()};
+        }
+
+    // Weighted choice class
+
+    namespace Detail {
+
+        template <typename T> struct UniformDistribution;
+        template <std::integral T> struct UniformDistribution<T> {
+            using type = UniformInteger<T>;
+        };
+        template <std::floating_point T> struct UniformDistribution<T> {
+            using type = UniformReal<T>;
+        };
+
+    }
+
+    template <std::regular T, typename W = int>
+    requires std::integral<W> || std::floating_point<W>
+    class WeightedChoice {
+
+    public:
+
+        WeightedChoice() = default;
+        WeightedChoice(std::initializer_list<std::pair<T, W>> list);
+
+        template <std::uniform_random_bit_generator RNG>
+            const T& operator()(RNG& rng) const; // UB if empty
+
+        void insert(const T& t, W w); // Ignored if w<=0
+        std::size_t size() const noexcept { return map_.size(); }
+        bool empty() const noexcept { return map_.empty(); }
+
+    private:
+
+        using weight_dist = Detail::UniformDistribution<W>::type;
+
+        std::map<W, T> map_;
+        weight_dist dist_;
+
+    };
+
+        template <std::regular T, typename W>
+        requires std::integral<W> || std::floating_point<W>
+        WeightedChoice<T, W>::WeightedChoice(std::initializer_list<std::pair<T, W>> list) {
+            W sum{};
+            for (const auto& [t,w]: list) {
+                if (w > 0) {
+                    sum += w;
+                    map_.insert({sum, t});
+                }
+            }
+            dist_ = weight_dist(sum);
+        }
+
+        template <std::regular T, typename W>
+        requires std::integral<W> || std::floating_point<W>
+        template <std::uniform_random_bit_generator RNG>
+        const T& WeightedChoice<T, W>::operator()(RNG& rng) const {
+            auto x = dist_(rng);
+            auto it = map_.upper_bound(x);
+            if constexpr (std::floating_point<W>) {
+                // Possible because of FP rounding errors
+                if (it == map_.end()) {
+                    --it;
+                }
+            }
+            return it->second;
+        }
+
+        template <std::regular T, typename W>
+        requires std::integral<W> || std::floating_point<W>
+        void WeightedChoice<T, W>::insert(const T& t, W w) {
+            if (w > 0) {
+                if (! map_.empty()) {
+                    w += std::prev(map_.end())->first;
+                }
+                map_.insert({w, t});
+                dist_ = weight_dist(w);
+            }
+        }
 
 }

@@ -2,6 +2,8 @@
 #include "rs-core/unit-test.hpp"
 #include <cmath>
 #include <cstdint>
+#include <map>
+#include <string>
 #include <vector>
 
 using namespace RS;
@@ -43,13 +45,13 @@ void test_rs_core_random_device_64_engine() {
     static constexpr auto nx = static_cast<double>(n);
     static const auto range = std::ldexp(1.0, 64);
     static const auto expect_mean = 0.5 * range;
-    static const auto expect_sd = range / std::sqrt(12.0);
+    static const auto expect_sd = (range + 1.0) / std::sqrt(12.0);
     static const auto tolerance = range / std::sqrt(nx);
 
     RandomDevice64 rng;
-    auto x = 0.0;
     auto sum = 0.0;
     auto sum2 = 0.0;
+    std::uint64_t x{};
 
     for (auto i = 0; i < n; ++i) {
         TRY(x = rng());
@@ -63,5 +65,482 @@ void test_rs_core_random_device_64_engine() {
 
     TEST_NEAR(mean, expect_mean, tolerance);
     TEST_NEAR(sd, expect_sd, tolerance);
+
+}
+
+void test_rs_core_random_uniform_integer() {
+
+    static constexpr auto n = 10'000;
+    static constexpr auto nx = static_cast<double>(n);
+
+    {
+
+        Pcg rng(42);
+        UniformInteger<int> dist(1, 100);
+
+        TEST_EQUAL(dist.min(), 1);
+        TEST_EQUAL(dist.max(), 100);
+
+        auto xmin = static_cast<double>(dist.min());
+        auto xmax = static_cast<double>(dist.max());
+        auto expect_mean = 0.5 * (xmin + xmax);
+        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
+        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        int x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            auto y = static_cast<double>(x);
+            sum += y;
+            sum2 += y * y;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        UniformInteger<int> dist(1000);
+
+        TEST_EQUAL(dist.min(), 0);
+        TEST_EQUAL(dist.max(), 999);
+
+        auto xmin = static_cast<double>(dist.min());
+        auto xmax = static_cast<double>(dist.max());
+        auto expect_mean = 0.5 * (xmin + xmax);
+        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
+        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        int x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            auto y = static_cast<double>(x);
+            sum += y;
+            sum2 += y * y;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        UniformInteger<std::int16_t> dist;
+
+        TEST_EQUAL(dist.min(), 0);
+        TEST_EQUAL(dist.max(), 32767);
+
+        auto xmin = static_cast<double>(dist.min());
+        auto xmax = static_cast<double>(dist.max());
+        auto expect_mean = 0.5 * (xmin + xmax);
+        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
+        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        std::int16_t x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            auto y = static_cast<double>(x);
+            sum += y;
+            sum2 += y * y;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        UniformInteger<std::uint16_t> dist;
+
+        TEST_EQUAL(dist.min(), 0u);
+        TEST_EQUAL(dist.max(), 65535u);
+
+        auto xmin = static_cast<double>(dist.min());
+        auto xmax = static_cast<double>(dist.max());
+        auto expect_mean = 0.5 * (xmin + xmax);
+        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
+        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        std::uint16_t x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            auto y = static_cast<double>(x);
+            sum += y;
+            sum2 += y * y;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        UniformInteger<std::uint64_t> dist;
+
+        TEST_EQUAL(dist.min(), 0u);
+        TEST_EQUAL(dist.max(), 0xffff'ffff'ffff'ffffull);
+
+        auto xmin = static_cast<double>(dist.min());
+        auto xmax = static_cast<double>(dist.max());
+        auto expect_mean = 0.5 * (xmin + xmax);
+        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
+        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        std::uint64_t x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            auto y = static_cast<double>(x);
+            sum += y;
+            sum2 += y * y;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+}
+
+void test_rs_core_random_uniform_real() {
+
+    static constexpr auto n = 10'000;
+    static constexpr auto nx = static_cast<double>(n);
+
+    {
+
+        Pcg rng(42);
+        UniformReal<double> dist;
+
+        TEST_EQUAL(dist.min(), 0.0);
+        TEST_EQUAL(dist.max(), 1.0);
+
+        auto expect_mean = 0.5 * (dist.min() + dist.max());
+        auto expect_sd = (dist.max() - dist.min()) / std::sqrt(12.0);
+        auto tolerance = (dist.max() - dist.min()) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        double x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            sum += x;
+            sum2 += x * x;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        UniformReal<double> dist(10.0);
+
+        TEST_EQUAL(dist.min(), 0.0);
+        TEST_EQUAL(dist.max(), 10.0);
+
+        auto expect_mean = 0.5 * (dist.min() + dist.max());
+        auto expect_sd = (dist.max() - dist.min()) / std::sqrt(12.0);
+        auto tolerance = (dist.max() - dist.min()) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        double x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            sum += x;
+            sum2 += x * x;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        UniformReal<double> dist(100.0, -100.0);
+
+        TEST_EQUAL(dist.min(), -100.0);
+        TEST_EQUAL(dist.max(), 100.0);
+
+        auto expect_mean = 0.5 * (dist.min() + dist.max());
+        auto expect_sd = (dist.max() - dist.min()) / std::sqrt(12.0);
+        auto tolerance = (dist.max() - dist.min()) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        double x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            sum += x;
+            sum2 += x * x;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+}
+
+void test_rs_core_random_choice() {
+
+    static constexpr auto iterations = 10'000;
+    static constexpr auto total = static_cast<double>(iterations);
+
+    {
+
+        RandomChoice<std::string> choice;
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        TRY(choice.insert("Alpha"));
+        TRY(choice.insert("Bravo"));
+        TRY(choice.insert("Charlie"));
+        TRY(choice.insert("Delta"));
+        TRY(choice.insert("Echo"));
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.2, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Echo"] / total,     0.2, 0.01);
+
+    }
+
+    {
+
+        std::vector<std::string> vec {
+            "Alpha",
+            "Bravo",
+            "Charlie",
+            "Delta",
+            "Echo",
+        };
+
+        RandomChoice<std::string> choice{vec};
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.2, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Echo"] / total,     0.2, 0.01);
+
+    }
+
+    {
+
+        RandomChoice<std::string> choice {
+            "Alpha",
+            "Bravo",
+            "Charlie",
+            "Delta",
+            "Echo",
+        };
+
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.2, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Echo"] / total,     0.2, 0.01);
+
+    }
+
+}
+
+void test_rs_core_random_weighted_choice() {
+
+    static constexpr auto iterations = 10'000;
+    static constexpr auto total = static_cast<double>(iterations);
+
+    {
+
+        WeightedChoice<std::string> choice;
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        TRY(choice.insert("Alpha",    10));
+        TRY(choice.insert("Bravo",    20));
+        TRY(choice.insert("Charlie",  30));
+        TRY(choice.insert("Delta",    40));
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.1, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
+
+    }
+
+    {
+
+        WeightedChoice<std::string> choice {
+            {"Alpha",    10},
+            {"Bravo",    20},
+            {"Charlie",  30},
+            {"Delta",    40},
+        };
+
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.1, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
+
+    }
+
+    {
+
+        WeightedChoice<std::string, double> choice;
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        TRY(choice.insert("Alpha",    0.01));
+        TRY(choice.insert("Bravo",    0.02));
+        TRY(choice.insert("Charlie",  0.03));
+        TRY(choice.insert("Delta",    0.04));
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.1, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
+
+    }
+
+    {
+
+        WeightedChoice<std::string, double> choice {
+            {"Alpha",    0.01},
+            {"Bravo",    0.02},
+            {"Charlie",  0.03},
+            {"Delta",    0.04},
+        };
+
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.1, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
+
+    }
 
 }
