@@ -97,6 +97,41 @@ integers instead of 32-bit.
 
 ## Random distributions
 
+### Bernoulli distribution
+
+```c++
+class BernoulliDistribution {
+    using result_type = bool;
+    BernoulliDistribution() noexcept;
+    explicit BernoulliDistribution(double p) noexcept;
+    explicit BernoulliDistribution(std::uint64_t den,
+        std::uint64_t num) noexcept;
+    BernoulliDistribution(const BernoulliDistribution& bd) noexcept;
+    BernoulliDistribution(BernoulliDistribution&& bd) noexcept;
+    ~BernoulliDistribution() noexcept;
+    BernoulliDistribution& operator=(const BernoulliDistribution& bd) noexcept;
+    BernoulliDistribution& operator=(BernoulliDistribution&& bd) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        bool operator()(RNG& rng) const;
+    static bool min() noexcept { return false; }
+    static bool max() noexcept { return true; }
+};
+```
+
+This is functionally the same as `std::bernoulli_distribution,` except that
+the function call operator is `const,` and that this will provide predictable
+results on different C++ implementations (with a caveat noted below).
+
+The default constructor gives a 50% chance of success. The second and third
+constructors accept an explicit probability of success, expressed either as a
+floating point number in the unit interval, or a fraction expressed as a
+numerator and denominator. In the second and third cases the probability is
+clamped to the range 0 to 1 (inclusive).
+
+If the constructor that takes a floating point argument is used, reproducible
+behaviour cannot be guaranteed because of the nondeterministic nature of
+floating point arithmetic.
+
 ### Uniform integer distribution
 
 ```c++

@@ -75,6 +75,7 @@ void test_rs_core_mp_integer_unsigned_conversion_from_string();
 void test_rs_core_random_pcg_engine();
 void test_rs_core_random_device_64_engine();
 void test_rs_core_random_uniform_integer();
+void test_rs_core_random_bernoulli_distribution();
 void test_rs_core_random_uniform_real();
 void test_rs_core_random_choice();
 void test_rs_core_random_weighted_choice();
@@ -174,6 +175,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
     call_me_maybe(test_rs_core_random_device_64_engine, "test_rs_core_random_device_64_engine");
     call_me_maybe(test_rs_core_random_uniform_integer, "test_rs_core_random_uniform_integer");
+    call_me_maybe(test_rs_core_random_bernoulli_distribution, "test_rs_core_random_bernoulli_distribution");
     call_me_maybe(test_rs_core_random_uniform_real, "test_rs_core_random_uniform_real");
     call_me_maybe(test_rs_core_random_choice, "test_rs_core_random_choice");
     call_me_maybe(test_rs_core_random_weighted_choice, "test_rs_core_random_weighted_choice");

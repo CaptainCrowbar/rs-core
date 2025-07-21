@@ -247,6 +247,74 @@ void test_rs_core_random_uniform_integer() {
 
 }
 
+void test_rs_core_random_bernoulli_distribution() {
+
+    static constexpr auto n = 10'000;
+    static constexpr auto nx = static_cast<double>(n);
+    static const auto tolerance = std::sqrt(nx);
+
+    {
+
+        Pcg rng(42);
+        BernoulliDistribution dist;
+
+        auto count = 0.0;
+        auto expect = 0.5 * nx;
+        bool x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            if (x) {
+                count += 1.0;
+            }
+        }
+
+        TEST_NEAR(count, expect, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        BernoulliDistribution dist(0.25);
+
+        auto count = 0.0;
+        auto expect = 0.25 * nx;
+        bool x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            if (x) {
+                count += 1.0;
+            }
+        }
+
+        TEST_NEAR(count, expect, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
+        BernoulliDistribution dist(300, 400);
+
+        auto count = 0.0;
+        auto expect = 0.75 * nx;
+        bool x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            if (x) {
+                count += 1.0;
+            }
+        }
+
+        TEST_NEAR(count, expect, tolerance);
+
+    }
+
+}
+
 void test_rs_core_random_uniform_real() {
 
     static constexpr auto n = 10'000;

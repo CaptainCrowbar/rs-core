@@ -221,6 +221,44 @@ namespace RS {
             }
         }
 
+    // Bernoulli distribution
+
+    class BernoulliDistribution {
+
+    public:
+
+        BernoulliDistribution() = default;
+        explicit BernoulliDistribution(double p) noexcept;
+        explicit BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept;
+
+        template <std::uniform_random_bit_generator RNG>
+            bool operator()(RNG& rng) const;
+
+        static bool min() noexcept { return false; }
+        static bool max() noexcept { return true; }
+
+    private:
+
+        static constexpr auto max64 = static_cast<std::uint64_t>(-1);
+
+        UniformInteger<std::uint64_t> dist_;
+        std::uint64_t threshold_{max64 >> 1};
+
+    };
+
+        inline BernoulliDistribution::BernoulliDistribution(double p) noexcept:
+        dist_(),
+        threshold_(static_cast<std::uint64_t>(std::clamp(p, 0.0, 1.0) * static_cast<double>(max64))) {}
+
+        inline BernoulliDistribution::BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept:
+        dist_(den),
+        threshold_(std::clamp(num, std::uint64_t{}, den)) {}
+
+        template <std::uniform_random_bit_generator RNG>
+        bool BernoulliDistribution::operator()(RNG& rng) const {
+            return dist_(rng) <= threshold_;
+        }
+
     // Uniform floating point distribution
 
     template <std::floating_point T>
