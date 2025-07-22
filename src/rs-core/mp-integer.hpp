@@ -384,12 +384,26 @@ namespace RS {
 
     inline std::pair<Natural, Natural> Natural::divide(const Natural& y) const {
 
-        Natural q;
-        Natural r{*this};
-
-        if (*this < y) {
+        if (words_.empty()) {
+            return {};
+        } else if (words_.size() == 1 && y.words_.size() == 1) {
+            auto a = words_[0];
+            auto b = y.words_[0];
+            auto q = a / b;
+            auto r = a % b;
             return {q, r};
         }
+
+        auto cmp = *this <=> y;
+
+        if (cmp == std::strong_ordering::less) {
+            return {{}, *this};
+        } else if (cmp == std::strong_ordering::equal) {
+            return {{1u}, {}};
+        }
+
+        Natural q;
+        Natural r{*this};
 
         auto shift = static_cast<int>(bits() - y.bits());
         auto r_sub = y << shift;
