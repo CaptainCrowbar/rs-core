@@ -74,6 +74,18 @@ void test_rs_core_mp_integer_unsigned_conversion_from_integer() {
 
 }
 
+void test_rs_core_mp_integer_unsigned_conversion_to_floating_point() {
+
+    Natural x;
+    double y{};
+
+    TRY((x = 0u));                                                    TRY(y = x.as_double());  TEST_EQUAL(y, 0.0);
+    TRY((x = 1u));                                                    TRY(y = x.as_double());  TEST_EQUAL(y, 1.0);
+    TRY((x = 123'456'789ul));                                         TRY(y = x.as_double());  TEST_EQUAL(y, 123'456'789.0);
+    TRY((x = {0xfedc'babc'defe'dcbaull, 0x9876'5432'1234'5678ull}));  TRY(y = x.as_double());  TEST_NEAR(y, 3.387700037e38, 1e29);
+
+}
+
 void test_rs_core_mp_integer_unsigned_conversion_to_string() {
 
     Natural x;

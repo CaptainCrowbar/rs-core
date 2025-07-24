@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-core/global.hpp"
+#include "rs-core/mp-integer.hpp"
 #include <algorithm>
 #include <bit>
 #include <concepts>
@@ -140,7 +141,7 @@ namespace RS {
 
     // Uniform integer distribution
 
-    template <std::integral T>
+    template <Integral T>
     class UniformInteger {
 
     public:
@@ -167,21 +168,21 @@ namespace RS {
 
     };
 
-        template <std::integral T>
+        template <Integral T>
         UniformInteger<T>::UniformInteger() noexcept:
         min_(0),
         range_(static_cast<std::uint64_t>(std::numeric_limits<T>::max()) + 1) {
             update();
         }
 
-        template <std::integral T>
+        template <Integral T>
         UniformInteger<T>::UniformInteger(T range) noexcept:
         min_(0),
         range_(static_cast<std::uint64_t>(range)) {
             update();
         }
 
-        template <std::integral T>
+        template <Integral T>
         UniformInteger<T>::UniformInteger(T min, T max) noexcept {
             if (min > max) {
                 std::swap(min, max);
@@ -191,7 +192,7 @@ namespace RS {
             update();
         }
 
-        template <std::integral T>
+        template <Integral T>
         template <std::uniform_random_bit_generator RNG>
         T UniformInteger<T>::operator()(RNG& rng) const {
             std::uint64_t x;
@@ -204,7 +205,7 @@ namespace RS {
             return min_ + static_cast<T>(x);
         }
 
-        template <std::integral T>
+        template <Integral T>
         T UniformInteger<T>::max() const noexcept {
             auto half_range = range_ / 2;
             auto t1 = static_cast<T>(half_range);
@@ -212,7 +213,7 @@ namespace RS {
             return min_ + t1 + t2;
         }
 
-        template <std::integral T>
+        template <Integral T>
         void UniformInteger<T>::update() noexcept {
             if (! std::has_single_bit(range_)) {
                 auto max64 = std::numeric_limits<std::uint64_t>::max();
@@ -354,7 +355,7 @@ namespace RS {
     namespace Detail {
 
         template <typename T> struct UniformDistribution;
-        template <std::integral T> struct UniformDistribution<T> {
+        template <Integral T> struct UniformDistribution<T> {
             using type = UniformInteger<T>;
         };
         template <std::floating_point T> struct UniformDistribution<T> {
@@ -363,8 +364,7 @@ namespace RS {
 
     }
 
-    template <std::regular T, typename W = int>
-    requires std::integral<W> || std::floating_point<W>
+    template <std::regular T, Arithmetic W = int>
     class WeightedChoice {
 
     public:
@@ -391,8 +391,7 @@ namespace RS {
 
     };
 
-        template <std::regular T, typename W>
-        requires std::integral<W> || std::floating_point<W>
+        template <std::regular T, Arithmetic W>
         WeightedChoice<T, W>::WeightedChoice(std::initializer_list<std::pair<T, W>> list) {
             W sum{};
             for (const auto& [t,w]: list) {
@@ -404,8 +403,7 @@ namespace RS {
             dist_ = weight_dist(sum);
         }
 
-        template <std::regular T, typename W>
-        requires std::integral<W> || std::floating_point<W>
+        template <std::regular T, Arithmetic W>
         template <std::uniform_random_bit_generator RNG>
         const T& WeightedChoice<T, W>::operator()(RNG& rng) const {
             auto x = dist_(rng);
@@ -419,8 +417,7 @@ namespace RS {
             return it->second;
         }
 
-        template <std::regular T, typename W>
-        requires std::integral<W> || std::floating_point<W>
+        template <std::regular T, Arithmetic W>
         void WeightedChoice<T, W>::insert(const T& t, W w) {
             if (w > 0) {
                 if (! map_.empty()) {

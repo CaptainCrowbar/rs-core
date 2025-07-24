@@ -6,6 +6,7 @@
 #include "rs-core/hash.hpp"
 #include <algorithm>
 #include <bit>
+#include <cmath>
 #include <compare>
 #include <concepts>
 #include <cstddef>
@@ -75,6 +76,8 @@ namespace RS {
         void set_bit(std::size_t i, bool b = true);
         void flip_bit(std::size_t i);
         std::size_t popcount() const noexcept;
+        double as_double() const noexcept;
+        explicit operator double() const noexcept { return as_double(); }
         template <std::integral T> bool in_range() const noexcept;
         template <std::integral T> std::optional<T> checked_cast() const noexcept;
         template <std::integral T> T unchecked_cast() const noexcept; // UB if out of range
@@ -484,6 +487,23 @@ namespace RS {
         return n;
     }
 
+    inline double Natural::as_double() const noexcept {
+
+        if (words_.size() <= 2) {
+
+            return static_cast<double>(unchecked_cast<std::uint64_t>());
+
+        } else {
+
+            auto shift = static_cast<int>(bits()) - 64;
+            auto shifted = (*this >> shift).unchecked_cast<std::uint64_t>();
+
+            return std::ldexp(shifted, shift);
+
+        }
+
+    }
+
     template <std::integral T>
     bool Natural::in_range() const noexcept {
         using limits = std::numeric_limits<T>;
@@ -668,6 +688,8 @@ namespace RS {
         friend std::strong_ordering operator<=>(const Integer& x, const Integer& y) noexcept;
 
         std::pair<Integer, Integer> divide(const Integer& y) const;
+        double as_double() const noexcept;
+        explicit operator double() const noexcept { return as_double(); }
         template <std::integral T> bool in_range() const noexcept;
         template <std::integral T> std::optional<T> checked_cast() const noexcept;
         template <std::integral T> T unchecked_cast() const noexcept; // UB if out of range
@@ -792,6 +814,11 @@ namespace RS {
 
     }
 
+    inline double Integer::as_double() const noexcept {
+        auto x = mag_.as_double();
+        return sign_ ? - x : x;
+    }
+
     template <std::integral T>
     bool Integer::in_range() const noexcept {
 
@@ -881,6 +908,24 @@ namespace RS {
         return num;
 
     }
+
+    // Concepts
+
+    template <typename T>
+    concept SignedIntegral =
+        (std::signed_integral<T> || std::same_as<T, Integer>)
+        && ! std::same_as<T, bool>;
+
+    template <typename T>
+    concept UnsignedIntegral =
+        (std::unsigned_integral<T> || std::same_as<T, Natural>)
+        && ! std::same_as<T, bool>;
+
+    template <typename T>
+    concept Integral = SignedIntegral<T> || UnsignedIntegral<T>;
+
+    template <typename T>
+    concept Arithmetic = Integral<T> || std::floating_point<T>;
 
     // Literals
 

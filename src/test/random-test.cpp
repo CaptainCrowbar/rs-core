@@ -1,4 +1,5 @@
 #include "rs-core/random.hpp"
+#include "rs-core/mp-integer.hpp"
 #include "rs-core/unit-test.hpp"
 #include <algorithm>
 #include <cmath>
@@ -227,6 +228,47 @@ void test_rs_core_random_uniform_integer() {
         auto sum = 0.0;
         auto sum2 = 0.0;
         std::uint64_t x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            auto y = static_cast<double>(x);
+            sum += y;
+            sum2 += y * y;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+}
+
+void test_rs_core_random_uniform_mp_integer() {
+
+    static constexpr auto n = 1000;
+    static constexpr auto nx = static_cast<double>(n);
+
+    {
+
+        Pcg rng(42);
+        UniformInteger<Integer> dist(1, 100);
+
+        TEST_EQUAL(dist.min(), 1);
+        TEST_EQUAL(dist.max(), 100);
+
+        auto xmin = static_cast<double>(dist.min());
+        auto xmax = static_cast<double>(dist.max());
+        auto expect_mean = 0.5 * (xmin + xmax);
+        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
+        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        Integer x{};
 
         for (auto i = 0; i < n; ++i) {
             TRY(x = dist(rng));
@@ -562,6 +604,13 @@ void test_rs_core_random_weighted_choice() {
 
     }
 
+}
+
+void test_rs_core_random_weighted_choice_floating_point() {
+
+    static constexpr auto iterations = 10'000;
+    static constexpr auto total = static_cast<double>(iterations);
+
     {
 
         WeightedChoice<std::string, double> choice;
@@ -594,6 +643,64 @@ void test_rs_core_random_weighted_choice() {
             {"Bravo",    0.02},
             {"Charlie",  0.03},
             {"Delta",    0.04},
+        };
+
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.1, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
+
+    }
+
+}
+
+void test_rs_core_random_weighted_choice_mp_integer() {
+
+    static constexpr auto iterations = 1000;
+    static constexpr auto total = static_cast<double>(iterations);
+
+    {
+
+        WeightedChoice<std::string, Integer> choice;
+        Pcg rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        TRY(choice.insert("Alpha",    10));
+        TRY(choice.insert("Bravo",    20));
+        TRY(choice.insert("Charlie",  30));
+        TRY(choice.insert("Delta",    40));
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.1, 0.01);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.01);
+        TEST_NEAR(census["Charlie"] / total,  0.3, 0.01);
+        TEST_NEAR(census["Delta"] / total,    0.4, 0.01);
+
+    }
+
+    {
+
+        WeightedChoice<std::string, Integer> choice {
+            {"Alpha",    10},
+            {"Bravo",    20},
+            {"Charlie",  30},
+            {"Delta",    40},
         };
 
         Pcg rng(42);

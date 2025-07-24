@@ -18,7 +18,7 @@
 
 namespace RS {
 
-    template <typename T>
+    template <SignedIntegral T>
     class Rational {
 
     public:
@@ -69,14 +69,14 @@ namespace RS {
     using IntRational = Rational<int>;
     using MPRational = Rational<Integer>;
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T>::Rational(const T& i, const T& n, const T& d):
     num_(i * d), den_(d) {
         num_ += i < T{0} ? - n : n;
         reduce();
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     Rational<T>::Rational(std::string_view str) {
         auto r = parse(str);
         if (! r) {
@@ -85,7 +85,7 @@ namespace RS {
         *this = std::move(*r);
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr T Rational<T>::whole() const {
         auto abs_this = abs();
         auto quo = abs_this.num_ / abs_this.den_;
@@ -99,7 +99,7 @@ namespace RS {
         return quo;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> Rational<T>::fraction() const {
         auto abs_this = abs();
         auto rem = abs_this.num_ % abs_this.den_;
@@ -112,7 +112,7 @@ namespace RS {
         return {rem, den_};
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr T Rational<T>::truncate() const {
         auto abs_this = abs();
         auto quo = abs_this.num_ / abs_this.den_;
@@ -122,7 +122,7 @@ namespace RS {
         return quo;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> Rational<T>::signed_fraction() const {
         auto abs_this = abs();
         auto rem = abs_this.num_ % abs_this.den_;
@@ -132,7 +132,7 @@ namespace RS {
         return {rem, den_};
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     std::string Rational<T>::mixed() const {
 
         if (num_ == T{0}) {
@@ -164,7 +164,7 @@ namespace RS {
 
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     std::string Rational<T>::str() const {
         if (den_ == T{1}) {
             return std::format("{}", num_);
@@ -173,12 +173,12 @@ namespace RS {
         }
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     std::string Rational<T>::rs_core_format(std::string_view flags) const {
         return flags.contains('m') ? mixed() : str();
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> operator+(const Rational<T>& x, const Rational<T>& y) {
         auto multiple = lcm(x.den(), y.den());
         auto lhs = x.num() * (multiple / x.den());
@@ -186,31 +186,31 @@ namespace RS {
         return {lhs + rhs, multiple};
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> operator-(const Rational<T>& x, const Rational<T>& y) {
         return x + - y;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> operator*(const Rational<T>& x, const Rational<T>& y) {
         auto z = x;
         z *= y;
         return z;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> operator/(const Rational<T>& x, const Rational<T>& y) {
         auto z = x;
         z /= y;
         return z;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr bool operator==(const Rational<T>& x, const Rational<T>& y) noexcept {
         return x.num() == y.num() && x.den() == y.den();
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr std::strong_ordering operator<=>(const Rational<T>& x, const Rational<T>& y) noexcept {
         auto multiple = lcm(x.den(), y.den());
         auto lhs = x.num() * (multiple / x.den());
@@ -218,7 +218,7 @@ namespace RS {
         return lhs <=> rhs;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     std::optional<Rational<T>> Rational<T>::parse(std::string_view str) {
 
         static const auto t_parser = [] (std::string_view s) {
@@ -289,7 +289,7 @@ namespace RS {
 
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr void Rational<T>::reduce() {
         if (den_ < T{0}) {
             num_ = - num_;
@@ -300,7 +300,7 @@ namespace RS {
         den_ /= common;
     }
 
-    template <typename T>
+    template <SignedIntegral T>
     constexpr Rational<T> Rational<T>::unchecked(const T& n, const T& d) {
         Rational r;
         r.num_ = n;
@@ -310,7 +310,7 @@ namespace RS {
 
 }
 
-template <typename T>
+template <RS::SignedIntegral T>
 struct std::hash<RS::Rational<T>> {
     std::size_t operator()(const RS::Rational<T>& r) const noexcept { return r.hash(); }
 };

@@ -135,7 +135,7 @@ floating point arithmetic.
 ### Uniform integer distribution
 
 ```c++
-template <std::integral T>
+template <Integral T>
 class UniformInteger {
     using result_type = T;
     UniformInteger() noexcept;
@@ -161,6 +161,9 @@ The default constructor generates values from zero to the maximum positive
 value of `T.` The second generates values from zero to `range-1;` behaviour
 is undefined if `range<1.` The third generates numbers from `min` to `max`
 inclusive; the bounds will be swapped if they are in the wrong order.
+
+TODO: The current implementation exhibits undefined behaviour if the output
+range is larger than that of the input PRNG.
 
 ### Uniform floating point distribution
 
@@ -232,8 +235,7 @@ is called on an empty list.
 ### Weighted choice class
 
 ```c++
-template <std::regular T, typename W = int>
-requires std::integral<W> || std::floating_point<W>
+template <std::regular T, Arithmetic W = int>
 class WeightedChoice {
     using result_type = T;
     using weight_type = W;

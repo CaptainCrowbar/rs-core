@@ -106,6 +106,22 @@ void test_rs_core_mp_integer_signed_conversion_from_integer() {
 
 }
 
+void test_rs_core_mp_integer_signed_conversion_to_floating_point() {
+
+    Integer x;
+    Natural n{0xfedc'babc'defe'dcbaull, 0x9876'5432'1234'5678ull};
+    double y{};
+
+    TRY((x = 0));              TRY(y = x.as_double());  TEST_EQUAL(y, 0.0);
+    TRY((x = 1));              TRY(y = x.as_double());  TEST_EQUAL(y, 1.0);
+    TRY((x = -1));             TRY(y = x.as_double());  TEST_EQUAL(y, -1.0);
+    TRY((x = 123'456'789l));   TRY(y = x.as_double());  TEST_EQUAL(y, 123'456'789.0);
+    TRY((x = -123'456'789l));  TRY(y = x.as_double());  TEST_EQUAL(y, -123'456'789.0);
+    TRY((x = n));              TRY(y = x.as_double());  TEST_NEAR(y, 3.387700037e38, 1e29);
+    TRY((x = - x));            TRY(y = x.as_double());  TEST_NEAR(y, -3.387700037e38, 1e29);
+
+}
+
 void test_rs_core_mp_integer_signed_conversion_to_string() {
 
     Integer x;

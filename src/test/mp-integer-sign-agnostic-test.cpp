@@ -1,10 +1,46 @@
 #include "rs-core/mp-integer.hpp"
 #include "rs-core/unit-test.hpp"
 #include <algorithm>
+#include <cstdint>
+#include <string>
 #include <tuple>
 #include <unordered_set>
 
 using namespace RS;
+
+void test_rs_core_mp_integer_concepts() {
+
+    static_assert(SignedIntegral<int>);
+    static_assert(! SignedIntegral<unsigned>);
+    static_assert(SignedIntegral<std::int64_t>);
+    static_assert(! SignedIntegral<std::uint64_t>);
+    static_assert(SignedIntegral<Integer>);
+    static_assert(! SignedIntegral<Natural>);
+    static_assert(! SignedIntegral<bool>);
+    static_assert(! SignedIntegral<int*>);
+    static_assert(! SignedIntegral<std::string>);
+
+    static_assert(! UnsignedIntegral<int>);
+    static_assert(UnsignedIntegral<unsigned>);
+    static_assert(! UnsignedIntegral<std::int64_t>);
+    static_assert(UnsignedIntegral<std::uint64_t>);
+    static_assert(! UnsignedIntegral<Integer>);
+    static_assert(UnsignedIntegral<Natural>);
+    static_assert(! UnsignedIntegral<bool>);
+    static_assert(! UnsignedIntegral<int*>);
+    static_assert(! UnsignedIntegral<std::string>);
+
+    static_assert(Integral<int>);
+    static_assert(Integral<unsigned>);
+    static_assert(Integral<std::int64_t>);
+    static_assert(Integral<std::uint64_t>);
+    static_assert(Integral<Integer>);
+    static_assert(Integral<Natural>);
+    static_assert(! Integral<bool>);
+    static_assert(! Integral<int*>);
+    static_assert(! Integral<std::string>);
+
+}
 
 void test_rs_core_mp_integer_literals() {
 

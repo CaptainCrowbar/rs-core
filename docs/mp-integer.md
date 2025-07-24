@@ -12,6 +12,19 @@ namespace RS;
 * TOC
 {:toc}
 
+## Concepts
+
+```c++
+template <typename T> concept SignedIntegral;
+template <typename T> concept UnsignedIntegral;
+template <typename T> concept Integral;
+template <typename T> concept Arithmetic;
+```
+
+These are satisfied by the same primitive types that satisfy `std::integral`
+etc, minus `bool,` plus `Integer` and `Natural.` The `Arithmetic` type
+matches `Integral` plus floating point.
+
 ## Multiple precision integer classes
 
 ```c++
@@ -198,6 +211,14 @@ explicit Mpitype::operator bool() const noexcept;
 ```
 
 Returns true if the value is not zero.
+
+```c++
+double Mpitype::as_double() const noexcept;
+explicit Mpitype::operator double() const noexcept;
+```
+
+Convert the value to floating point. This may only be approximate, depending
+on the size of the value.
 
 ```c++
 template <std::integral T> bool Mpitype::in_range() const noexcept;

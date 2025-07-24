@@ -15,21 +15,20 @@ namespace RS;
 ## Rational class
 
 ```c++
-template <typename T> class Rational;
+template <SignedIntegral T> class Rational;
 ```
 
-This represents a rational number. The underlying integer type is not
-explicitly constrained; it is expected to be either a signed primitive
-integer type, or the `[Integer](mp-integer.html)` type from this library.
+This represents a rational number. The underlying integer type is expected to
+be either a signed primitive integer type, or the `[Integer]
+(mp-integer.html)` type from this library.
 
 Rationals are always kept in their lowest terms. The numerator contains the
-rational number's sign; the denominator is always positive.
+sign; the denominator is always positive.
 
 Operations on `Rational` objects are `constexpr` if the required operations on
-the underlying integer type are. Because of this conditionality, individual
-functions are not labelled as `constexpr` or not here.
-
-### TODO
+the underlying integer type are, and strings are not involved. Because of
+this conditionality, individual functions are not labelled as `constexpr`
+here.
 
 ```c++
 using integer_type = T;
