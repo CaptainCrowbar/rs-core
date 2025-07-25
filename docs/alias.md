@@ -119,10 +119,10 @@ Alias& Alias::operator=(const T& t);
 Alias& Alias::operator=(T&& t);
 ```
 
-Conversions from a `T` to an `Alias.` Explicit conversion constructors are
-always defined; implicit conversions and assignment operators are defined if
-the `implicit_to_alias` flag is present and `T` has the necessary
-properties.
+Conversions from a `T` to an `Alias.` Conversion constructors are always
+defined, and are explicit by default; implicit conversions and assignment
+operators are defined if the `implicit_to_alias` flag is present and `T` has
+the necessary properties.
 
 ```c++
 template <typename Tag2, AliasFlags F2>
@@ -155,9 +155,9 @@ Destructor.
 [optionally explicit] Alias::operator T() const;
 ```
 
-Conversion operator from an `Alias` to a `T`. The explicit conversion operator
-is always defined; an implicit conversion operator is defined if the
-`implicit_from_alias` flag is present.
+Conversion operator from an `Alias` to a `T`. This conversion operator is
+always defined, and is explicit by default; an implicit conversion operator
+is defined if the `implicit_from_alias` flag is present.
 
 ```c++
 [optionally explicit] Alias::operator bool() const;
@@ -277,8 +277,7 @@ bool Alias::empty() const;
 std::size_t Alias::size() const;
 ```
 
-Range property functions. Defined if `std::ranges::empty/size(T)` are
-defined.
+Range property functions. Defined if `std::ranges::empty/size(T)` are valid.
 
 ### String functions
 
@@ -286,9 +285,9 @@ defined.
 Alias Alias::substr(std::size_t pos, std::size_t len = npos) const;
 ```
 
-Defined if `T::substr()` is defined. This returns an `Alias` wrapped around
-the substring, instead of the raw `T` substring that `Alias->substr()` would
-return.
+Defined if `T::substr()` is defined and returns a `T` or a type convertible to
+it. This returns an `Alias` wrapped around the substring, instead of the raw
+`T` substring that `Alias->substr()` would return.
 
 ### Formatting functions
 
@@ -305,5 +304,5 @@ accepts the same formatting flags.
 class std::hash<Alias>;
 ```
 
-Hash functions. This is defined if `std::hash<T>` is defined, and returns the
+Hash functions This is defined if `std::hash<T>` is defined, and returns the
 same value.
