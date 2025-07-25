@@ -16,9 +16,12 @@ namespace RS;
 
 ```c++
 template <typename T> concept Hashable;
+template <typename T> concept RegularHashable
+    = Hashable<T> && std::regular<T>;
 ```
 
-Matches any type for which a valid specialization of `std::hash` exists.
+`Hashable` matches any type for which a valid specialization of `std::hash`
+exists.
 
 ## Hash functions
 

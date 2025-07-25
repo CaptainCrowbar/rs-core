@@ -21,6 +21,9 @@ namespace RS {
         { std::hash<std::remove_cvref_t<T>>()(t) } -> std::convertible_to<std::size_t>;
     };
 
+    template <typename T>
+    concept RegularHashable = Hashable<T> && std::regular<T>;
+
     // Hash mixing functions
 
     constexpr std::size_t hash_mix() noexcept {

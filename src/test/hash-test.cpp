@@ -6,6 +6,19 @@
 
 using namespace RS;
 
+void test_rs_core_hash_concepts() {
+
+    static_assert(Hashable<int>);
+    static_assert(Hashable<void*>);
+    static_assert(Hashable<std::string>);
+    static_assert(! Hashable<void>);
+    static_assert(RegularHashable<int>);
+    static_assert(RegularHashable<void*>);
+    static_assert(RegularHashable<std::string>);
+    static_assert(! RegularHashable<void>);
+
+}
+
 void test_rs_core_hash_kernighan() {
 
     std::string s;
