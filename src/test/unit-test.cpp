@@ -7,6 +7,7 @@
 
 using namespace RS::UnitTest;
 
+void test_rs_core_global_concepts();
 void test_rs_core_global_range_functions();
 void test_rs_core_alias_constructors();
 void test_rs_core_alias_conversions();
@@ -118,6 +119,7 @@ int main(int argc, char** argv) {
     std::println("{}Running unit tests{}", xhead, xreset);
     std::println("{}{}{}", xrule, rule, xreset);
 
+    call_me_maybe(test_rs_core_global_concepts, "test_rs_core_global_concepts");
     call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
     call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");

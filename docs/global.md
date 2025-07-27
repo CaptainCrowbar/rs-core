@@ -21,6 +21,20 @@ constexpr auto npos = ~ 0uz;
 
 Defined for convenience.
 
+## Concepts
+
+```c++
+template <typename R, typename V> concept ReadableRange;
+template <typename R, typename V> concept WritableRange;
+template <typename R, typename V> concept ReadWriteRange
+    = ReadableRange<R, V> && WritableRange<R, V>;
+```
+
+Range concepts compatible with specific value types. All of these require `R`
+to be a range. `ReadableRange` also requires a dereferenced iterator to be
+assignable to a `V` object; `WritableRange` also requires a dereferenced
+iterator to be assignable from a `V` object; `ReadWriteRange` requires both.
+
 ## Metaprogramming utilities
 
 ```c++

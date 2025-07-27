@@ -13,6 +13,19 @@ namespace RS {
 
     static_assert(std::numeric_limits<unsigned char>::digits == 8);
 
+    // Concepts
+
+    template <typename R, typename V>
+    concept ReadableRange = std::ranges::range<R>
+        && std::assignable_from<V&, std::ranges::range_reference_t<R>>;
+
+    template <typename R, typename V>
+    concept WritableRange = std::ranges::range<R>
+        && std::assignable_from<std::ranges::range_reference_t<R>&, V>;
+
+    template <typename R, typename V>
+    concept ReadWriteRange = ReadableRange<R, V> && WritableRange<R, V>;
+
     // Constants
 
     constexpr std::string_view ascii_whitespace = "\t\n\r ";
