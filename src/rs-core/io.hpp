@@ -130,7 +130,7 @@ namespace RS {
                 do {
                     auto offset = buf.size();
                     buf.resize(offset + block_size);
-                    auto count = read(buf.data() + offset, block_size);
+                    count = read(buf.data() + offset, block_size);
                     buf.resize(offset + count);
                 } while (count > 0);
 

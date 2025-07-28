@@ -359,7 +359,7 @@ namespace RS {
 
             if (rc != ParseNumber::ok) {
                 return rc;
-            } else if (u > max_value + static_cast<T>(negative)) {
+            } else if (u > max_value + static_cast<U>(negative)) {
                 return ParseNumber::out_of_range;
             }
 
