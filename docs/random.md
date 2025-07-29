@@ -151,6 +151,30 @@ inclusive; the bounds will be swapped if they are in the wrong order.
 _TODO: The current implementation exhibits undefined behaviour if the output
 range is larger than that of the input PRNG._
 
+### Quick uniform integer distribution
+
+```c++
+template <Integral T>
+class QuickRandom {
+    using result_type = T;
+    constexpr QuickRandom() noexcept;
+    constexpr explicit QuickRandom(T range) noexcept;
+    constexpr explicit QuickRandom(T min, T max) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        constexpr T operator()(RNG& rng) const;
+    constexpr T min() const noexcept;
+    constexpr T max() const noexcept;
+};
+```
+
+This has the same interface as `UniformInteger,` but generates its result with
+a simple modulo operation, and will never call the underlying RNG more than
+once. This is faster than `UniformInteger` but has a small bias, on the order
+of `output-range/RNG-range,` if the output range is not a power of 2.
+
+_TODO: This has the same issue as `UniformInteger` if the output range is
+large._
+
 ### Uniform floating point distribution
 
 ```c++

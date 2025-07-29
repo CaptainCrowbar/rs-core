@@ -176,7 +176,7 @@ namespace RS {
     private:
 
         T min_{0};
-        std::uint64_t range_{0};
+        std::uint64_t range_{0}; // 0 if range is full uint64_t
         std::uint64_t threshold_{0}; // Highest multiple of range that fits in a uint64_t
 
         constexpr void update() noexcept;
@@ -222,6 +222,11 @@ namespace RS {
 
         template <Integral T>
         constexpr T UniformInteger<T>::max() const noexcept {
+            if constexpr (std::same_as<T, std::uint64_t>) {
+                if (range_ == 0) {
+                    return std::numeric_limits<std::uint64_t>::max();
+                }
+            }
             auto half_range = range_ / 2;
             auto t1 = static_cast<T>(half_range);
             auto t2 = static_cast<T>(range_ - half_range - 1);
@@ -235,6 +240,74 @@ namespace RS {
                 auto rem = max64 % range_;
                 threshold_ = max64 - rem;
             }
+        }
+
+    // Quick integer distribution
+
+    template <Integral T>
+    class QuickRandom {
+
+    public:
+
+        using result_type = T;
+
+        constexpr QuickRandom() noexcept;
+        constexpr explicit QuickRandom(T range) noexcept; // UB if range<=0
+        constexpr explicit QuickRandom(T min, T max) noexcept;
+
+        template <std::uniform_random_bit_generator RNG>
+            constexpr T operator()(RNG& rng) const;
+
+        constexpr T min() const noexcept { return min_; }
+        constexpr T max() const noexcept;
+
+    private:
+
+        T min_{0};
+        std::uint64_t range_{0}; // 0 if range is full uint64_t
+
+    };
+
+        template <Integral T>
+        constexpr QuickRandom<T>::QuickRandom() noexcept:
+        min_(0),
+        range_(static_cast<std::uint64_t>(std::numeric_limits<T>::max()) + 1) {}
+
+        template <Integral T>
+        constexpr QuickRandom<T>::QuickRandom(T range) noexcept:
+        min_(0),
+        range_(static_cast<std::uint64_t>(range)) {}
+
+        template <Integral T>
+        constexpr QuickRandom<T>::QuickRandom(T min, T max) noexcept {
+            if (min > max) {
+                std::swap(min, max);
+            }
+            min_ = min;
+            range_ = static_cast<std::uint64_t>(max - min) + 1;
+        }
+
+        template <Integral T>
+        template <std::uniform_random_bit_generator RNG>
+        constexpr T QuickRandom<T>::operator()(RNG& rng) const {
+            auto x = rng();
+            if (range_ != 0) {
+                x %= range_;
+            }
+            return min_ + static_cast<T>(x);
+        }
+
+        template <Integral T>
+        constexpr T QuickRandom<T>::max() const noexcept {
+            if constexpr (std::same_as<T, std::uint64_t>) {
+                if (range_ == 0) {
+                    return std::numeric_limits<std::uint64_t>::max();
+                }
+            }
+            auto half_range = range_ / 2;
+            auto t1 = static_cast<T>(half_range);
+            auto t2 = static_cast<T>(range_ - half_range - 1);
+            return min_ + t1 + t2;
         }
 
     // Bernoulli distribution
