@@ -30,14 +30,13 @@ preference):
 * `[string or view] T::rs_core_format(std::string_view flags,
     std::size_t size) const;`
 * `[string or view] rs_core_format(const T& t, std::string_view flags,
-    std::size_t size) const;`
+    std::size_t size);`
 * `[string or view] T::rs_core_format(std::string_view flags) const;`
-* `[string or view] rs_core_format(const T& t,
-    std::string_view flags) const;`
+* `[string or view] rs_core_format(const T& t, std::string_view flags);`
 * `[string or view] T::rs_core_format(std::size_t size) const;`
-* `[string or view] rs_core_format(const T& t, std::size_t size) const;`
+* `[string or view] rs_core_format(const T& t, std::size_t size);`
 * `[string or view] T::rs_core_format() const;`
-* `[string or view] rs_core_format(const T& t) const;`
+* `[string or view] rs_core_format(const T& t);`
 
 If the formatting function takes a flags argument, the generated formatter
 will accept any character except null, digits, or braces as part of the flags
