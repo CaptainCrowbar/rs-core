@@ -79,6 +79,7 @@ void test_rs_core_mp_integer_unsigned_conversion_to_floating_point();
 void test_rs_core_mp_integer_unsigned_conversion_to_string();
 void test_rs_core_mp_integer_unsigned_conversion_from_string();
 void test_rs_core_random_choice();
+void test_rs_core_random_choice_functions();
 void test_rs_core_random_weighted_choice();
 void test_rs_core_random_weighted_choice_floating_point();
 void test_rs_core_random_weighted_choice_mp_integer();
@@ -192,6 +193,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_to_string, "test_rs_core_mp_integer_unsigned_conversion_to_string");
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_from_string, "test_rs_core_mp_integer_unsigned_conversion_from_string");
     call_me_maybe(test_rs_core_random_choice, "test_rs_core_random_choice");
+    call_me_maybe(test_rs_core_random_choice_functions, "test_rs_core_random_choice_functions");
     call_me_maybe(test_rs_core_random_weighted_choice, "test_rs_core_random_weighted_choice");
     call_me_maybe(test_rs_core_random_weighted_choice_floating_point, "test_rs_core_random_weighted_choice_floating_point");
     call_me_maybe(test_rs_core_random_weighted_choice_mp_integer, "test_rs_core_random_weighted_choice_mp_integer");

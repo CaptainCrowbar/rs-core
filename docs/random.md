@@ -232,6 +232,21 @@ The `size()` function returns the number of items in the list (note that this
 may include duplicates). Behaviour is undefined if the function call operator
 is called on an empty list.
 
+### Random choice function
+
+```c++
+template <std::ranges::random_access_range R,
+        std::uniform_random_bit_generator RNG>
+    [reference type] random_choice(R& range, RNG& rng);
+template <std::ranges::random_access_range R,
+        std::uniform_random_bit_generator RNG>
+    [reference type] quick_choice(R& range, RNG& rng);
+```
+
+Convenience functions to select a random item from a range. The two functions
+differ only in whether they use `UniformInteger` or `QuickRandom`
+internally. Behaviour is undefined if the range is empty.
+
 ### Weighted choice class
 
 ```c++

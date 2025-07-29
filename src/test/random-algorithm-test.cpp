@@ -100,6 +100,61 @@ void test_rs_core_random_choice() {
 
 }
 
+void test_rs_core_random_choice_functions() {
+
+    static constexpr auto iterations = 10'000;
+    static constexpr auto total = static_cast<double>(iterations);
+
+    static const std::vector<std::string> vec {
+        "Alpha",
+        "Bravo",
+        "Charlie",
+        "Delta",
+        "Echo",
+    };
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = random_choice(vec, rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.2, 0.02);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.02);
+        TEST_NEAR(census["Charlie"] / total,  0.2, 0.02);
+        TEST_NEAR(census["Delta"] / total,    0.2, 0.02);
+        TEST_NEAR(census["Echo"] / total,     0.2, 0.02);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = quick_choice(vec, rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.2, 0.02);
+        TEST_NEAR(census["Bravo"] / total,    0.2, 0.02);
+        TEST_NEAR(census["Charlie"] / total,  0.2, 0.02);
+        TEST_NEAR(census["Delta"] / total,    0.2, 0.02);
+        TEST_NEAR(census["Echo"] / total,     0.2, 0.02);
+
+    }
+
+}
+
 void test_rs_core_random_weighted_choice() {
 
     static constexpr auto iterations = 10'000;
