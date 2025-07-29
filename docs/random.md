@@ -25,6 +25,12 @@ arithmetic, but some floating point distributions are duplicated here anyway
 because the standard versions inconveniently have a non-`const` function call
 operator.
 
+All of the random number engine and distribution classes described here are
+regular value types. To save space, the boilerplate life cycle operations
+common to all (copy and move constructors and assignment operators, and
+destructor) are not individually documented. Their conventional signatures
+and behaviour can be assumed.
+
 ## Random number engines
 
 ### PCG engine
@@ -53,16 +59,6 @@ constexpr explicit Pcg::Pcg(std::uint64_t s0, std::uint64_t s1,
 
 Constructors from one or more seeds. The default constructor uses a standard
 seed.
-
-```c++
-constexpr Pcg::~Pcg() noexcept;
-constexpr Pcg::Pcg(const Pcg& p) noexcept;
-constexpr Pcg::Pcg(Pcg&& p) noexcept;
-constexpr Pcg& Pcg::operator=(const Pcg& p) noexcept;
-constexpr Pcg& Pcg::operator=(Pcg&& p) noexcept;
-```
-
-Other life cycle functions.
 
 ```c++
 constexpr std::uint64_t Pcg::operator()() noexcept;
@@ -102,19 +98,14 @@ integers instead of 32-bit.
 ```c++
 class BernoulliDistribution {
     using result_type = bool;
-    BernoulliDistribution() noexcept;
-    explicit BernoulliDistribution(double p) noexcept;
-    explicit BernoulliDistribution(std::uint64_t den,
+    constexpr BernoulliDistribution() noexcept;
+    constexpr explicit BernoulliDistribution(double p) noexcept;
+    constexpr explicit BernoulliDistribution(std::uint64_t den,
         std::uint64_t num) noexcept;
-    BernoulliDistribution(const BernoulliDistribution& bd) noexcept;
-    BernoulliDistribution(BernoulliDistribution&& bd) noexcept;
-    ~BernoulliDistribution() noexcept;
-    BernoulliDistribution& operator=(const BernoulliDistribution& bd) noexcept;
-    BernoulliDistribution& operator=(BernoulliDistribution&& bd) noexcept;
     template <std::uniform_random_bit_generator RNG>
-        bool operator()(RNG& rng) const;
-    static bool min() noexcept { return false; }
-    static bool max() noexcept { return true; }
+        constexpr bool operator()(RNG& rng) const;
+    constexpr static bool min() noexcept { return false; }
+    constexpr static bool max() noexcept { return true; }
 };
 ```
 
@@ -138,18 +129,13 @@ floating point arithmetic.
 template <Integral T>
 class UniformInteger {
     using result_type = T;
-    UniformInteger() noexcept;
-    explicit UniformInteger(T range) noexcept;
-    explicit UniformInteger(T min, T max) noexcept;
-    UniformInteger(const UniformInteger& ui) noexcept;
-    UniformInteger(UniformInteger&& ui) noexcept;
-    ~UniformInteger() noexcept;
-    UniformInteger& operator=(const UniformInteger& ui) noexcept;
-    UniformInteger& operator=(UniformInteger&& ui) noexcept;
+    constexpr UniformInteger() noexcept;
+    constexpr explicit UniformInteger(T range) noexcept;
+    constexpr explicit UniformInteger(T min, T max) noexcept;
     template <std::uniform_random_bit_generator RNG>
-        T operator()(RNG& rng) const;
-    T min() const noexcept;
-    T max() const noexcept;
+        constexpr T operator()(RNG& rng) const;
+    constexpr T min() const noexcept;
+    constexpr T max() const noexcept;
 };
 ```
 
@@ -162,8 +148,8 @@ value of `T.` The second generates values from zero to `range-1;` behaviour
 is undefined if `range<1.` The third generates numbers from `min` to `max`
 inclusive; the bounds will be swapped if they are in the wrong order.
 
-TODO: The current implementation exhibits undefined behaviour if the output
-range is larger than that of the input PRNG.
+_TODO: The current implementation exhibits undefined behaviour if the output
+range is larger than that of the input PRNG._
 
 ### Uniform floating point distribution
 
@@ -171,18 +157,13 @@ range is larger than that of the input PRNG.
 template <std::floating_point T>
 class UniformReal {
     using result_type = T;
-    UniformReal() noexcept;
-    explicit UniformReal(T range) noexcept;
-    explicit UniformReal(T min, T max) noexcept;
-    UniformReal(const UniformReal& ur) noexcept;
-    UniformReal(UniformReal&& ur) noexcept;
-    ~UniformReal() noexcept;
-    UniformReal& operator=(const UniformReal& ur) noexcept;
-    UniformReal& operator=(UniformReal&& ur) noexcept;
+    constexpr UniformReal() noexcept;
+    constexpr explicit UniformReal(T range) noexcept;
+    constexpr explicit UniformReal(T min, T max) noexcept;
     template <std::uniform_random_bit_generator RNG>
-        T operator()(RNG& rng) const;
-    T min() const noexcept;
-    T max() const noexcept;
+        constexpr T operator()(RNG& rng) const;
+    constexpr T min() const noexcept;
+    constexpr T max() const noexcept;
 };
 ```
 
@@ -211,11 +192,6 @@ class RandomChoice {
     template <std::ranges::range R>
         requires std::convertible_to<std::ranges::range_value_t<R>, T>
         explicit RandomChoice(const R& r);
-    RandomChoice(const RandomChoice& rc);
-    RandomChoice(RandomChoice&& rc) noexcept;
-    ~RandomChoice() noexcept;
-    RandomChoice& operator=(const RandomChoice& rc);
-    RandomChoice& operator=(RandomChoice&& rc) noexcept;
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
     void insert(const T& t);
@@ -241,11 +217,6 @@ class WeightedChoice {
     using weight_type = W;
     WeightedChoice();
     WeightedChoice(std::initializer_list<std::pair<T, W>> list);
-    WeightedChoice(const WeightedChoice& wc);
-    WeightedChoice(WeightedChoice&& wc) noexcept;
-    ~WeightedChoice() noexcept;
-    WeightedChoice& operator=(const WeightedChoice& wc);
-    WeightedChoice& operator=(WeightedChoice&& wc) noexcept;
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
     void insert(const T& t, W w);

@@ -163,15 +163,15 @@ namespace RS {
 
         using result_type = T;
 
-        UniformInteger() noexcept;
-        explicit UniformInteger(T range) noexcept; // UB if range<=0
-        explicit UniformInteger(T min, T max) noexcept;
+        constexpr UniformInteger() noexcept;
+        constexpr explicit UniformInteger(T range) noexcept; // UB if range<=0
+        constexpr explicit UniformInteger(T min, T max) noexcept;
 
         template <std::uniform_random_bit_generator RNG>
-            T operator()(RNG& rng) const;
+            constexpr T operator()(RNG& rng) const;
 
-        T min() const noexcept { return min_; }
-        T max() const noexcept;
+        constexpr T min() const noexcept { return min_; }
+        constexpr T max() const noexcept;
 
     private:
 
@@ -179,26 +179,26 @@ namespace RS {
         std::uint64_t range_{0};
         std::uint64_t threshold_{0}; // Highest multiple of range that fits in a uint64_t
 
-        void update() noexcept;
+        constexpr void update() noexcept;
 
     };
 
         template <Integral T>
-        UniformInteger<T>::UniformInteger() noexcept:
+        constexpr UniformInteger<T>::UniformInteger() noexcept:
         min_(0),
         range_(static_cast<std::uint64_t>(std::numeric_limits<T>::max()) + 1) {
             update();
         }
 
         template <Integral T>
-        UniformInteger<T>::UniformInteger(T range) noexcept:
+        constexpr UniformInteger<T>::UniformInteger(T range) noexcept:
         min_(0),
         range_(static_cast<std::uint64_t>(range)) {
             update();
         }
 
         template <Integral T>
-        UniformInteger<T>::UniformInteger(T min, T max) noexcept {
+        constexpr UniformInteger<T>::UniformInteger(T min, T max) noexcept {
             if (min > max) {
                 std::swap(min, max);
             }
@@ -209,7 +209,7 @@ namespace RS {
 
         template <Integral T>
         template <std::uniform_random_bit_generator RNG>
-        T UniformInteger<T>::operator()(RNG& rng) const {
+        constexpr T UniformInteger<T>::operator()(RNG& rng) const {
             std::uint64_t x;
             do {
                 x = rng();
@@ -221,7 +221,7 @@ namespace RS {
         }
 
         template <Integral T>
-        T UniformInteger<T>::max() const noexcept {
+        constexpr T UniformInteger<T>::max() const noexcept {
             auto half_range = range_ / 2;
             auto t1 = static_cast<T>(half_range);
             auto t2 = static_cast<T>(range_ - half_range - 1);
@@ -229,7 +229,7 @@ namespace RS {
         }
 
         template <Integral T>
-        void UniformInteger<T>::update() noexcept {
+        constexpr void UniformInteger<T>::update() noexcept {
             if (! std::has_single_bit(range_)) {
                 auto max64 = std::numeric_limits<std::uint64_t>::max();
                 auto rem = max64 % range_;
@@ -243,15 +243,15 @@ namespace RS {
 
     public:
 
-        BernoulliDistribution() = default;
-        explicit BernoulliDistribution(double p) noexcept;
-        explicit BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept;
+        constexpr BernoulliDistribution() = default;
+        constexpr explicit BernoulliDistribution(double p) noexcept;
+        constexpr explicit BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept;
 
         template <std::uniform_random_bit_generator RNG>
-            bool operator()(RNG& rng) const;
+            constexpr bool operator()(RNG& rng) const;
 
-        static bool min() noexcept { return false; }
-        static bool max() noexcept { return true; }
+        constexpr static bool min() noexcept { return false; }
+        constexpr static bool max() noexcept { return true; }
 
     private:
 
@@ -262,16 +262,16 @@ namespace RS {
 
     };
 
-        inline BernoulliDistribution::BernoulliDistribution(double p) noexcept:
+        constexpr BernoulliDistribution::BernoulliDistribution(double p) noexcept:
         dist_(),
         threshold_(static_cast<std::uint64_t>(std::clamp(p, 0.0, 1.0) * static_cast<double>(max64))) {}
 
-        inline BernoulliDistribution::BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept:
+        constexpr BernoulliDistribution::BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept:
         dist_(den),
         threshold_(std::clamp(num, std::uint64_t{}, den)) {}
 
         template <std::uniform_random_bit_generator RNG>
-        bool BernoulliDistribution::operator()(RNG& rng) const {
+        constexpr bool BernoulliDistribution::operator()(RNG& rng) const {
             return dist_(rng) <= threshold_;
         }
 
@@ -284,15 +284,15 @@ namespace RS {
 
         using result_type = T;
 
-        UniformReal() = default;
-        explicit UniformReal(T range) noexcept: UniformReal(T{0}, range) {}
-        explicit UniformReal(T min, T max) noexcept;
+        constexpr UniformReal() = default;
+        constexpr explicit UniformReal(T range) noexcept: UniformReal(T{0}, range) {}
+        constexpr explicit UniformReal(T min, T max) noexcept;
 
         template <std::uniform_random_bit_generator RNG>
-            T operator()(RNG& rng) const;
+            constexpr T operator()(RNG& rng) const;
 
-        T min() const noexcept { return min_; }
-        T max() const noexcept { return min_ + range_; }
+        constexpr T min() const noexcept { return min_; }
+        constexpr T max() const noexcept { return min_ + range_; }
 
     private:
 
@@ -302,7 +302,7 @@ namespace RS {
     };
 
         template <std::floating_point T>
-        UniformReal<T>::UniformReal(T min, T max) noexcept {
+        constexpr UniformReal<T>::UniformReal(T min, T max) noexcept {
             if (min > max) {
                 std::swap(min, max);
             }
@@ -312,7 +312,7 @@ namespace RS {
 
         template <std::floating_point T>
         template <std::uniform_random_bit_generator RNG>
-        T UniformReal<T>::operator()(RNG& rng) const {
+        constexpr T UniformReal<T>::operator()(RNG& rng) const {
             auto x = rng() - rng.min();
             auto y = rng.max() - rng.min();
             auto z = static_cast<T>(x) / static_cast<T>(y);
