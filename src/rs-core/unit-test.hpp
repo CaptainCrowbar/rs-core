@@ -59,6 +59,9 @@ namespace RS::UnitTest {
         std::string text;
 
         bool operator()(std::string pattern) const {
+            if (pattern.ends_with("$\n")) {
+                pattern.pop_back();
+            }
             std::regex regex(pattern);
             return std::regex_search(text, regex);
         }
