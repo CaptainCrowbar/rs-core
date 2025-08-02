@@ -266,3 +266,23 @@ namespace RS::UnitTest {
         FAIL("Unexpected exception"); \
     } \
 } while (false)
+
+// Same as TEST_THROW but the error message must be an exact match.
+
+#define TEST_THROW_EXACT(expr, exception_type, message) do { \
+    try { \
+        (expr); \
+        FAIL("No exception thrown: {}", # expr); \
+    } \
+    catch (const exception_type& _test_except) { \
+        if (_test_except.what() != message) { \
+            FAIL("Unexpected error message: {}", _test_except.what()); \
+        } \
+    } \
+    catch (const std::exception& _test_except) { \
+        FAIL("Unexpected exception: {}", _test_except.what()); \
+    } \
+    catch (...) { \
+        FAIL("Unexpected exception"); \
+    } \
+} while (false)
