@@ -275,7 +275,7 @@ namespace RS::UnitTest {
         FAIL("No exception thrown: {}", # expr); \
     } \
     catch (const exception_type& _test_except) { \
-        if (_test_except.what() != message) { \
+        if (std::string(_test_except.what()) != std::string(message)) { \
             FAIL("Unexpected error message: {}", _test_except.what()); \
         } \
     } \
