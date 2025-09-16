@@ -280,6 +280,14 @@ namespace RS {
                 return {};
             }
 
+            static constexpr std::string_view anon_text = "anonymous namespace";
+
+            auto anon_pos = pretty.find(anon_text);
+
+            if (anon_pos != npos) {
+                pretty = pretty.substr(anon_pos + anon_text.size() + 1);
+            }
+
             static const auto name_char = [] (char c) {
                 return ascii_isalnum_w(c) || static_cast<unsigned char>(c) >= 0x80;
             };
