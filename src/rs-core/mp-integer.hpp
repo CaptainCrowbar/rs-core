@@ -720,7 +720,7 @@ namespace RS {
         if (t == limits::min()) {
             mag_ = static_cast<unsigned_type>(limits::max()) + 1u;
         } else if (sign_) {
-            mag_ = static_cast<unsigned_type>(- t);
+            mag_ = static_cast<unsigned_type>(T{0} - t);
         } else {
             mag_ = static_cast<unsigned_type>(t);
         }
@@ -850,10 +850,10 @@ namespace RS {
 
         if (! sign_) {
             return static_cast<T>(u);
-        } else if (u > limits::max()) {
+        } else if (u > static_cast<unsigned_type>(limits::max())) {
             return limits::min();
         } else {
-            return - static_cast<T>(u);
+            return T{0} - static_cast<T>(u);
         }
 
     }

@@ -36,7 +36,9 @@ namespace RS {
                 constexpr explicit operator std::uint64_t() const noexcept { return lo_; }
 
                 constexpr Uint128 operator<<(int y) const noexcept {
-                    if (y >= 64) {
+                    if (y >= 128) {
+                        return {};
+                    } else if (y >= 64) {
                         return {lo_ << (y - 64), 0};
                     } else if (y >= 1) {
                         return {(hi_ << y) + (lo_ >> (64 - y)), lo_ << y};
@@ -46,7 +48,9 @@ namespace RS {
                 }
 
                 constexpr Uint128 operator>>(int y) const noexcept {
-                    if (y >= 64) {
+                    if (y >= 128) {
+                        return {};
+                    } else if (y >= 64) {
                         return hi_ >> (y - 64);
                     } else if (y >= 1) {
                         return {hi_ >> y, (lo_ >> y) + (hi_ << (64 - y))};
@@ -235,7 +239,7 @@ namespace RS {
 
         template <Integral T>
         constexpr void UniformInteger<T>::update() noexcept {
-            if (! std::has_single_bit(range_)) {
+            if (std::popcount(range_) > 1) {
                 auto max64 = std::numeric_limits<std::uint64_t>::max();
                 auto rem = max64 % range_;
                 threshold_ = max64 - rem;

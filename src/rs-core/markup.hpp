@@ -109,7 +109,8 @@ namespace RS {
                 stop();
             } else {
                 auto end_of_tag = std::ranges::find_if_not(element, ascii_isalnum_w);
-                tag_.assign(element.data(), end_of_tag);
+                auto tag_size = static_cast<std::size_t>(end_of_tag - element.begin());
+                tag_.assign(element.data(), tag_size);
             }
 
         }

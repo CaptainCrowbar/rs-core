@@ -159,7 +159,7 @@ namespace RS {
             friend Alias operator^(const Alias& a, const Alias& b) { return Alias(a.value_ ^ b.value_); }
         template <bool OK = requires (T t, int i) { { t << i } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
             friend Alias operator<<(const Alias& a, int j) { return Alias(a.value_ << j); }
-        template <bool OK = requires (T t, int i) { { t >> i } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
+        template <bool OK = requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
             friend Alias operator>>(const Alias& a, int j) { return Alias(a.value_ >> j); }
 
         // Comparison operators

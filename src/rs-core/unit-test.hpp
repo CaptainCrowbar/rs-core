@@ -77,7 +77,12 @@ namespace RS::UnitTest {
 
     inline bool read_file_contents(const std::filesystem::path& path, std::string& out) {
 
-        auto file_ptr = std::fopen(path.c_str(), "rb");
+        auto file_ptr =
+            #ifdef _WIN32
+                _wfopen(path.c_str(), L"rb");
+            #else
+                std::fopen(path.c_str(), "rb");
+            #endif
 
         if (file_ptr == nullptr) {
             return false;

@@ -91,6 +91,20 @@ namespace RS {
                 return n + 1;
             }
 
+    protected:
+
+        #ifdef _WIN32
+
+            static std::wstring quick_wstring(const char* cptr) {
+                std::wstring wstr;
+                for (;*cptr != 0; ++cptr) {
+                    wstr += static_cast<wchar_t>(*cptr);
+                }
+                return wstr;
+            }
+
+        #endif
+
     };
 
         inline IO::iterator::iterator(IO& io):
@@ -216,6 +230,7 @@ namespace RS {
                 case write_only:  return "wb";
                 case read_write:  return "rb+";
                 case append:      return "ab";
+                default:          std::unreachable();
             }
         }
 
@@ -231,7 +246,12 @@ namespace RS {
                 }
             } else {
                 errno = 0;
-                stream_ = std::fopen(path.c_str(), mode);
+                #ifdef _WIN32
+                    auto wmode = quick_wstring(mode);
+                    stream_ = _wfopen(path.c_str(), wmode.data());
+                #else
+                    stream_ = std::fopen(path.c_str(), mode);
+                #endif
                 int err = errno;
                 if (stream_ == nullptr) {
                     throw std::system_error(std::error_code(err, std::system_category()), path.string());
@@ -322,7 +342,7 @@ namespace RS {
 
         inline void Cstdio::seek(std::ptrdiff_t offset, IOSeek from) {
             errno = 0;
-            std::fseek(stream_, offset, static_cast<int>(from));
+            std::fseek(stream_, static_cast<long>(offset), static_cast<int>(from));
             check(errno);
         }
 

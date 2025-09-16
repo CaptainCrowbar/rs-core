@@ -27,14 +27,14 @@ void test_rs_core_typename_static() {
     TEST_EQUAL(type_name<int>(),                       "int");
     TEST_EQUAL(type_name<unsigned>(),                  "unsigned int");
     TEST_EQUAL(type_name<float>(),                     "float");
-    TEST_EQUAL(type_name<char*>(),                     "char*");
-    TEST_EQUAL(type_name<char const*>(),               "char const*");
-    TEST_EQUAL(type_name<std::byte>(),                 "std::byte");
-    TEST_MATCH(type_name<std::string>(),               "^std(::\\w+)?::basic_string<char, .+>$");
-    TEST_MATCH(type_name<std::vector<int>>(),          "^std(::\\w+)?::vector<int, .+>$");
-    TEST_MATCH(type_name<std::vector<std::string>>(),  "^std(::\\w+)?::vector<std(::\\w+)?::basic_string<char, .+>, .+>$");
-    TEST_MATCH(type_name<Alpha>(),                     "^.+::Alpha$");
-    TEST_MATCH(type_name<Bravo>(),                     "^.+::Bravo$");
+    TEST_MATCH(type_name<char*>(),                     R"(^char ?\*( _\w+)?)");
+    TEST_MATCH(type_name<char const*>(),               R"(^char const ?\*( _\w+)?)");
+    TEST_MATCH(type_name<std::byte>(),                 R"(^(enum )?std::byte$)");
+    TEST_MATCH(type_name<std::string>(),               R"(^(class )?std(::\w+)?::basic_string<char,.+>$)");
+    TEST_MATCH(type_name<std::vector<int>>(),          R"(^(class )?std(::\w+)?::vector<int,.+>$)");
+    TEST_MATCH(type_name<std::vector<std::string>>(),  R"(^(class )?std(::\w+)?::vector<(class )?std(::\w+)?::basic_string<char,.+>,.+>$)");
+    TEST_MATCH(type_name<Alpha>(),                     R"(^.+::Alpha$)");
+    TEST_MATCH(type_name<Bravo>(),                     R"(^.+::Bravo$)");
 
 }
 

@@ -26,8 +26,8 @@
 #ifdef _WIN32
 
     extern "C" {
-        unsigned long GetCurrentProcessId();
-        unsigned long GetCurrentThreadId();
+        _declspec(dllimport) unsigned long __stdcall GetCurrentProcessId();
+        _declspec(dllimport) unsigned long __stdcall GetCurrentThreadId();
     }
 
 #else
@@ -284,23 +284,34 @@ namespace RS {
                 return ascii_isalnum_w(c) || static_cast<unsigned char>(c) >= 0x80;
             };
 
-            auto paren_pos = 0uz;
+            auto end_name = pretty.find('(');
 
-            do {
-                paren_pos = pretty.find('(', paren_pos + 1);
-                if (paren_pos == npos) {
+            if (end_name == 0 || end_name == npos) {
+                return pretty;
+            }
+
+            if (pretty[end_name - 1] == '>') {
+                auto depth = 0;
+                do {
+                    --end_name;
+                    if (pretty[end_name] == '<') {
+                        --depth;
+                    } else if (pretty[end_name] == '>') {
+                        ++depth;
+                    }
+                } while (end_name != 0 && depth > 0);
+                if (end_name == 0) {
                     return pretty;
                 }
-            } while (! name_char(pretty[paren_pos - 1]));
+            }
 
-            auto end_name = pretty.begin() + paren_pos;
-            auto begin_name = end_name - 1;
+            auto begin_name = end_name;
 
-            while (begin_name != pretty.begin() && name_char(begin_name[-1])) {
+            while (begin_name > 0 && name_char(pretty[begin_name - 1])) {
                 --begin_name;
             }
 
-            return std::string_view{begin_name, end_name};
+            return pretty.substr(begin_name, end_name - begin_name);
 
         }
 

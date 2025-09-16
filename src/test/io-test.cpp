@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 
 namespace {
 
-    const inline fs::path file{"__test_file__"};
+    const inline fs::path test_file{"__test_file__"};
 
 }
 
@@ -21,7 +21,7 @@ void test_rs_core_io_cstdio_class() {
     auto z = 0z;
 
     {
-        Cstdio io(file, IO::write_only);
+        Cstdio io(test_file, IO::write_only);
         TRY(n = io.write_str("Hello world\n"));
         TEST_EQUAL(n, 12u);
         TRY(n = io.write_str("Goodnight moon\n"));
@@ -30,10 +30,10 @@ void test_rs_core_io_cstdio_class() {
         TEST_EQUAL(n, 19u);
     }
 
-    TEST(fs::exists(file));
+    TEST(fs::exists(test_file));
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TRY(z = io.tell());
         TEST_EQUAL(z, 0);
         TRY(io.seek(0, IO::end));
@@ -42,7 +42,7 @@ void test_rs_core_io_cstdio_class() {
     }
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TRY(s = io.read_str(12));
         TEST_EQUAL(s, "Hello world\n");
         TRY(s = io.read_str(15));
@@ -54,7 +54,7 @@ void test_rs_core_io_cstdio_class() {
     }
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TRY(s = io.read_all());
         TEST_EQUAL(s,
             "Hello world\n"
@@ -63,9 +63,9 @@ void test_rs_core_io_cstdio_class() {
         );
     }
 
-    TRY(fs::remove(file));
-    TEST(! fs::exists(file));
-    TEST_THROW(Cstdio(file), std::system_error, "No such file");
+    TRY(fs::remove(test_file));
+    TEST(! fs::exists(test_file));
+    TEST_THROW(Cstdio(test_file), std::system_error, test_file.string());
 
 }
 
@@ -75,7 +75,7 @@ void test_rs_core_io_cstdio_byte_io() {
     char c{};
 
     {
-        Cstdio io(file, IO::write_only);
+        Cstdio io(test_file, IO::write_only);
         TRY(io.put('H'));
         TRY(io.put('e'));
         TRY(io.put('l'));
@@ -84,10 +84,10 @@ void test_rs_core_io_cstdio_byte_io() {
         TRY(io.put('\n'));
     }
 
-    TEST(fs::exists(file));
+    TEST(fs::exists(test_file));
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TEST(io.get(c));  TEST_EQUAL(c, 'H');
         TEST(io.get(c));  TEST_EQUAL(c, 'e');
         TEST(io.get(c));  TEST_EQUAL(c, 'l');
@@ -97,9 +97,9 @@ void test_rs_core_io_cstdio_byte_io() {
         TEST(! io.get(c));
     }
 
-    TRY(fs::remove(file));
-    TEST(! fs::exists(file));
-    TEST_THROW(Cstdio(file), std::system_error, "No such file");
+    TRY(fs::remove(test_file));
+    TEST(! fs::exists(test_file));
+    TEST_THROW(Cstdio(test_file), std::system_error, test_file.string());
 
 }
 
@@ -109,7 +109,7 @@ void test_rs_core_io_cstdio_formatting() {
     auto n = 0uz;
 
     {
-        Cstdio io(file, IO::write_only);
+        Cstdio io(test_file, IO::write_only);
         TRY(n = io.print("Hello world\n"));
         TEST_EQUAL(n, 12u);
         TRY(n = io.print("Answer {}\n", 42));
@@ -118,10 +118,10 @@ void test_rs_core_io_cstdio_formatting() {
         TEST_EQUAL(n, 19u);
     }
 
-    TEST(fs::exists(file));
+    TEST(fs::exists(test_file));
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TRY(s = io.read_all());
         TEST_EQUAL(s,
             "Hello world\n"
@@ -131,7 +131,7 @@ void test_rs_core_io_cstdio_formatting() {
     }
 
     {
-        Cstdio io(file, IO::write_only);
+        Cstdio io(test_file, IO::write_only);
         TRY(n = io.println("Hello world"));
         TEST_EQUAL(n, 12u);
         TRY(n = io.println("Answer {}", 42));
@@ -140,10 +140,10 @@ void test_rs_core_io_cstdio_formatting() {
         TEST_EQUAL(n, 19u);
     }
 
-    TEST(fs::exists(file));
+    TEST(fs::exists(test_file));
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TRY(s = io.read_all());
         TEST_EQUAL(s,
             "Hello world\n"
@@ -152,9 +152,9 @@ void test_rs_core_io_cstdio_formatting() {
         );
     }
 
-    TRY(fs::remove(file));
-    TEST(! fs::exists(file));
-    TEST_THROW(Cstdio(file), std::system_error, "No such file");
+    TRY(fs::remove(test_file));
+    TEST(! fs::exists(test_file));
+    TEST_THROW(Cstdio(test_file), std::system_error, test_file.string());
 
 }
 
@@ -165,16 +165,16 @@ void test_rs_core_io_cstdio_line_iterator() {
     IO::iterator i;
 
     {
-        Cstdio io(file, IO::write_only);
+        Cstdio io(test_file, IO::write_only);
         TRY(io.write_str("Hello world\n"));
         TRY(io.write_str("Goodnight moon\n"));
         TRY(io.write_str("Here comes the sun\n"));
     }
 
-    TEST(fs::exists(file));
+    TEST(fs::exists(test_file));
 
     {
-        Cstdio io(file);
+        Cstdio io(test_file);
         TRY(lines = io.lines());
         TRY(i = lines.begin());
         TRY(s = *i);
@@ -189,9 +189,9 @@ void test_rs_core_io_cstdio_line_iterator() {
         TEST(i == lines.end());
     }
 
-    TRY(fs::remove(file));
-    TEST(! fs::exists(file));
-    TEST_THROW(Cstdio(file), std::system_error, "No such file");
+    TRY(fs::remove(test_file));
+    TEST(! fs::exists(test_file));
+    TEST_THROW(Cstdio(test_file), std::system_error, test_file.string());
 
 }
 

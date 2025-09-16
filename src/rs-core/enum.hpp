@@ -17,25 +17,25 @@
         __VA_ARGS__ \
     }; \
     [[maybe_unused]] inline const std::set<EnumType>& enum_values(EnumType) { \
-        static const auto set = [] { \
-            std::set<EnumType> set; \
+        static const auto static_set = [] { \
+            std::set<EnumType> temp_set; \
             if constexpr (std::signed_integral<IntType>) { \
                 auto table = ::RS::Detail::signed_enum_table(# __VA_ARGS__); \
                 for (auto& [k,v]: table) { \
-                    set.insert(static_cast<EnumType>(k)); \
+                    temp_set.insert(static_cast<EnumType>(k)); \
                 } \
             } else { \
                 auto table = ::RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
                 for (auto& [k,v]: table) { \
-                    set.insert(static_cast<EnumType>(k)); \
+                    temp_set.insert(static_cast<EnumType>(k)); \
                 } \
             } \
-            return set; \
+            return temp_set; \
         }(); \
-        return set; \
+        return static_set; \
     } \
     [[maybe_unused]] inline std::string to_string(EnumType t) { \
-        static const auto table = [] { \
+        static const auto static_table = [] { \
             if constexpr (std::signed_integral<IntType>) { \
                 return ::RS::Detail::signed_enum_table(# __VA_ARGS__); \
             } else { \
@@ -43,8 +43,8 @@
             } \
         }(); \
         auto index = static_cast<IntType>(t); \
-        auto it = table.find(index); \
-        if (it == table.end()) { \
+        auto it = static_table.find(index); \
+        if (it == static_table.end()) { \
             return std::to_string(index); \
         } else { \
             return it->second; \
@@ -59,26 +59,26 @@
         __VA_ARGS__ \
     }; \
     [[maybe_unused]] inline const std::set<EnumType>& enum_values(EnumType) { \
-        static const auto set = [] { \
-            std::set<EnumType> set {}; \
+        static const auto static_set = [] { \
+            std::set<EnumType> temp_set {}; \
             auto table = ::RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
             for (auto& [k,v]: table) { \
-                set.insert(static_cast<EnumType>(k)); \
+                temp_set.insert(static_cast<EnumType>(k)); \
             } \
-            return set; \
+            return temp_set; \
         }(); \
-        return set; \
+        return static_set; \
     } \
     [[maybe_unused]] inline std::string to_string(EnumType t) { \
         static_assert(std::unsigned_integral<IntType>); \
-        static const auto table = ::RS::Detail::linear_enum_table(# __VA_ARGS__); \
+        static const auto static_table = ::RS::Detail::linear_enum_table(# __VA_ARGS__); \
         auto index = static_cast<unsigned long long>(t); \
         if (index == 0) { \
             return "none"; \
         } \
         auto residue = index; \
         std::string str; \
-        for (const auto& [number,name]: table) { \
+        for (const auto& [number,name]: static_table) { \
             if ((number & residue) != 0) { \
                 str += name + '|'; \
                 residue &= ~ number; \

@@ -226,8 +226,8 @@ void test_rs_core_arithmetic_parse_integers_maybe() {
 
 void test_rs_core_arithmetic_try_parse_integers() {
 
-    std::int16_t i;
-    std::uint16_t u;
+    std::int16_t i {};
+    std::uint16_t u {};
 
     TRY(i = try_parse_number<std::int16_t>("0"));                            TEST_EQUAL(i, 0);
     TRY(i = try_parse_number<std::int16_t>("42"));                           TEST_EQUAL(i, 42);

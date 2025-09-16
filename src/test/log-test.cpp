@@ -173,7 +173,7 @@ void test_rs_core_log_context() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line());
-        TEST_MATCH(line, R"(^\[void test_rs_core_log_context\(\)\] Hello\n$)");
+        TEST_MATCH(line, R"(^\[void (\w+ )?test_rs_core_log_context\((void)?\)\] Hello\n$)");
     }
 
     {
@@ -241,7 +241,7 @@ void test_rs_core_log_function_context() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line());
-        TEST_MATCH(line, R"(^\[void .+::foo\(.+\) .+\] Hello 42\n$)");
+        TEST_MATCH(line, R"(^\[void .+::foo(<.+>)?\(.+\).*\] Hello 42\n$)");
     }
 
     {
@@ -292,7 +292,7 @@ void test_rs_core_log_function_context() {
         Cstdio in(logfile);
         std::string line;
         TRY(line = in.read_line());
-        TEST_MATCH(line, R"(^\[void .+::Bravo::f\(.+\) .+\] Hello 99\n$)");
+        TEST_MATCH(line, R"(^\[void .+::Bravo::f(<.+>)?\(.+\) .+\] Hello 99\n$)");
     }
 
     {

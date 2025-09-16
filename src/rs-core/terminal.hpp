@@ -14,8 +14,8 @@
 #ifdef _WIN32
 
     extern "C" {
-        void* __stdcall GetStdHandle(unsigned long nStdHandle);
-        int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
+        _declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
+        _declspec(dllimport) int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
     }
 
 #else
