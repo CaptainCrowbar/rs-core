@@ -25,15 +25,31 @@ Defined for convenience.
 
 ```c++
 template <typename R, typename V> concept ReadableRange;
+template <typename R, typename V> concept ReadableForwardRange;
+template <typename R, typename V> concept ReadableBidirectionalRange;
+template <typename R, typename V> concept ReadableRandomAccessRange;
+template <typename R, typename V> concept ReadableContiguousRange;
 template <typename R, typename V> concept WritableRange;
+template <typename R, typename V> concept WritableForwardRange;
+template <typename R, typename V> concept WritableBidirectionalRange;
+template <typename R, typename V> concept WritableRandomAccessRange;
+template <typename R, typename V> concept WritableContiguousRange;
 template <typename R, typename V> concept ReadWriteRange
     = ReadableRange<R, V> && WritableRange<R, V>;
+template <typename R, typename V> concept ReadWriteForwardRange
+    = ReadableForwardRange<R, V> && WritableForwardRange<R, V>;
+template <typename R, typename V> concept ReadWriteBidirectionalRange
+    = ReadableBidirectionalRange<R, V> && WritableBidirectionalRange<R, V>;
+template <typename R, typename V> concept ReadWriteRandomAccessRange
+    = ReadableRandomAccessRange<R, V> && WritableRandomAccessRange<R, V>;
+template <typename R, typename V> concept ReadWriteContiguousRange
+    = ReadableContiguousRange<R, V> && WritableContiguousRange<R, V>;
 ```
 
 Range concepts compatible with specific value types. All of these require `R`
-to be a range. `ReadableRange` also requires a dereferenced iterator to be
-assignable to a `V` object; `WritableRange` also requires a dereferenced
-iterator to be assignable from a `V` object; `ReadWriteRange` requires both.
+to be a range of the appropriate type. `ReadableRange` also requires a
+dereferenced iterator to be assignable to a `V` object; `WritableRange` also
+requires a dereferenced iterator to be assignable from a `V` object.
 
 ## Metaprogramming utilities
 

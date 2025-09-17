@@ -15,16 +15,61 @@ namespace RS {
 
     // Concepts
 
-    template <typename R, typename V>
-    concept ReadableRange = std::ranges::range<R>
-        && std::assignable_from<V&, std::ranges::range_reference_t<R>>;
+    namespace Detail {
+
+        template <typename R, typename V>
+        concept CanReadRange = std::assignable_from<V&, std::ranges::range_reference_t<R>>;
+
+        template <typename R, typename V>
+        concept CanWriteRange = std::assignable_from<std::ranges::range_reference_t<R>&, V>;
+
+    }
 
     template <typename R, typename V>
-    concept WritableRange = std::ranges::range<R>
-        && std::assignable_from<std::ranges::range_reference_t<R>&, V>;
+    concept ReadableRange = std::ranges::range<R> && Detail::CanReadRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadableForwardRange = std::ranges::forward_range<R> && Detail::CanReadRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadableBidirectionalRange = std::ranges::bidirectional_range<R> && Detail::CanReadRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadableRandomAccessRange = std::ranges::random_access_range<R> && Detail::CanReadRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadableContiguousRange = std::ranges::contiguous_range<R> && Detail::CanReadRange<R, V>;
+
+    template <typename R, typename V>
+    concept WritableRange = std::ranges::range<R> && Detail::CanWriteRange<R, V>;
+
+    template <typename R, typename V>
+    concept WritableForwardRange = std::ranges::forward_range<R> && Detail::CanWriteRange<R, V>;
+
+    template <typename R, typename V>
+    concept WritableBidirectionalRange = std::ranges::bidirectional_range<R> && Detail::CanWriteRange<R, V>;
+
+    template <typename R, typename V>
+    concept WritableRandomAccessRange = std::ranges::random_access_range<R> && Detail::CanWriteRange<R, V>;
+
+    template <typename R, typename V>
+    concept WritableContiguousRange = std::ranges::contiguous_range<R> && Detail::CanWriteRange<R, V>;
 
     template <typename R, typename V>
     concept ReadWriteRange = ReadableRange<R, V> && WritableRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadWriteForwardRange = ReadableForwardRange<R, V> && WritableForwardRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadWriteBidirectionalRange = ReadableBidirectionalRange<R, V> && WritableBidirectionalRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadWriteRandomAccessRange = ReadableRandomAccessRange<R, V> && WritableRandomAccessRange<R, V>;
+
+    template <typename R, typename V>
+    concept ReadWriteContiguousRange = ReadableContiguousRange<R, V> && WritableContiguousRange<R, V>;
+
 
     // Constants
 
