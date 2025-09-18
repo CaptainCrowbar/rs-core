@@ -16,6 +16,7 @@
     enum class EnumType: IntType { \
         __VA_ARGS__ \
     }; \
+    [[maybe_unused]] inline void rs_core_enum_signature(EnumType) {} \
     [[maybe_unused]] inline const std::set<EnumType>& enum_values(EnumType) { \
         static const auto static_set = [] { \
             std::set<EnumType> temp_set; \
@@ -58,6 +59,7 @@
     enum class EnumType: IntType { \
         __VA_ARGS__ \
     }; \
+    [[maybe_unused]] inline void rs_core_bitmask_signature(EnumType) {} \
     [[maybe_unused]] inline const std::set<EnumType>& enum_values(EnumType) { \
         static const auto static_set = [] { \
             std::set<EnumType> temp_set {}; \
@@ -119,76 +121,91 @@
         return t = t ^ u; \
     }
 
-namespace RS::Detail {
+namespace RS {
 
-    template <std::integral T>
-    std::vector<std::pair<T, std::string>> make_enum_list(const char* va_args) {
+    namespace Detail {
 
-        static constexpr std::string_view whitespace = "\t\n\r ";
+        template <std::integral T>
+        std::vector<std::pair<T, std::string>> make_enum_list(const char* va_args) {
 
-        std::string_view va_view = va_args;
-        std::vector<std::pair<T, std::string>> list;
-        T index = 0;
-        auto begin_field = 0uz;
+            static constexpr std::string_view whitespace = "\t\n\r ";
 
-        while (begin_field < va_view.size()) {
+            std::string_view va_view = va_args;
+            std::vector<std::pair<T, std::string>> list;
+            T index = 0;
+            auto begin_field = 0uz;
 
-            auto comma_pos = va_view.find_first_of(",", begin_field);
-            auto field = va_view.substr(begin_field, comma_pos - begin_field);
-            auto begin_name = field.find_first_not_of(whitespace);
+            while (begin_field < va_view.size()) {
 
-            if (begin_name != std::string::npos) {
+                auto comma_pos = va_view.find_first_of(",", begin_field);
+                auto field = va_view.substr(begin_field, comma_pos - begin_field);
+                auto begin_name = field.find_first_not_of(whitespace);
 
-                field = field.substr(begin_name);
-                field = field.substr(0, field.find_last_not_of(whitespace) + 1);
-                auto eq_pos = field.find('=');
+                if (begin_name != std::string::npos) {
 
-                if (eq_pos != std::string::npos) {
+                    field = field.substr(begin_name);
+                    field = field.substr(0, field.find_last_not_of(whitespace) + 1);
+                    auto eq_pos = field.find('=');
 
-                    auto index_str = field.substr(eq_pos + 1);
-                    field = field.substr(0, eq_pos);
-                    auto end_field = field.find_last_not_of(whitespace) + 1;
+                    if (eq_pos != std::string::npos) {
 
-                    if (end_field != 0) {
-                        field = field.substr(0, end_field);
+                        auto index_str = field.substr(eq_pos + 1);
+                        field = field.substr(0, eq_pos);
+                        auto end_field = field.find_last_not_of(whitespace) + 1;
+
+                        if (end_field != 0) {
+                            field = field.substr(0, end_field);
+                        }
+
+                        if constexpr (std::signed_integral<T>) {
+                            index = static_cast<T>(std::strtoll(index_str.data(), nullptr, 0));
+                        } else {
+                            index = static_cast<T>(std::strtoull(index_str.data(), nullptr, 0));
+                        }
+
                     }
 
-                    if constexpr (std::signed_integral<T>) {
-                        index = static_cast<T>(std::strtoll(index_str.data(), nullptr, 0));
-                    } else {
-                        index = static_cast<T>(std::strtoull(index_str.data(), nullptr, 0));
-                    }
+                    std::string name{field};
+                    list.push_back({index, name});
+                    ++index;
 
                 }
 
-                std::string name{field};
-                list.push_back({index, name});
-                ++index;
+                begin_field = comma_pos + 1;
 
             }
 
-            begin_field = comma_pos + 1;
+            return list;
 
         }
 
-        return list;
+        inline std::unordered_map<long long, std::string> signed_enum_table(const char* va_args) {
+            auto list = make_enum_list<long long>(va_args);
+            std::unordered_map<long long, std::string> table(list.begin(), list.end());
+            return table;
+        }
+
+        inline std::unordered_map<unsigned long long, std::string> unsigned_enum_table(const char* va_args) {
+            auto list = make_enum_list<unsigned long long>(va_args);
+            std::unordered_map<unsigned long long, std::string> table(list.begin(), list.end());
+            return table;
+        }
+
+        inline std::vector<std::pair<unsigned long long, std::string>> linear_enum_table(const char* va_args) {
+            return make_enum_list<unsigned long long>(va_args);
+        }
 
     }
 
-    inline std::unordered_map<long long, std::string> signed_enum_table(const char* va_args) {
-        auto list = make_enum_list<long long>(va_args);
-        std::unordered_map<long long, std::string> table(list.begin(), list.end());
-        return table;
-    }
+    template <typename T>
+    concept AutoBitmask = requires (T t) {
+        { rs_core_bitmask_signature(t) };
+    };
 
-    inline std::unordered_map<unsigned long long, std::string> unsigned_enum_table(const char* va_args) {
-        auto list = make_enum_list<unsigned long long>(va_args);
-        std::unordered_map<unsigned long long, std::string> table(list.begin(), list.end());
-        return table;
-    }
-
-    inline std::vector<std::pair<unsigned long long, std::string>> linear_enum_table(const char* va_args) {
-        return make_enum_list<unsigned long long>(va_args);
-    }
+    template <typename T>
+    concept AutoEnum = AutoBitmask<T>
+        || requires (T t) {
+            { rs_core_enum_signature(t) };
+        };
 
 }

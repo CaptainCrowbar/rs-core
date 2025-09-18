@@ -12,6 +12,17 @@ namespace RS;
 * TOC
 {:toc}
 
+## Concepts
+
+```c++
+template <typename T> concept AutoEnum;
+template <typename T> concept AutoBitmask;
+```
+
+These detect enumeration types defined using the macros described below. The
+`AutoEnum` concept will match types defined using either macro; `AutoBitmask`
+will only match bitmask types.
+
 ## Scoped enumeration types
 
 ```c++

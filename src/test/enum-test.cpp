@@ -31,6 +31,24 @@ namespace {
         charlie = 4,
     )
 
+    enum class Raw: int {
+        alpha,
+    };
+
+}
+
+void test_rs_core_enum_concepts() {
+
+    static_assert(AutoEnum<Simple>);
+    static_assert(AutoEnum<Complicated>);
+    static_assert(AutoEnum<Mask>);
+    static_assert(! AutoEnum<Raw>);
+
+    static_assert(! AutoBitmask<Simple>);
+    static_assert(! AutoBitmask<Complicated>);
+    static_assert(AutoBitmask<Mask>);
+    static_assert(! AutoBitmask<Raw>);
+
 }
 
 void test_rs_core_enum_class() {
