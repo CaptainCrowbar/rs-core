@@ -59,41 +59,31 @@ namespace RS {
 
         // Life cycle operations
 
-        template <bool OK = std::default_initializable<T>, std::enable_if_t<OK, int> = 0>
-            Alias(): value_{} {}
+        Alias() requires std::default_initializable<T>: value_{} {}
 
-        template <bool OK = std::copyable<T>, std::enable_if_t<OK, int> = 0>
-            Alias(const Alias& a): value_(a.value_) {}
-        template <bool OK = std::movable<T>, std::enable_if_t<OK, int> = 0>
-            Alias(Alias&& a): value_(std::move(a.value_)) {}
-        template <bool OK = std::copyable<T>, std::enable_if_t<OK, int> = 0>
-            Alias& operator=(const Alias& a) { value_ = a.value_; return *this; }
-        template <bool OK = std::movable<T>, std::enable_if_t<OK, int> = 0>
-            Alias& operator=(Alias&& a) { value_ = std::move(a.value_); return *this; }
+        Alias(const Alias& a) requires std::copyable<T>: value_(a.value_) {}
+        Alias(Alias&& a) requires std::movable<T>: value_(std::move(a.value_)) {}
+        Alias& operator=(const Alias& a) requires std::copyable<T> { value_ = a.value_; return *this; }
+        Alias& operator=(Alias&& a) requires std::movable<T> { value_ = std::move(a.value_); return *this; }
 
-        template <bool OK = std::copyable<T>, std::enable_if_t<OK, int> = 0>
-            explicit(! implicit_to_alias) Alias(const T& t): value_(t) {}
-        template <bool OK = std::movable<T>, std::enable_if_t<OK, int> = 0>
-            explicit(! implicit_to_alias) Alias(T&& t): value_(std::move(t)) {}
-        template <bool OK = implicit_to_alias && std::copyable<T>, std::enable_if_t<OK, int> = 0>
-            Alias& operator=(const T& t) { value_ = t; return *this; }
-        template <bool OK = implicit_to_alias && std::movable<T>, std::enable_if_t<OK, int> = 0>
-            Alias& operator=(T&& t) { value_ = std::move(t); return *this; }
+        explicit(! implicit_to_alias) Alias(const T& t) requires std::copyable<T>: value_(t) {}
+        explicit(! implicit_to_alias) Alias(T&& t) requires std::movable<T>: value_(std::move(t)) {}
+        Alias& operator=(const T& t) requires implicit_to_alias && std::copyable<T> { value_ = t; return *this; }
+        Alias& operator=(T&& t) requires implicit_to_alias && std::movable<T> { value_ = std::move(t); return *this; }
 
-        template <typename Tag2, AliasFlags F2, bool OK = std::copyable<T>, std::enable_if_t<OK, int> = 0>
-            explicit Alias(const Alias<T, Tag2, F2>& a): value_(a.value_) {}
-        template <typename Tag2, AliasFlags F2, bool OK = std::movable<T>, std::enable_if_t<OK, int> = 0>
-            explicit Alias(Alias<T, Tag2, F2>&& a): value_(std::move(a.value_)) {}
+        template <typename Tag2, AliasFlags F2> explicit Alias(const Alias<T, Tag2, F2>& a)
+            requires std::copyable<T>: value_(a.value_) {}
+        template <typename Tag2, AliasFlags F2> explicit Alias(Alias<T, Tag2, F2>&& a)
+            requires std::movable<T>: value_(std::move(a.value_)) {}
 
-        template <typename... TS, std::enable_if_t<std::constructible_from<T, TS...>, int> = 0>
-            explicit Alias(TS&&... args): value_(std::forward<TS>(args)...) {}
+        template <typename... TS> explicit Alias(TS&&... args)
+            requires std::constructible_from<T, TS...>: value_(std::forward<TS>(args)...) {}
 
         // Conversion operators
 
         explicit(! implicit_from_alias) operator T() const { return value_; }
-
-        template <bool OK = std::constructible_from<bool, T>, std::enable_if_t<OK, int> = 0>
-            explicit(! std::convertible_to<T, bool>) operator bool() const { return bool(value_); }
+        explicit(! std::convertible_to<T, bool>) operator bool() const
+            requires std::constructible_from<bool, T> { return bool(value_); }
 
         // Access operators
 
@@ -104,102 +94,82 @@ namespace RS {
 
         // Arithmetic operators
 
-        template <bool OK = requires (T t) { { + t } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            Alias operator+() const { return Alias(+ value_); }
-        template <bool OK = requires (T t) { { - t } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            Alias operator-() const { return Alias(- value_); }
-        template <bool OK = requires (T t) { { ~ t } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            Alias operator~() const { return Alias(~ value_); }
+        Alias operator+() const requires requires (T t) { { + t } -> std::convertible_to<T>; } { return Alias(+ value_); }
+        Alias operator-() const requires requires (T t) { { - t } -> std::convertible_to<T>; } { return Alias(- value_); }
+        Alias operator~() const requires requires (T t) { { ~ t } -> std::convertible_to<T>; } { return Alias(~ value_); }
 
-        template <bool OK = requires (T& t) { { ++ t }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator++() { ++ value_; return *this; }
-        template <bool OK = requires (T& t) { { t ++ }; }, std::enable_if_t<OK, int> = 0>
-            Alias operator++(int) { auto old = *this; value_ ++; return old; }
-        template <bool OK = requires (T& t) { { -- t }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator--() { -- value_; return *this; }
-        template <bool OK = requires (T& t) { { t -- }; }, std::enable_if_t<OK, int> = 0>
-            Alias operator--(int) { auto old = *this; value_ --; return old; }
+        Alias& operator++() requires requires (T& t) { { ++ t }; } { ++ value_; return *this; }
+        Alias operator++(int) requires requires (T& t) { { t ++ }; } { auto old = *this; value_ ++; return old; }
+        Alias& operator--() requires requires (T& t) { { -- t }; } { -- value_; return *this; }
+        Alias operator--(int) requires requires (T& t) { { t -- }; } { auto old = *this; value_ --; return old; }
 
-        template <bool OK = requires (T& t, T u) { { t += u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator+=(const Alias& a) { value_ += a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t -= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator-=(const Alias& a) { value_ -= a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t *= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator*=(const Alias& a) { value_ *= a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t /= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator/=(const Alias& a) { value_ /= a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t %= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator%=(const Alias& a) { value_ %= a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t &= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator&=(const Alias& a) { value_ &= a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t |= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator|=(const Alias& a) { value_ |= a.value_; return *this; }
-        template <bool OK = requires (T& t, T u) { { t ^= u }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator^=(const Alias& a) { value_ ^= a.value_; return *this; }
-        template <bool OK = requires (T& t, int i) { { t <<= i }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator<<=(int j) { value_ <<= j; return *this; }
-        template <bool OK = requires (T& t, int i) { { t >>= i }; }, std::enable_if_t<OK, int> = 0>
-            Alias& operator>>=(int j) { value_ >>= j; return *this; }
+        Alias& operator+=(const Alias& a) requires requires (T& t, T u) { { t += u }; } { value_ += a.value_; return *this; }
+        Alias& operator-=(const Alias& a) requires requires (T& t, T u) { { t -= u }; } { value_ -= a.value_; return *this; }
+        Alias& operator*=(const Alias& a) requires requires (T& t, T u) { { t *= u }; } { value_ *= a.value_; return *this; }
+        Alias& operator/=(const Alias& a) requires requires (T& t, T u) { { t /= u }; } { value_ /= a.value_; return *this; }
+        Alias& operator%=(const Alias& a) requires requires (T& t, T u) { { t %= u }; } { value_ %= a.value_; return *this; }
+        Alias& operator&=(const Alias& a) requires requires (T& t, T u) { { t &= u }; } { value_ &= a.value_; return *this; }
+        Alias& operator|=(const Alias& a) requires requires (T& t, T u) { { t |= u }; } { value_ |= a.value_; return *this; }
+        Alias& operator^=(const Alias& a) requires requires (T& t, T u) { { t ^= u }; } { value_ ^= a.value_; return *this; }
+        Alias& operator<<=(int j) requires requires (T& t, int i) { { t <<= i }; } { value_ <<= j; return *this; }
+        Alias& operator>>=(int j) requires requires (T& t, int i) { { t >>= i }; } { value_ >>= j; return *this; }
 
-        template <bool OK = requires (T t, T u) { { t + u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator+(const Alias& a, const Alias& b) { return Alias(a.value_ + b.value_); }
-        template <bool OK = requires (T t, T u) { { t - u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator-(const Alias& a, const Alias& b) { return Alias(a.value_ - b.value_); }
-        template <bool OK = requires (T t, T u) { { t * u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator*(const Alias& a, const Alias& b) { return Alias(a.value_ * b.value_); }
-        template <bool OK = requires (T t, T u) { { t / u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator/(const Alias& a, const Alias& b) { return Alias(a.value_ / b.value_); }
-        template <bool OK = requires (T t, T u) { { t % u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator%(const Alias& a, const Alias& b) { return Alias(a.value_ % b.value_); }
-        template <bool OK = requires (T t, T u) { { t & u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator&(const Alias& a, const Alias& b) { return Alias(a.value_ & b.value_); }
-        template <bool OK = requires (T t, T u) { { t | u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator|(const Alias& a, const Alias& b) { return Alias(a.value_ | b.value_); }
-        template <bool OK = requires (T t, T u) { { t ^ u } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator^(const Alias& a, const Alias& b) { return Alias(a.value_ ^ b.value_); }
-        template <bool OK = requires (T t, int i) { { t << i } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator<<(const Alias& a, int j) { return Alias(a.value_ << j); }
-        template <bool OK = requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            friend Alias operator>>(const Alias& a, int j) { return Alias(a.value_ >> j); }
+        friend Alias operator+(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t + u } -> std::convertible_to<T>; } { return Alias(a.value_ + b.value_); }
+        friend Alias operator-(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t - u } -> std::convertible_to<T>; } { return Alias(a.value_ - b.value_); }
+        friend Alias operator*(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t * u } -> std::convertible_to<T>; } { return Alias(a.value_ * b.value_); }
+        friend Alias operator/(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t / u } -> std::convertible_to<T>; } { return Alias(a.value_ / b.value_); }
+        friend Alias operator%(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t % u } -> std::convertible_to<T>; } { return Alias(a.value_ % b.value_); }
+        friend Alias operator&(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t & u } -> std::convertible_to<T>; } { return Alias(a.value_ & b.value_); }
+        friend Alias operator|(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t | u } -> std::convertible_to<T>; } { return Alias(a.value_ | b.value_); }
+        friend Alias operator^(const Alias& a, const Alias& b)
+            requires requires (T t, T u) { { t ^ u } -> std::convertible_to<T>; } { return Alias(a.value_ ^ b.value_); }
+        friend Alias operator<<(const Alias& a, int j)
+            requires requires (T t, int i) { { t << i } -> std::convertible_to<T>; } { return Alias(a.value_ << j); }
+        friend Alias operator>>(const Alias& a, int j)
+            requires requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; } { return Alias(a.value_ >> j); }
 
         // Comparison operators
 
-        template <bool OK = std::equality_comparable<T>, std::enable_if_t<OK, int> = 0>
-            friend bool operator==(const Alias& a, const Alias& b) { return a.value_ == b.value_; }
-        template <bool OK = std::three_way_comparable<T>, std::enable_if_t<OK, int> = 0>
-            friend auto operator<=>(const Alias& a, const Alias& b) { return a.value_ <=> b.value_; }
-        template <bool OK = std::equality_comparable<T> && cross_compare, std::enable_if_t<OK, int> = 0>
-            friend bool operator==(const Alias& a, const T& t) { return a.value_ == t; }
-        template <bool OK = std::three_way_comparable<T> && cross_compare, std::enable_if_t<OK, int> = 0>
-            friend auto operator<=>(const Alias& a, const T& t) { return a.value_ <=> t; }
+        friend bool operator==(const Alias& a, const Alias& b)
+            requires std::equality_comparable<T> { return a.value_ == b.value_; }
+        friend auto operator<=>(const Alias& a, const Alias& b)
+            requires std::three_way_comparable<T> { return a.value_ <=> b.value_; }
+        friend bool operator==(const Alias& a, const T& t)
+            requires std::equality_comparable<T> && cross_compare { return a.value_ == t; }
+        friend auto operator<=>(const Alias& a, const T& t)
+            requires std::three_way_comparable<T> && cross_compare { return a.value_ <=> t; }
 
         // Range access
 
-        template <bool OK = requires (T& t) { { t[0] } -> Detail::MutableReference; }, std::enable_if_t<OK, int> = 0>
-            auto& operator[](std::size_t i) { return value_[i]; }
-        template <bool OK = requires (const T& t) { { t[0] } -> Detail::Reference; }, std::enable_if_t<OK, int> = 0>
-            const auto& operator[](std::size_t i) const { return value_[i]; }
-        template <bool OK = requires (const T& t) { { t[0] } -> Detail::NonReference; }, std::enable_if_t<OK, int> = 0>
-            auto operator[](std::size_t i) const { return value_[i]; }
+        auto& operator[](std::size_t i)
+            requires requires (T& t) { { t[0] } -> Detail::MutableReference; } { return value_[i]; }
+        const auto& operator[](std::size_t i) const
+            requires requires (const T& t) { { t[0] } -> Detail::Reference; } { return value_[i]; }
+        auto operator[](std::size_t i) const
+            requires requires (const T& t) { { t[0] } -> Detail::NonReference; } { return value_[i]; }
 
-        template <bool OK = requires (T& t) { { std::ranges::begin(t) }; }, std::enable_if_t<OK, int> = 0>
-            auto begin() { return std::ranges::begin(value_); }
-        template <bool OK = requires (const T& t) { { std::ranges::begin(t) }; }, std::enable_if_t<OK, int> = 0>
-            auto begin() const { return std::ranges::begin(value_); }
-        template <bool OK = requires (T& t) { { std::ranges::end(t) }; }, std::enable_if_t<OK, int> = 0>
-            auto end() { return std::ranges::end(value_); }
-        template <bool OK = requires (const T& t) { { std::ranges::end(t) }; }, std::enable_if_t<OK, int> = 0>
-            auto end() const { return std::ranges::end(value_); }
+        auto begin() requires requires (T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
+        auto begin() const requires requires (const T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
+        auto end() requires requires (T& t) { { std::ranges::end(t) }; } { return std::ranges::end(value_); }
+        auto end() const requires requires (const T& t) { { std::ranges::end(t) }; } { return std::ranges::end(value_); }
 
-        template <bool OK = requires (const T& t) { { std::ranges::size(t) }; }, std::enable_if_t<OK, int> = 0>
-            std::size_t size() const { return std::size_t(std::ranges::size(value_)); }
-        template <bool OK = requires (const T& t) { { std::ranges::empty(t) }; }, std::enable_if_t<OK, int> = 0>
-            bool empty() const { return std::ranges::empty(value_); }
+        std::size_t size() const
+            requires requires (const T& t) { { std::ranges::size(t) }; } { return std::size_t(std::ranges::size(value_)); }
+        bool empty() const
+            requires requires (const T& t) { { std::ranges::empty(t) }; } { return std::ranges::empty(value_); }
 
         // String functions
 
-        template <bool OK = requires (const T& t) { { t.substr(0, 1) } -> std::convertible_to<T>; }, std::enable_if_t<OK, int> = 0>
-            Alias substr(std::size_t pos, std::size_t len = npos) const { return Alias(value_.substr(pos, len)); }
+        Alias substr(std::size_t pos, std::size_t len = npos) const
+            requires requires (const T& t) { { t.substr(0, 1) } -> std::convertible_to<T>; }
+            { return Alias(value_.substr(pos, len)); }
 
     };
 
