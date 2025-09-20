@@ -246,7 +246,7 @@ bool operator>=(const T& t, const Alias& a);
 [comparison type] operator<=>(const T& t, const Alias& a);
 ```
 
-Homogeneous comparison operators. Each of these is defined if the
+Heterogeneous comparison operators. Each of these is defined if the
 `cross_compare` flag is present and the corresponding operator is defined for
 `T`.
 
