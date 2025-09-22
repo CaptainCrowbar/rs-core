@@ -11,6 +11,7 @@
 #include <cstring>
 #include <filesystem>
 #include <format>
+#include <iterator>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -40,7 +41,7 @@ namespace RS {
         using enum IOSeek;
 
         class iterator:
-        public InputIterator<iterator, const std::string> {
+        public Iterator<iterator, const std::string, std::input_iterator_tag> {
         public:
             iterator() {}
             explicit iterator(IO& io);

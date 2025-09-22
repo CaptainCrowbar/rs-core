@@ -13,7 +13,7 @@ namespace rs = std::ranges;
 using namespace RS;
 
 class Output:
-public OutputIterator<Output> {
+public Iterator<Output, int, std::output_iterator_tag> {
 public:
     Output() = default;
     explicit Output(std::vector<int>& v): vec_(&v) {}
@@ -23,7 +23,7 @@ private:
 };
 
 class Input:
-public InputIterator<Input, const int> {
+public Iterator<Input, const int, std::input_iterator_tag> {
 public:
     Input() = default;
     explicit Input(const std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
@@ -35,7 +35,7 @@ private:
 };
 
 class Forward:
-public ForwardIterator<Forward, const int> {
+public Iterator<Forward, const int, std::forward_iterator_tag> {
 public:
     Forward() = default;
     explicit Forward(const std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
@@ -46,8 +46,20 @@ private:
     const int* ptr_;
 };
 
+class ForwardMutable:
+public Iterator<ForwardMutable, int, std::forward_iterator_tag> {
+public:
+    ForwardMutable() = default;
+    explicit ForwardMutable(std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
+    int& operator*() const { return *ptr_; }
+    ForwardMutable& operator++() { ++ptr_; return *this; }
+    bool operator==(const ForwardMutable& i) const { return ptr_ == i.ptr_; }
+private:
+    int* ptr_;
+};
+
 class Bidirectional:
-public BidirectionalIterator<Bidirectional, const int> {
+public Iterator<Bidirectional, const int, std::bidirectional_iterator_tag> {
 public:
     Bidirectional() = default;
     explicit Bidirectional(const std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
@@ -59,20 +71,45 @@ private:
     const int* ptr_;
 };
 
-class Random:
-public RandomAccessIterator<Random, const int> {
+class BidirectionalMutable:
+public Iterator<BidirectionalMutable, int, std::bidirectional_iterator_tag> {
 public:
-    Random() = default;
-    explicit Random(const std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
+    BidirectionalMutable() = default;
+    explicit BidirectionalMutable(std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
+    int& operator*() const { return *ptr_; }
+    BidirectionalMutable& operator++() { ++ptr_; return *this; }
+    BidirectionalMutable& operator--() { --ptr_; return *this; }
+    bool operator==(const BidirectionalMutable& i) const { return ptr_ == i.ptr_; }
+private:
+    int* ptr_;
+};
+
+class RandomAccess:
+public Iterator<RandomAccess, const int, std::random_access_iterator_tag> {
+public:
+    RandomAccess() = default;
+    explicit RandomAccess(const std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
     const int& operator*() const { return *ptr_; }
-    Random& operator+=(std::ptrdiff_t n) { ptr_ += n; return *this; }
-    std::ptrdiff_t operator-(const Random& i) const { return ptr_ - i.ptr_; }
+    RandomAccess& operator+=(std::ptrdiff_t n) { ptr_ += n; return *this; }
+    std::ptrdiff_t operator-(const RandomAccess& i) const { return ptr_ - i.ptr_; }
 private:
     const int* ptr_;
 };
 
+class RandomAccessMutable:
+public Iterator<RandomAccessMutable, int, std::random_access_iterator_tag> {
+public:
+    RandomAccessMutable() = default;
+    explicit RandomAccessMutable(std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
+    int& operator*() const { return *ptr_; }
+    RandomAccessMutable& operator+=(std::ptrdiff_t n) { ptr_ += n; return *this; }
+    std::ptrdiff_t operator-(const RandomAccessMutable& i) const { return ptr_ - i.ptr_; }
+private:
+    int* ptr_;
+};
+
 class Contiguous:
-public ContiguousIterator<Contiguous, const int> {
+public Iterator<Contiguous, const int, std::contiguous_iterator_tag> {
 public:
     Contiguous() = default;
     explicit Contiguous(const std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
@@ -83,14 +120,26 @@ private:
     const int* ptr_;
 };
 
+class ContiguousMutable:
+public Iterator<ContiguousMutable, int, std::contiguous_iterator_tag> {
+public:
+    ContiguousMutable() = default;
+    explicit ContiguousMutable(std::vector<int>& v, std::size_t i): ptr_(v.data() + i) {}
+    int& operator*() const { return *ptr_; }
+    ContiguousMutable& operator+=(std::ptrdiff_t n) { ptr_ += n; return *this; }
+    std::ptrdiff_t operator-(const ContiguousMutable& i) const { return ptr_ - i.ptr_; }
+private:
+    int* ptr_;
+};
+
 void test_rs_core_iterator_tags() {
 
-    static_assert(std::same_as<std::iterator_traits<Output>::iterator_category, std::output_iterator_tag>);
-    static_assert(std::same_as<std::iterator_traits<Input>::iterator_category, std::input_iterator_tag>);
-    static_assert(std::same_as<std::iterator_traits<Forward>::iterator_category, std::forward_iterator_tag>);
-    static_assert(std::same_as<std::iterator_traits<Bidirectional>::iterator_category, std::bidirectional_iterator_tag>);
-    static_assert(std::same_as<std::iterator_traits<Random>::iterator_category, std::random_access_iterator_tag>);
-    static_assert(std::same_as<std::iterator_traits<Contiguous>::iterator_category, std::contiguous_iterator_tag>);
+    static_assert(std::same_as<std::iterator_traits<Output>::iterator_category,         std::output_iterator_tag>);
+    static_assert(std::same_as<std::iterator_traits<Input>::iterator_category,          std::input_iterator_tag>);
+    static_assert(std::same_as<std::iterator_traits<Forward>::iterator_category,        std::forward_iterator_tag>);
+    static_assert(std::same_as<std::iterator_traits<Bidirectional>::iterator_category,  std::bidirectional_iterator_tag>);
+    static_assert(std::same_as<std::iterator_traits<RandomAccess>::iterator_category,         std::random_access_iterator_tag>);
+    static_assert(std::same_as<std::iterator_traits<Contiguous>::iterator_category,     std::contiguous_iterator_tag>);
 
 }
 
@@ -140,6 +189,12 @@ void test_rs_core_iterator_forward_iterators() {
     TRY(j = i);          TEST(i == j);
     TRY(++j);            TEST(i != j);
 
+    auto rmut = rs::subrange(ForwardMutable(v, 0), ForwardMutable(v, v.size()));
+    for (auto& x: rmut) {
+        x *= 10;
+    }
+    TEST_EQUAL(std::format("{}", v), "[10, 20, 30, 40, 50]");
+
 }
 
 void test_rs_core_iterator_bidirectional_iterators() {
@@ -159,14 +214,20 @@ void test_rs_core_iterator_bidirectional_iterators() {
     TRY(j = i);          TEST(i == j);
     TRY(++j);            TEST(i != j);
 
+    auto rmut = rs::subrange(BidirectionalMutable(v, 0), BidirectionalMutable(v, v.size()));
+    for (auto& x: rmut) {
+        x *= 10;
+    }
+    TEST_EQUAL(std::format("{}", v), "[10, 20, 30, 40, 50]");
+
 }
 
 void test_rs_core_iterator_random_access_iterators() {
 
     std::vector<int> v {1, 2, 3, 4, 5};
-    auto r = rs::subrange(Random(v, 0), Random(v, v.size()));
+    auto r = rs::subrange(RandomAccess(v, 0), RandomAccess(v, v.size()));
     TEST_EQUAL(std::format("{}", r), "[1, 2, 3, 4, 5]");
-    Random i, j, k;
+    RandomAccess i, j, k;
     auto n = 0z;
 
     (void)j;
@@ -198,6 +259,12 @@ void test_rs_core_iterator_random_access_iterators() {
     TEST_EQUAL(i[2], 3);
     TEST_EQUAL(i[3], 4);
     TEST_EQUAL(i[4], 5);
+
+    auto rmut = rs::subrange(RandomAccessMutable(v, 0), RandomAccessMutable(v, v.size()));
+    for (auto& x: rmut) {
+        x *= 10;
+    }
+    TEST_EQUAL(std::format("{}", v), "[10, 20, 30, 40, 50]");
 
 }
 
@@ -238,5 +305,11 @@ void test_rs_core_iterator_contiguous_iterators() {
     TEST_EQUAL(i[2], 3);
     TEST_EQUAL(i[3], 4);
     TEST_EQUAL(i[4], 5);
+
+    auto rmut = rs::subrange(ContiguousMutable(v, 0), ContiguousMutable(v, v.size()));
+    for (auto& x: rmut) {
+        x *= 10;
+    }
+    TEST_EQUAL(std::format("{}", v), "[10, 20, 30, 40, 50]");
 
 }
