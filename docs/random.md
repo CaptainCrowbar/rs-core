@@ -235,17 +235,16 @@ is called on an empty list.
 ### Random choice function
 
 ```c++
-template <std::ranges::random_access_range R,
-        std::uniform_random_bit_generator RNG>
+template <std::ranges::range R, std::uniform_random_bit_generator RNG>
     [reference type] random_choice(const R& range, RNG& rng);
-template <std::ranges::random_access_range R,
-        std::uniform_random_bit_generator RNG>
+template <std::ranges::range R, std::uniform_random_bit_generator RNG>
     [reference type] quick_choice(const R& range, RNG& rng);
 ```
 
 Convenience functions to select a random item from a range. The two functions
-differ only in whether they use `UniformInteger` or `QuickRandom`
-internally. Behaviour is undefined if the range is empty.
+differ only in whether they use `UniformInteger` or `QuickRandom` internally.
+Complexity is `O(1)` for random access or contiguous ranges, `O(n)` for other
+ranges. Behaviour is undefined if the range is empty.
 
 ### Weighted choice class
 

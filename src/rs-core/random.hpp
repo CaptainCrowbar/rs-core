@@ -442,20 +442,22 @@ namespace RS {
             dist_ = size_dist{vec_.size()};
         }
 
-    template <std::ranges::random_access_range R,
-        std::uniform_random_bit_generator RNG>
+    template <std::ranges::range R, std::uniform_random_bit_generator RNG>
     typename std::ranges::range_reference_t<const R> random_choice(const R& range, RNG& rng) {
         auto n = std::ranges::ssize(range);
         auto dist = UniformInteger(n);
-        return *(std::ranges::begin(range) + dist(rng));
+        auto it = std::ranges::begin(range);
+        std::advance(it, dist(rng));
+        return *it;
     }
 
-    template <std::ranges::random_access_range R,
-        std::uniform_random_bit_generator RNG>
+    template <std::ranges::range R, std::uniform_random_bit_generator RNG>
     typename std::ranges::range_reference_t<const R> quick_choice(const R& range, RNG& rng) {
         auto n = std::ranges::ssize(range);
         auto dist = QuickRandom(n);
-        return *(std::ranges::begin(range) + dist(rng));
+        auto it = std::ranges::begin(range);
+        std::advance(it, dist(rng));
+        return *it;
     }
 
     // Weighted choice class

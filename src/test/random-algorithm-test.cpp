@@ -1,6 +1,7 @@
 #include "rs-core/random.hpp"
 #include "rs-core/unit-test.hpp"
 #include <algorithm>
+#include <list>
 #include <map>
 #include <random>
 #include <ranges>
@@ -113,6 +114,14 @@ void test_rs_core_random_choice_functions() {
         "Echo",
     };
 
+    static const std::list<std::string> list {
+        "Zulu",
+        "Yankee",
+        "Xray",
+        "Whiskey",
+        "Victor",
+    };
+
     {
 
         std::minstd_rand rng(42);
@@ -140,6 +149,26 @@ void test_rs_core_random_choice_functions() {
         std::string s;
 
         for (auto i = 0; i < iterations; ++i) {
+            TRY(s = random_choice(list, rng));
+            TEST_MATCH(s, "^[V-Z][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Zulu"] / total,     0.2, 0.02);
+        TEST_NEAR(census["Yankee"] / total,   0.2, 0.02);
+        TEST_NEAR(census["Xray"] / total,     0.2, 0.02);
+        TEST_NEAR(census["Whiskey"] / total,  0.2, 0.02);
+        TEST_NEAR(census["Victor"] / total,   0.2, 0.02);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
             TRY(s = quick_choice(vec, rng));
             TEST_MATCH(s, "^[A-E][a-z]+$");
             ++census[s];
@@ -150,6 +179,26 @@ void test_rs_core_random_choice_functions() {
         TEST_NEAR(census["Charlie"] / total,  0.2, 0.02);
         TEST_NEAR(census["Delta"] / total,    0.2, 0.02);
         TEST_NEAR(census["Echo"] / total,     0.2, 0.02);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = quick_choice(list, rng));
+            TEST_MATCH(s, "^[V-Z][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Zulu"] / total,     0.2, 0.02);
+        TEST_NEAR(census["Yankee"] / total,   0.2, 0.02);
+        TEST_NEAR(census["Xray"] / total,     0.2, 0.02);
+        TEST_NEAR(census["Whiskey"] / total,  0.2, 0.02);
+        TEST_NEAR(census["Victor"] / total,   0.2, 0.02);
 
     }
 
