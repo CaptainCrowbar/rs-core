@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/mp-integer.hpp"
 #include <algorithm>
@@ -13,6 +14,7 @@
 #include <map>
 #include <random>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -539,6 +541,50 @@ namespace RS {
         }
 
     // Random algorithms
+
+    namespace Detail {
+
+        template <AutoEnum E>
+        constexpr int select_enum_minimum =
+            std::unsigned_integral<std::underlying_type_t<E>> ? 0 :
+            sizeof(E) >= sizeof(int) ? std::numeric_limits<int>::min() :
+            static_cast<int>(std::numeric_limits<std::underlying_type_t<E>>::min());
+
+        template <AutoEnum E, E Min>
+        const auto& select_enum_values() {
+            static const auto values = enum_values(E{})
+                | std::views::drop_while([] (E x) { return x < Min; })
+                | std::ranges::to<std::vector>();
+            return values;
+        }
+
+    }
+
+    template <AutoEnum E,
+        int Min = Detail::select_enum_minimum<E>,
+        std::uniform_random_bit_generator RNG = std::minstd_rand>
+    requires (std::signed_integral<std::underlying_type_t<E>> || Min >= 0)
+    E random_enum(RNG& rng) {
+        return random_choice(Detail::select_enum_values<E, static_cast<E>(Min)>(), rng);
+    }
+
+    template <AutoEnum E,
+        int Min = Detail::select_enum_minimum<E>,
+        std::uniform_random_bit_generator RNG = std::minstd_rand>
+    requires (std::signed_integral<std::underlying_type_t<E>> || Min >= 0)
+    E quick_enum(RNG& rng) {
+        return quick_choice(Detail::select_enum_values<E, static_cast<E>(Min)>(), rng);
+    }
+
+    template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
+    E random_enum(RNG& rng) {
+        return random_choice(Detail::select_enum_values<E, Min>(), rng);
+    }
+
+    template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
+    E quick_enum(RNG& rng) {
+        return quick_choice(Detail::select_enum_values<E, Min>(), rng);
+    }
 
     template <std::ranges::random_access_range R, std::uniform_random_bit_generator RNG>
     void shuffle(R& range, RNG& rng) {

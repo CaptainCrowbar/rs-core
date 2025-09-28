@@ -135,9 +135,9 @@ namespace RS {
             T index = 0;
             auto begin_field = 0uz;
 
-            while (begin_field < va_view.size()) {
+            for (;;) {
 
-                auto comma_pos = va_view.find_first_of(",", begin_field);
+                auto comma_pos = va_view.find(',', begin_field);
                 auto field = va_view.substr(begin_field, comma_pos - begin_field);
                 auto begin_name = field.find_first_not_of(whitespace);
 
@@ -169,6 +169,10 @@ namespace RS {
                     list.push_back({index, name});
                     ++index;
 
+                }
+
+                if (comma_pos >= va_view.size()) {
+                    break;
                 }
 
                 begin_field = comma_pos + 1;

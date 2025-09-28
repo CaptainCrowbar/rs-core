@@ -276,6 +276,33 @@ function call operator is called on an empty list.
 ## Random algorithms
 
 ```c++
+template <AutoEnum E, int Min = [see below],
+        std::uniform_random_bit_generator RNG = [see below]>
+    E random_enum(RNG& rng);
+template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
+    E random_enum(RNG& rng);
+template <AutoEnum E, int Min = [see below],
+        std::uniform_random_bit_generator RNG = [see below]>
+    E quick_enum(RNG& rng);
+template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
+    E quick_enum(RNG& rng);
+```
+
+Select a random one of the possible values of an enumeration type, which must
+have been defined using the `RS_ENUM()` or `RS_BITMAP()` macros. Optionally,
+a minimum return value can be supplied, either as an integer or an explicit
+enumeration value. If an integer is supplied, it does not need to match any
+named enumeration value.
+
+The default template parameters are unimportant to the caller. If no minimum
+value is supplied, all of the possible values may be returned. The `RNG` type
+is expected to always be supplied through the function argument.
+
+Behaviour is undefined if the enumeration type contains values that are out of
+range for an `int` or if an explicitly supplied minimum value is out of range
+for the enumeration type.
+
+```c++
 template <std::ranges::random_access_range R,
         std::uniform_random_bit_generator RNG>
     void shuffle(R& range, RNG& rng);
