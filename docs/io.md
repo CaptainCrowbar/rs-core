@@ -229,12 +229,16 @@ input or output.
 
 ```c++
 explicit Cstdio::Cstdio(std::FILE* stream) noexcept;
+explicit Cstdio::Cstdio(std::FILE* stream, bool own) noexcept;
 ```
 
 Constructor from an existing stream handle. This is mainly intended to be used
-with the standard handles (`stdin,stdout,stderr`). If the handle is not one
-of these, and is not null, the `Cstdio` object will take ownership of the
-stream and will close it on destruction.
+with the standard handles (`stdin,stdout,stderr`). If the `own` flag is set,
+the `Cstdio` object will take ownership of the stream and will close it on
+destruction. By default, ownership is taken if the handle is not standard
+input, standard output, or standard error. This will throw
+`std::invalid_argument` if the second version is called with one of the
+standard streams but with the ownership flag set to true.
 
 ```c++
 Cstdio::Cstdio(Cstdio&& io) noexcept;
@@ -263,9 +267,12 @@ operator) that close the stream will ignore errors while closing.
 
 ```c++
 std::FILE* Cstdio::handle() const noexcept;
+std::FILE* Cstdio::release() noexcept;
 ```
 
-Returns the underlying `<cstdio>` stream handle.
+These return the underlying `<cstdio>` stream handle. The `release()` function
+relinquishes ownership of the handle (if it was owned) and sets the internal
+handle to null.
 
 ## StringBuffer class
 

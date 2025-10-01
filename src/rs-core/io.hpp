@@ -194,7 +194,8 @@ namespace RS {
         Cstdio() = default;
         explicit Cstdio(const std::filesystem::path& path, IOMode mode = read_only);
         explicit Cstdio(const std::filesystem::path& path, const char* mode);
-        explicit Cstdio(std::FILE* stream) noexcept: stream_(stream) {}
+        explicit Cstdio(std::FILE* stream) noexcept: stream_(stream), owner_(! is_stdio(stream)) {}
+        explicit Cstdio(std::FILE* stream, bool own);
         Cstdio(Cstdio&& io) noexcept: stream_(std::exchange(io.stream_, nullptr)) {}
         Cstdio& operator=(Cstdio&& io) noexcept;
         Cstdio(const Cstdio&) = delete;
@@ -213,27 +214,20 @@ namespace RS {
         std::size_t write(const void* ptr, std::size_t len) override;
 
         std::FILE* handle() const noexcept { return stream_; }
+        std::FILE* release() noexcept;
 
     private:
 
-        std::FILE* stream_{nullptr};
+        std::FILE* stream_ = nullptr;
+        bool owner_ = false;
 
         void check(int err) const;
         void close_stream(bool checked);
 
+        static bool is_stdio(std::FILE* stream) noexcept;
         static const char* translate_mode(IOMode mode) noexcept;
 
     };
-
-        inline const char* Cstdio::translate_mode(IOMode mode) noexcept {
-            switch (mode) {
-                case read_only:   return "rb";
-                case write_only:  return "wb";
-                case read_write:  return "rb+";
-                case append:      return "ab";
-                default:          std::unreachable();
-            }
-        }
 
         inline Cstdio::Cstdio(const std::filesystem::path& path, IOMode mode):
         Cstdio(path, translate_mode(mode)) {}
@@ -257,6 +251,15 @@ namespace RS {
                 if (stream_ == nullptr) {
                     throw std::system_error(std::error_code(err, std::system_category()), path.string());
                 }
+                owner_ = true;
+            }
+        }
+
+        inline Cstdio::Cstdio(std::FILE* stream, bool own):
+        stream_(stream),
+        owner_(own) {
+            if (is_stdio(stream) && own) {
+                throw std::invalid_argument("Can't take ownership of a standard stream");
             }
         }
 
@@ -361,6 +364,11 @@ namespace RS {
             return n;
         }
 
+        inline std::FILE* Cstdio::release() noexcept {
+            owner_ = false;
+            return std::exchange(stream_, nullptr);
+        }
+
         inline void Cstdio::check(int err) const {
             if (err != 0) {
                 throw std::system_error(std::error_code(err, std::system_category()));
@@ -370,9 +378,7 @@ namespace RS {
         }
 
         inline void Cstdio::close_stream(bool checked) {
-            if (stream_ == stdin || stream_ == stdout || stream_ == stderr) {
-                stream_ = nullptr;
-            } else if (stream_ != nullptr) {
+            if (owner_) {
                 errno = 0;
                 std::fclose(stream_);
                 int err = errno;
@@ -380,6 +386,20 @@ namespace RS {
                 if (checked) {
                     check(err);
                 }
+            }
+        }
+
+        inline bool Cstdio::is_stdio(std::FILE* stream) noexcept {
+            return stream == stdin || stream == stdout || stream == stderr;
+        }
+
+        inline const char* Cstdio::translate_mode(IOMode mode) noexcept {
+            switch (mode) {
+                case read_only:   return "rb";
+                case write_only:  return "wb";
+                case read_write:  return "rb+";
+                case append:      return "ab";
+                default:          std::unreachable();
             }
         }
 
