@@ -1,10 +1,12 @@
 #pragma once
 
+#include "rs-core/character.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include <concepts>
 #include <cstdlib>
 #include <format>
+#include <ranges>
 #include <set>
 #include <string>
 #include <string_view>
@@ -50,9 +52,6 @@
         } else { \
             return it->second; \
         } \
-    } \
-    [[maybe_unused]] inline std::string rs_core_format(EnumType t) { \
-        return to_string(t); \
     }
 
 #define RS_BITMASK(EnumType, IntType, ...) \
@@ -93,9 +92,6 @@
             return std::format("0x{:x}", index); \
         } \
     } \
-    [[maybe_unused]] inline std::string rs_core_format(EnumType t) { \
-        return to_string(t); \
-    } \
     [[maybe_unused]] constexpr bool operator!(EnumType t) noexcept { \
         return ! static_cast<bool>(t); \
     } \
@@ -124,6 +120,31 @@
 namespace RS {
 
     namespace Detail {
+
+        constexpr bool is_enum_delimiter_char(char c) noexcept {
+            return c == ' '
+                || (ascii_ispunct(c)
+                    && c != '(' && c != ')' && c != '[' && c != ']' && c != '{' && c != '}' && c != '_');
+        }
+
+        inline void reformat_enum(std::string& str, char delimiter, bool mixed_case) {
+
+            if (mixed_case) {
+                auto was_alnum = false;
+                for (auto& c: str) {
+                    auto is_alnum = ascii_isalnum(c);
+                    if (is_alnum && ! was_alnum) {
+                        c = ascii_toupper(c);
+                    }
+                    was_alnum = is_alnum;
+                }
+            }
+
+            if (delimiter != '_') {
+                std::ranges::replace(str, '_', delimiter);
+            }
+
+        }
 
         template <std::integral T>
         std::vector<std::pair<T, std::string>> make_enum_list(const char* va_args) {
@@ -213,3 +234,38 @@ namespace RS {
         };
 
 }
+
+template <::RS::AutoEnum T>
+struct std::formatter<T> {
+
+public:
+
+    constexpr auto parse(std::format_parse_context& ctx) {
+        using namespace ::RS::Detail;
+        auto it = ctx.begin();
+        for (; it != ctx.end() && *it != '}'; ++it) {
+            if (*it == 'm') {
+                mixed_case = true;
+            } else if (is_enum_delimiter_char(*it) && delimiter == '_') {
+                delimiter = *it;
+            } else {
+                throw std::format_error{std::format("Invalid format: {:?}", *it)};
+            }
+        }
+        return it;
+    }
+
+    template <typename FormatContext>
+    auto format(const T& t, FormatContext& ctx) const {
+        using namespace ::RS::Detail;
+        auto out = to_string(t);
+        reformat_enum(out, delimiter, mixed_case);
+        return std::ranges::copy(out, ctx.out()).out;
+    }
+
+private:
+
+    char delimiter = '_';
+    bool mixed_case = false;
+
+};

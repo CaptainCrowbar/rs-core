@@ -17,11 +17,11 @@ namespace {
     )
 
     RS_ENUM(Complicated, unsigned,
-        alpha,
-        bravo = 10,
-        charlie,
-        delta = 0x20,
-        echo,
+        alpha_bravo,
+        charlie_delta = 10,
+        echo_foxtrot,
+        golf_hotel = 0x20,
+        india_juliet,
     )
 
     RS_BITMASK(Mask, std::uint16_t,
@@ -58,25 +58,25 @@ void test_rs_core_enum_class() {
     static_assert(std::formattable<Simple, char>);
     static_assert(std::formattable<Complicated, char>);
 
-    TEST_EQUAL(static_cast<int>(Simple::alpha),         0);
-    TEST_EQUAL(static_cast<int>(Simple::bravo),         1);
-    TEST_EQUAL(static_cast<int>(Simple::charlie),       2);
-    TEST_EQUAL(static_cast<int>(Complicated::alpha),    0);
-    TEST_EQUAL(static_cast<int>(Complicated::bravo),    10);
-    TEST_EQUAL(static_cast<int>(Complicated::charlie),  11);
-    TEST_EQUAL(static_cast<int>(Complicated::delta),    32);
-    TEST_EQUAL(static_cast<int>(Complicated::echo),     33);
+    TEST_EQUAL(static_cast<int>(Simple::alpha),               0);
+    TEST_EQUAL(static_cast<int>(Simple::bravo),               1);
+    TEST_EQUAL(static_cast<int>(Simple::charlie),             2);
+    TEST_EQUAL(static_cast<int>(Complicated::alpha_bravo),    0);
+    TEST_EQUAL(static_cast<int>(Complicated::charlie_delta),  10);
+    TEST_EQUAL(static_cast<int>(Complicated::echo_foxtrot),   11);
+    TEST_EQUAL(static_cast<int>(Complicated::golf_hotel),     32);
+    TEST_EQUAL(static_cast<int>(Complicated::india_juliet),   33);
 
     TEST_EQUAL(to_string(Simple::alpha),                  "alpha");
     TEST_EQUAL(to_string(Simple::bravo),                  "bravo");
     TEST_EQUAL(to_string(Simple::charlie),                "charlie");
     TEST_EQUAL(to_string(static_cast<Simple>(-1)),        "-1");
     TEST_EQUAL(to_string(static_cast<Simple>(3)),         "3");
-    TEST_EQUAL(to_string(Complicated::alpha),             "alpha");
-    TEST_EQUAL(to_string(Complicated::bravo),             "bravo");
-    TEST_EQUAL(to_string(Complicated::charlie),           "charlie");
-    TEST_EQUAL(to_string(Complicated::delta),             "delta");
-    TEST_EQUAL(to_string(Complicated::echo),              "echo");
+    TEST_EQUAL(to_string(Complicated::alpha_bravo),       "alpha_bravo");
+    TEST_EQUAL(to_string(Complicated::charlie_delta),     "charlie_delta");
+    TEST_EQUAL(to_string(Complicated::echo_foxtrot),      "echo_foxtrot");
+    TEST_EQUAL(to_string(Complicated::golf_hotel),        "golf_hotel");
+    TEST_EQUAL(to_string(Complicated::india_juliet),      "india_juliet");
     TEST_EQUAL(to_string(static_cast<Complicated>(1)),    "1");
     TEST_EQUAL(to_string(static_cast<Complicated>(999)),  "999");
 
@@ -85,16 +85,31 @@ void test_rs_core_enum_class() {
     TEST_EQUAL(std::format("{}", Simple::charlie),                "charlie");
     TEST_EQUAL(std::format("{}", static_cast<Simple>(-1)),        "-1");
     TEST_EQUAL(std::format("{}", static_cast<Simple>(3)),         "3");
-    TEST_EQUAL(std::format("{}", Complicated::alpha),             "alpha");
-    TEST_EQUAL(std::format("{}", Complicated::bravo),             "bravo");
-    TEST_EQUAL(std::format("{}", Complicated::charlie),           "charlie");
-    TEST_EQUAL(std::format("{}", Complicated::delta),             "delta");
-    TEST_EQUAL(std::format("{}", Complicated::echo),              "echo");
+    TEST_EQUAL(std::format("{}", Complicated::alpha_bravo),       "alpha_bravo");
+    TEST_EQUAL(std::format("{}", Complicated::charlie_delta),     "charlie_delta");
+    TEST_EQUAL(std::format("{}", Complicated::echo_foxtrot),      "echo_foxtrot");
+    TEST_EQUAL(std::format("{}", Complicated::golf_hotel),        "golf_hotel");
+    TEST_EQUAL(std::format("{}", Complicated::india_juliet),      "india_juliet");
     TEST_EQUAL(std::format("{}", static_cast<Complicated>(1)),    "1");
     TEST_EQUAL(std::format("{}", static_cast<Complicated>(999)),  "999");
+    TEST_EQUAL(std::format("{:m}", Complicated::alpha_bravo),     "Alpha_Bravo");
+    TEST_EQUAL(std::format("{:m}", Complicated::charlie_delta),   "Charlie_Delta");
+    TEST_EQUAL(std::format("{:m}", Complicated::echo_foxtrot),    "Echo_Foxtrot");
+    TEST_EQUAL(std::format("{:m}", Complicated::golf_hotel),      "Golf_Hotel");
+    TEST_EQUAL(std::format("{:m}", Complicated::india_juliet),    "India_Juliet");
+    TEST_EQUAL(std::format("{: }", Complicated::alpha_bravo),     "alpha bravo");
+    TEST_EQUAL(std::format("{: }", Complicated::charlie_delta),   "charlie delta");
+    TEST_EQUAL(std::format("{: }", Complicated::echo_foxtrot),    "echo foxtrot");
+    TEST_EQUAL(std::format("{: }", Complicated::golf_hotel),      "golf hotel");
+    TEST_EQUAL(std::format("{: }", Complicated::india_juliet),    "india juliet");
+    TEST_EQUAL(std::format("{:m }", Complicated::alpha_bravo),    "Alpha Bravo");
+    TEST_EQUAL(std::format("{:m }", Complicated::charlie_delta),  "Charlie Delta");
+    TEST_EQUAL(std::format("{:m }", Complicated::echo_foxtrot),   "Echo Foxtrot");
+    TEST_EQUAL(std::format("{:m }", Complicated::golf_hotel),     "Golf Hotel");
+    TEST_EQUAL(std::format("{:m }", Complicated::india_juliet),   "India Juliet");
 
     TEST_EQUAL(std::format("{}", enum_values(Simple{})),       "{alpha, bravo, charlie}");
-    TEST_EQUAL(std::format("{}", enum_values(Complicated{})),  "{alpha, bravo, charlie, delta, echo}");
+    TEST_EQUAL(std::format("{}", enum_values(Complicated{})),  "{alpha_bravo, charlie_delta, echo_foxtrot, golf_hotel, india_juliet}");
 
 }
 

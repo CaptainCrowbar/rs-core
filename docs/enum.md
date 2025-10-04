@@ -39,7 +39,11 @@ values. It also defines a few additional features around the new type:
 * `std::string to_string(EnumType t)`
     * Returns the unqualified enumeration value name as a string.
 * `std::formatter<EnumType>`
-    * Formatter that calls `to_strig().`
+    * Formatter. The default format is the string returned by `to_string().`
+    * An `'m'` flag converts the string to mixed case (ASCII letters only).
+    * A punctuation modifier will replace the underscore in the output string.
+      This can be a space or any ASCII punctuation mark except the six
+      brackets.
 
 The list of enumeration values can include explicit integer values, but the
 macro does not understand values based on other identifiers or arithmetic
