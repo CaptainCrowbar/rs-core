@@ -299,8 +299,8 @@ value is supplied, all of the possible values may be returned. The `RNG` type
 is expected to always be supplied through the function argument.
 
 Behaviour is undefined if the enumeration type contains values that are out of
-range for an `int` or if an explicitly supplied minimum value is out of range
-for the enumeration type.
+range for an `int` or if an explicitly supplied minimum value is greater than
+the maximum named value of the enumeration type.
 
 ```c++
 template <std::ranges::random_access_range R,
