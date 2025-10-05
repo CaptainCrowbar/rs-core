@@ -40,6 +40,7 @@ values. It also defines a few additional features around the new type:
     * Returns the unqualified enumeration value name as a string.
 * `std::formatter<EnumType>`
     * Formatter. The default format is the string returned by `to_string().`
+    * An `'i'` flag displays the underlying integer value instead of the name.
     * An `'s'` flag converts the string to sentence case (ASCII letters only).
     * A `'t'` flag converts the string to title case (ASCII letters only).
     * A punctuation modifier will replace the underscore in the output string.

@@ -92,6 +92,11 @@ void test_rs_core_enum_class() {
     TEST_EQUAL(std::format("{}", Complicated::india_juliet),      "india_juliet");
     TEST_EQUAL(std::format("{}", static_cast<Complicated>(1)),    "1");
     TEST_EQUAL(std::format("{}", static_cast<Complicated>(999)),  "999");
+    TEST_EQUAL(std::format("{:i}", Complicated::alpha_bravo),     "0");
+    TEST_EQUAL(std::format("{:i}", Complicated::charlie_delta),   "10");
+    TEST_EQUAL(std::format("{:i}", Complicated::echo_foxtrot),    "11");
+    TEST_EQUAL(std::format("{:i}", Complicated::golf_hotel),      "32");
+    TEST_EQUAL(std::format("{:i}", Complicated::india_juliet),    "33");
     TEST_EQUAL(std::format("{:s}", Complicated::alpha_bravo),     "Alpha_bravo");
     TEST_EQUAL(std::format("{:s}", Complicated::charlie_delta),   "Charlie_delta");
     TEST_EQUAL(std::format("{:s}", Complicated::echo_foxtrot),    "Echo_foxtrot");

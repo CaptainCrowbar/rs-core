@@ -11,6 +11,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -124,6 +125,7 @@ namespace RS {
 
         enum class EnumCase: int {
             none,
+            integer,
             sentence,
             title,
         };
@@ -265,11 +267,13 @@ public:
         using namespace ::RS::Detail;
         auto it = ctx.begin();
         for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 's' && case_ == EnumCase::none) {
+            if (*it == 'i' && case_ == EnumCase::none && delimiter_ == '_') {
+                case_ = EnumCase::integer;
+            } else if (*it == 's' && case_ == EnumCase::none) {
                 case_ = EnumCase::sentence;
             } else if (*it == 't' && case_ == EnumCase::none) {
                 case_ = EnumCase::title;
-            } else if (is_enum_delimiter_char(*it) && delimiter_ == '_') {
+            } else if (is_enum_delimiter_char(*it) && case_ != EnumCase::integer && delimiter_ == '_') {
                 delimiter_ = *it;
             } else {
                 throw std::format_error{std::format("Invalid format: {:?}", *it)};
@@ -281,9 +285,15 @@ public:
     template <typename FormatContext>
     auto format(const T& t, FormatContext& ctx) const {
         using namespace ::RS::Detail;
-        auto out = to_string(t);
-        reformat_enum(out, case_, delimiter_);
-        return std::ranges::copy(out, ctx.out()).out;
+        using U = std::underlying_type_t<T>;
+        std::string str;
+        if (case_ == EnumCase::integer) {
+            str = std::to_string(static_cast<U>(t));
+        } else {
+            str = to_string(t);
+            reformat_enum(str, case_, delimiter_);
+        }
+        return std::ranges::copy(str, ctx.out()).out;
     }
 
 private:
