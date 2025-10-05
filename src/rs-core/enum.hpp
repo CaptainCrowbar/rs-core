@@ -3,6 +3,7 @@
 #include "rs-core/character.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
+#include <algorithm>
 #include <concepts>
 #include <cstdlib>
 #include <format>
@@ -121,23 +122,43 @@ namespace RS {
 
     namespace Detail {
 
+        enum class EnumCase: int {
+            none,
+            sentence,
+            title,
+        };
+
         constexpr bool is_enum_delimiter_char(char c) noexcept {
             return c == ' '
                 || (ascii_ispunct(c)
                     && c != '(' && c != ')' && c != '[' && c != ']' && c != '{' && c != '}' && c != '_');
         }
 
-        inline void reformat_enum(std::string& str, char delimiter, bool mixed_case) {
+        inline void reformat_enum(std::string& str, EnumCase casing, char delimiter) {
 
-            if (mixed_case) {
-                auto was_alnum = false;
+            if (casing == EnumCase::sentence) {
+
+                auto any_alpha = false;
+
                 for (auto& c: str) {
-                    auto is_alnum = ascii_isalnum(c);
-                    if (is_alnum && ! was_alnum) {
-                        c = ascii_toupper(c);
+                    if (ascii_isalpha(c)) {
+                        c = any_alpha ? ascii_tolower(c) : ascii_toupper(c);
+                        any_alpha = true;
                     }
-                    was_alnum = is_alnum;
                 }
+
+            } else if (casing == EnumCase::title) {
+
+                auto was_alpha = false;
+
+                for (auto& c: str) {
+                    auto is_alpha = ascii_isalpha(c);
+                    if (is_alpha) {
+                        c = was_alpha ? ascii_tolower(c) : ascii_toupper(c);
+                    }
+                    was_alpha = is_alpha;
+                }
+
             }
 
             if (delimiter != '_') {
@@ -244,10 +265,12 @@ public:
         using namespace ::RS::Detail;
         auto it = ctx.begin();
         for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 'm') {
-                mixed_case = true;
-            } else if (is_enum_delimiter_char(*it) && delimiter == '_') {
-                delimiter = *it;
+            if (*it == 's' && case_ == EnumCase::none) {
+                case_ = EnumCase::sentence;
+            } else if (*it == 't' && case_ == EnumCase::none) {
+                case_ = EnumCase::title;
+            } else if (is_enum_delimiter_char(*it) && delimiter_ == '_') {
+                delimiter_ = *it;
             } else {
                 throw std::format_error{std::format("Invalid format: {:?}", *it)};
             }
@@ -259,13 +282,13 @@ public:
     auto format(const T& t, FormatContext& ctx) const {
         using namespace ::RS::Detail;
         auto out = to_string(t);
-        reformat_enum(out, delimiter, mixed_case);
+        reformat_enum(out, case_, delimiter_);
         return std::ranges::copy(out, ctx.out()).out;
     }
 
 private:
 
-    char delimiter = '_';
-    bool mixed_case = false;
+    ::RS::Detail::EnumCase case_ = ::RS::Detail::EnumCase::none;
+    char delimiter_ = '_';
 
 };
