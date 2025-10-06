@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.105
+    VERSION 0.1.106
     LANGUAGES CXX
 )
 
@@ -34,6 +34,8 @@ else()
         add_compile_definitions(_DARWIN_C_SOURCE=1)
     endif()
 endif()
+
+# add_compile_definitions(RS_TEST_UINT128=1)
 
 find_package(Threads REQUIRED)
 include_directories(.)

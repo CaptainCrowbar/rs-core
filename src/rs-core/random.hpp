@@ -22,7 +22,28 @@ namespace RS {
 
     namespace Detail {
 
-        #ifdef __GNUC__
+        template <typename T>
+        concept LessThan32Engine = std::uniform_random_bit_generator<T>
+            && T::max() <= max32
+            && (T::min() != 0 || T::max() < max32);
+
+        template <typename T>
+        concept Exact32Engine = std::uniform_random_bit_generator<T>
+            && T::min() == 0
+            && T::max() == max32;
+
+        template <typename T>
+        concept LessThan64Engine = std::uniform_random_bit_generator<T>
+            && T::max() > max32
+            && T::max() <= max64
+            && (T::min() != 0 || T::max() < max64);
+
+        template <typename T>
+        concept Exact64Engine = std::uniform_random_bit_generator<T>
+            && T::min() == 0
+            && T::max() == max64;
+
+        #if defined(__GNUC__) && ! defined(RS_TEST_UINT128)
 
             using Uint128 = __uint128_t;
 
@@ -99,8 +120,7 @@ namespace RS {
 
     }
 
-    // PCG64-DXSM algorithm
-    // Based on code by Melissa O'Neill and Tony Finch
+    // PCG64-DXSM algorithm by Melissa O'Neill and Tony Finch
     // http://www.pcg-random.org/
     // https://dotat.at/@/2023-06-21-pcg64-dxsm.html
 
@@ -124,7 +144,7 @@ namespace RS {
         constexpr void seed(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept;
 
         constexpr static std::uint64_t min() noexcept { return 0; }
-        constexpr static std::uint64_t max() noexcept { return ~ std::uint64_t{}; }
+        constexpr static std::uint64_t max() noexcept { return max64; }
 
     private:
 
@@ -162,6 +182,35 @@ namespace RS {
 
     // Uniform integer distribution
 
+    // Lemire's algorithm
+    // https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+
+    namespace Detail {
+
+        constexpr std::uint32_t lemire32(std::uint64_t r, std::uint64_t delta) noexcept {
+            return static_cast<std::uint32_t>((r * (delta + 1)) >> 32);
+        }
+
+        constexpr std::uint64_t lemire64(std::uint64_t r, std::uint64_t delta) noexcept {
+            return static_cast<std::uint64_t>((Uint128{r} * (Uint128{delta} + 1)) >> 64);
+        }
+
+        // Will only be called on inexact engines
+        template <std::uniform_random_bit_generator RNG, std::unsigned_integral T>
+        constexpr void synthesize_bits(RNG& rng, T& out) {
+            using R = typename RNG::result_type;
+            static constexpr auto bits_out = std::numeric_limits<T>::digits;
+            static constexpr auto good_bits = std::bit_width(RNG::max() - RNG::min() + 1) - 1;
+            static constexpr auto mask = (R{1} << good_bits) - 1;
+            static constexpr auto n_calls = (bits_out + good_bits - 1) / good_bits;
+            out = 0;
+            for (auto i = 0uz; i < n_calls; ++i) {
+                out = (out << good_bits) + (rng() & mask);
+            }
+        }
+
+    }
+
     template <Integral T>
     class UniformInteger {
 
@@ -169,151 +218,76 @@ namespace RS {
 
         using result_type = T;
 
-        constexpr UniformInteger() noexcept;
-        constexpr explicit UniformInteger(T range) noexcept; // UB if range<=0
+        constexpr UniformInteger() noexcept = default;
+        constexpr explicit UniformInteger(T range) noexcept: min_{0}, max_{range - 1} {} // UB if range<1
         constexpr explicit UniformInteger(T min, T max) noexcept;
 
         template <std::uniform_random_bit_generator RNG>
             constexpr T operator()(RNG& rng) const;
 
         constexpr T min() const noexcept { return min_; }
-        constexpr T max() const noexcept;
+        constexpr T max() const noexcept { return max_; }
 
     private:
 
         T min_{0};
-        std::uint64_t range_{0}; // 0 if range is full uint64_t
-        std::uint64_t threshold_{0}; // Highest multiple of range that fits in a uint64_t
-
-        constexpr void update() noexcept;
+        T max_{std::numeric_limits<T>::max()};
 
     };
 
         template <Integral T>
-        constexpr UniformInteger<T>::UniformInteger() noexcept:
-        min_(0),
-        range_(static_cast<std::uint64_t>(std::numeric_limits<T>::max()) + 1) {
-            update();
-        }
-
-        template <Integral T>
-        constexpr UniformInteger<T>::UniformInteger(T range) noexcept:
-        min_(0),
-        range_(static_cast<std::uint64_t>(range)) {
-            update();
-        }
-
-        template <Integral T>
-        constexpr UniformInteger<T>::UniformInteger(T min, T max) noexcept {
-            if (min > max) {
-                std::swap(min, max);
+        constexpr UniformInteger<T>::UniformInteger(T min, T max) noexcept:
+        min_(min), max_(max) {
+            if (min_ > max_) {
+                std::swap(min_, max_);
             }
-            min_ = min;
-            range_ = static_cast<std::uint64_t>(max - min) + 1;
-            update();
         }
 
         template <Integral T>
         template <std::uniform_random_bit_generator RNG>
         constexpr T UniformInteger<T>::operator()(RNG& rng) const {
+
+            using namespace Detail;
+
+            auto delta = static_cast<std::uint64_t>(max_ - min_);
             std::uint64_t x;
-            do {
-                x = rng();
-            } while (threshold_ != 0 && x >= threshold_);
-            if (range_ != 0) {
-                x %= range_;
-            }
-            return min_ + static_cast<T>(x);
-        }
 
-        template <Integral T>
-        constexpr T UniformInteger<T>::max() const noexcept {
-            if constexpr (std::same_as<T, std::uint64_t>) {
-                if (range_ == 0) {
-                    return std::numeric_limits<std::uint64_t>::max();
+            if constexpr (Exact64Engine<RNG>) {
+
+                if (delta == max64) {
+                    x = rng();
+                } else {
+                    x = lemire64(rng(), delta);
                 }
-            }
-            auto half_range = range_ / 2;
-            auto t1 = static_cast<T>(half_range);
-            auto t2 = static_cast<T>(range_ - half_range - 1);
-            return min_ + t1 + t2;
-        }
 
-        template <Integral T>
-        constexpr void UniformInteger<T>::update() noexcept {
-            if (std::popcount(range_) > 1) {
-                auto max64 = std::numeric_limits<std::uint64_t>::max();
-                auto rem = max64 % range_;
-                threshold_ = max64 - rem;
-            }
-        }
+            } else if constexpr (Exact32Engine<RNG>) {
 
-    // Quick integer distribution
-
-    template <Integral T>
-    class QuickRandom {
-
-    public:
-
-        using result_type = T;
-
-        constexpr QuickRandom() noexcept;
-        constexpr explicit QuickRandom(T range) noexcept; // UB if range<=0
-        constexpr explicit QuickRandom(T min, T max) noexcept;
-
-        template <std::uniform_random_bit_generator RNG>
-            constexpr T operator()(RNG& rng) const;
-
-        constexpr T min() const noexcept { return min_; }
-        constexpr T max() const noexcept;
-
-    private:
-
-        T min_{0};
-        std::uint64_t range_{0}; // 0 if range is full uint64_t
-
-    };
-
-        template <Integral T>
-        constexpr QuickRandom<T>::QuickRandom() noexcept:
-        min_(0),
-        range_(static_cast<std::uint64_t>(std::numeric_limits<T>::max()) + 1) {}
-
-        template <Integral T>
-        constexpr QuickRandom<T>::QuickRandom(T range) noexcept:
-        min_(0),
-        range_(static_cast<std::uint64_t>(range)) {}
-
-        template <Integral T>
-        constexpr QuickRandom<T>::QuickRandom(T min, T max) noexcept {
-            if (min > max) {
-                std::swap(min, max);
-            }
-            min_ = min;
-            range_ = static_cast<std::uint64_t>(max - min) + 1;
-        }
-
-        template <Integral T>
-        template <std::uniform_random_bit_generator RNG>
-        constexpr T QuickRandom<T>::operator()(RNG& rng) const {
-            auto x = rng();
-            if (range_ != 0) {
-                x %= range_;
-            }
-            return min_ + static_cast<T>(x);
-        }
-
-        template <Integral T>
-        constexpr T QuickRandom<T>::max() const noexcept {
-            if constexpr (std::same_as<T, std::uint64_t>) {
-                if (range_ == 0) {
-                    return std::numeric_limits<std::uint64_t>::max();
+                if (delta == max32) {
+                    x = rng();
+                } else if (delta < max32) {
+                    x = lemire32(rng(), delta);
+                } else {
+                    std::uint64_t y = rng();
+                    y = (y << 32) + rng();
+                    x = lemire64(y, delta);
                 }
+
+            } else {
+
+                if (delta <= max32) {
+                    std::uint32_t y;
+                    synthesize_bits(rng, y);
+                    x = lemire32(y, delta);
+                } else {
+                    std::uint64_t y;
+                    synthesize_bits(rng, y);
+                    x = lemire64(y, delta);
+                }
+
             }
-            auto half_range = range_ / 2;
-            auto t1 = static_cast<T>(half_range);
-            auto t2 = static_cast<T>(range_ - half_range - 1);
-            return min_ + t1 + t2;
+
+            return min_ + static_cast<T>(x);
+
         }
 
     // Bernoulli distribution
@@ -456,15 +430,6 @@ namespace RS {
         return *it;
     }
 
-    template <std::ranges::range R, std::uniform_random_bit_generator RNG>
-    typename std::ranges::range_reference_t<const R> quick_choice(const R& range, RNG& rng) {
-        auto n = std::ranges::ssize(range);
-        auto dist = QuickRandom(n);
-        auto it = std::ranges::begin(range);
-        std::advance(it, dist(rng));
-        return *it;
-    }
-
     // Weighted choice class
 
     namespace Detail {
@@ -571,22 +536,9 @@ namespace RS {
         return random_choice(Detail::select_enum_values<E, static_cast<E>(Min)>(), rng);
     }
 
-    template <AutoEnum E,
-        int Min = Detail::select_enum_minimum<E>,
-        std::uniform_random_bit_generator RNG = std::minstd_rand>
-    requires (std::signed_integral<std::underlying_type_t<E>> || Min >= 0)
-    E quick_enum(RNG& rng) {
-        return quick_choice(Detail::select_enum_values<E, static_cast<E>(Min)>(), rng);
-    }
-
     template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
     E random_enum(RNG& rng) {
         return random_choice(Detail::select_enum_values<E, Min>(), rng);
-    }
-
-    template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
-    E quick_enum(RNG& rng) {
-        return quick_choice(Detail::select_enum_values<E, Min>(), rng);
     }
 
     template <std::ranges::random_access_range R, std::uniform_random_bit_generator RNG>

@@ -3,6 +3,8 @@
 #include "rs-core/unit-test.hpp"
 #include <cmath>
 #include <cstdint>
+#include <random>
+#include <unordered_map>
 
 using namespace RS;
 
@@ -78,6 +80,69 @@ void test_rs_core_random_uniform_integer() {
 
     static constexpr auto n = 10'000;
     static constexpr auto nx = static_cast<double>(n);
+
+    {
+
+        std::minstd_rand rng(42);
+        UniformInteger<int> dist(1, 10);
+
+        TEST_EQUAL(dist.min(), 1);
+        TEST_EQUAL(dist.max(), 10);
+
+        std::unordered_map<int, int> census;
+        int x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            ++census[x];
+        }
+
+        TEST_NEAR(census[1] / nx, 0.1, 0.01);
+        TEST_NEAR(census[2] / nx, 0.1, 0.01);
+        TEST_NEAR(census[3] / nx, 0.1, 0.01);
+        TEST_NEAR(census[4] / nx, 0.1, 0.01);
+        TEST_NEAR(census[5] / nx, 0.1, 0.01);
+        TEST_NEAR(census[6] / nx, 0.1, 0.01);
+        TEST_NEAR(census[7] / nx, 0.1, 0.01);
+        TEST_NEAR(census[8] / nx, 0.1, 0.01);
+        TEST_NEAR(census[9] / nx, 0.1, 0.01);
+        TEST_NEAR(census[10] / nx, 0.1, 0.01);
+
+    }
+
+    {
+
+        std::mt19937 rng(42);
+        UniformInteger<int> dist(-5, 5);
+
+        TEST_EQUAL(dist.min(), -5);
+        TEST_EQUAL(dist.max(), 5);
+
+        std::unordered_map<int, int> census;
+        int x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            ++census[x];
+        }
+
+        TEST_NEAR(census[-5] / nx, 0.091, 0.01);
+        TEST_NEAR(census[-4] / nx, 0.091, 0.01);
+        TEST_NEAR(census[-3] / nx, 0.091, 0.01);
+        TEST_NEAR(census[-2] / nx, 0.091, 0.01);
+        TEST_NEAR(census[-1] / nx, 0.091, 0.01);
+        TEST_NEAR(census[0] / nx, 0.091, 0.01);
+        TEST_NEAR(census[1] / nx, 0.091, 0.01);
+        TEST_NEAR(census[2] / nx, 0.091, 0.01);
+        TEST_NEAR(census[3] / nx, 0.091, 0.01);
+        TEST_NEAR(census[4] / nx, 0.091, 0.01);
+        TEST_NEAR(census[5] / nx, 0.091, 0.01);
+
+    }
 
     {
 
@@ -272,47 +337,6 @@ void test_rs_core_random_uniform_mp_integer() {
         auto sum = 0.0;
         auto sum2 = 0.0;
         Integer x{};
-
-        for (auto i = 0; i < n; ++i) {
-            TRY(x = dist(rng));
-            TEST(x >= dist.min());
-            TEST(x <= dist.max());
-            auto y = static_cast<double>(x);
-            sum += y;
-            sum2 += y * y;
-        }
-
-        auto mean = sum / nx;
-        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
-
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
-
-    }
-
-}
-
-void test_rs_core_random_quick_integer() {
-
-    static constexpr auto n = 1000;
-    static constexpr auto nx = static_cast<double>(n);
-
-    {
-
-        Pcg rng(42);
-        QuickRandom<int> dist(1, 100);
-
-        TEST_EQUAL(dist.min(), 1);
-        TEST_EQUAL(dist.max(), 100);
-
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
-        auto sum = 0.0;
-        auto sum2 = 0.0;
-        int x{};
 
         for (auto i = 0; i < n; ++i) {
             TRY(x = dist(rng));

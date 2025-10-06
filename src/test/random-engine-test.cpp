@@ -2,9 +2,68 @@
 #include "rs-core/unit-test.hpp"
 #include <cmath>
 #include <cstdint>
+#include <random>
 #include <vector>
 
 using namespace RS;
+using namespace RS::Detail;
+
+void test_rs_core_random_engine_concepts() {
+
+    // Engine         Bits  Min  Max                    Category
+    // ranlux24       24    0    0xff'ffff              <32
+    // ranlux24_base  24    0    0xff'ffff              <32
+    // knuth_b        32    1    0x7fff'fffe            <32
+    // minstd_rand    32    1    0x7fff'fffe            <32
+    // minstd_rand0   32    1    0x7fff'fffe            <32
+    // mt19937        32    0    0xffff'ffff            =32
+    // ranlux48       48    0    0xffff'ffff'ffff       <64
+    // ranlux48_base  48    0    0xffff'ffff'ffff       <64
+    // mt19937_64     64    0    0xffff'ffff'ffff'ffff  =64
+    // Pcg            64    0    0xffff'ffff'ffff'ffff  =64
+
+    TEST(! Exact32Engine<std::ranlux24>);
+    TEST(! Exact64Engine<std::ranlux24>);
+    TEST(LessThan32Engine<std::ranlux24>);
+    TEST(! LessThan64Engine<std::ranlux24>);
+    TEST(! Exact32Engine<std::ranlux24_base>);
+    TEST(! Exact64Engine<std::ranlux24_base>);
+    TEST(LessThan32Engine<std::ranlux24_base>);
+    TEST(! LessThan64Engine<std::ranlux24_base>);
+    TEST(! Exact32Engine<std::knuth_b>);
+    TEST(! Exact64Engine<std::knuth_b>);
+    TEST(LessThan32Engine<std::knuth_b>);
+    TEST(! LessThan64Engine<std::knuth_b>);
+    TEST(! Exact32Engine<std::minstd_rand>);
+    TEST(! Exact64Engine<std::minstd_rand>);
+    TEST(LessThan32Engine<std::minstd_rand>);
+    TEST(! LessThan64Engine<std::minstd_rand>);
+    TEST(! Exact32Engine<std::minstd_rand0>);
+    TEST(! Exact64Engine<std::minstd_rand0>);
+    TEST(LessThan32Engine<std::minstd_rand0>);
+    TEST(! LessThan64Engine<std::minstd_rand0>);
+    TEST(Exact32Engine<std::mt19937>);
+    TEST(! Exact64Engine<std::mt19937>);
+    TEST(! LessThan32Engine<std::mt19937>);
+    TEST(! LessThan64Engine<std::mt19937>);
+    TEST(! Exact32Engine<std::ranlux48>);
+    TEST(! Exact64Engine<std::ranlux48>);
+    TEST(! LessThan32Engine<std::ranlux48>);
+    TEST(LessThan64Engine<std::ranlux48>);
+    TEST(! Exact32Engine<std::ranlux48_base>);
+    TEST(! Exact64Engine<std::ranlux48_base>);
+    TEST(! LessThan32Engine<std::ranlux48_base>);
+    TEST(LessThan64Engine<std::ranlux48_base>);
+    TEST(! Exact32Engine<std::mt19937_64>);
+    TEST(Exact64Engine<std::mt19937_64>);
+    TEST(! LessThan32Engine<std::mt19937_64>);
+    TEST(! LessThan64Engine<std::mt19937_64>);
+    TEST(! Exact32Engine<Pcg>);
+    TEST(Exact64Engine<Pcg>);
+    TEST(! LessThan32Engine<Pcg>);
+    TEST(! LessThan64Engine<Pcg>);
+
+}
 
 void test_rs_core_random_pcg_engine() {
 

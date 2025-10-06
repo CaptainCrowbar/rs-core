@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <cstdint>
 #include <iterator>
 #include <limits>
 #include <print>
@@ -71,10 +72,11 @@ namespace RS {
     template <typename R, typename V>
     concept ReadWriteContiguousRange = ReadableContiguousRange<R, V> && WritableContiguousRange<R, V>;
 
-
     // Constants
 
     constexpr std::string_view ascii_whitespace = "\t\n\r ";
+    constexpr auto max32 = ~ std::uint32_t{0};
+    constexpr auto max64 = ~ std::uint64_t{0};
     constexpr auto npos = ~ 0uz;
 
     // Metaprogramming utilities

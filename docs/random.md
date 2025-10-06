@@ -148,32 +148,11 @@ value of `T.` The second generates values from zero to `range-1;` behaviour
 is undefined if `range<1.` The third generates numbers from `min` to `max`
 inclusive; the bounds will be swapped if they are in the wrong order.
 
+This uses
+[Lemire's algorithm](https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/).
+
 _TODO: The current implementation exhibits undefined behaviour if the output
-range is larger than that of the input PRNG._
-
-### Quick uniform integer distribution
-
-```c++
-template <Integral T>
-class QuickRandom {
-    using result_type = T;
-    constexpr QuickRandom() noexcept;
-    constexpr explicit QuickRandom(T range) noexcept;
-    constexpr explicit QuickRandom(T min, T max) noexcept;
-    template <std::uniform_random_bit_generator RNG>
-        constexpr T operator()(RNG& rng) const;
-    constexpr T min() const noexcept;
-    constexpr T max() const noexcept;
-};
-```
-
-This has the same interface as `UniformInteger,` but generates its result with
-a simple modulo operation, and will never call the underlying RNG more than
-once. This is faster than `UniformInteger` but has a small bias, on the order
-of `output-range/RNG-range,` if the output range is not a power of 2.
-
-_TODO: This has the same issue as `UniformInteger` if the output range is
-large._
+range is larger than that of a 64-bit unsigned integer._
 
 ### Uniform floating point distribution
 
@@ -236,14 +215,11 @@ is called on an empty list.
 ```c++
 template <std::ranges::range R, std::uniform_random_bit_generator RNG>
     [reference type] random_choice(const R& range, RNG& rng);
-template <std::ranges::range R, std::uniform_random_bit_generator RNG>
-    [reference type] quick_choice(const R& range, RNG& rng);
 ```
 
-Convenience functions to select a random item from a range. The two functions
-differ only in whether they use `UniformInteger` or `QuickRandom` internally.
-Complexity is `O(1)` for random access or contiguous ranges, `O(n)` for other
-ranges. Behaviour is undefined if the range is empty.
+Convenience function to select an item from a range. Complexity is `O(1)` for
+random access or contiguous ranges, `O(n)` for other ranges. Behaviour is
+undefined if the range is empty.
 
 ### Weighted choice class
 
@@ -280,11 +256,6 @@ template <AutoEnum E, int Min = [see below],
     E random_enum(RNG& rng);
 template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
     E random_enum(RNG& rng);
-template <AutoEnum E, int Min = [see below],
-        std::uniform_random_bit_generator RNG = [see below]>
-    E quick_enum(RNG& rng);
-template <AutoEnum E, E Min, std::uniform_random_bit_generator RNG>
-    E quick_enum(RNG& rng);
 ```
 
 Select a random one of the possible values of an enumeration type, which must
@@ -307,4 +278,5 @@ template <std::ranges::random_access_range R,
     void shuffle(R& range, RNG& rng);
 ```
 
-Shuffles an array into random order.
+Shuffles an array into random order. Supplied in place of the standard
+algorithm for consistent behaviour.
