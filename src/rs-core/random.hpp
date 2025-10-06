@@ -371,31 +371,34 @@ namespace RS {
             constexpr T operator()(RNG& rng) const;
 
         constexpr T min() const noexcept { return min_; }
-        constexpr T max() const noexcept { return min_ + range_; }
+        constexpr T max() const noexcept { return max_; }
 
     private:
 
         T min_{0};
+        T max_{1};
         T range_{1};
 
     };
 
         template <std::floating_point T>
-        constexpr UniformReal<T>::UniformReal(T min, T max) noexcept {
-            if (min > max) {
-                std::swap(min, max);
-            }
-            min_ = min;
-            range_ = max - min;
-        }
+        constexpr UniformReal<T>::UniformReal(T min, T max) noexcept:
+        min_(std::min(min, max)),
+        max_(std::max(min, max)),
+        range_(max_ - min_) {}
 
         template <std::floating_point T>
         template <std::uniform_random_bit_generator RNG>
         constexpr T UniformReal<T>::operator()(RNG& rng) const {
-            auto x = rng() - rng.min();
-            auto y = rng.max() - rng.min();
-            auto z = static_cast<T>(x) / static_cast<T>(y);
-            return min_ + range_ * z;
+            static constexpr auto k = T{1} / static_cast<T>(RNG::max() - RNG::min());
+            if (range_ == 0) {
+                return min_;
+            }
+            T x;
+            do {
+                x = min_ + static_cast<T>(rng() - RNG::min()) * k * range_;
+            } while (x <= min_ || x >= max_);
+            return x;
         }
 
     // Random choice class

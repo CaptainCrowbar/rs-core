@@ -198,12 +198,11 @@ predictable results because of nondeterministic floating point arithmetic.
 
 The default constructor generates values from 0 to 1. The second generates
 values from zero to `range;` in this case `range` may be negative. The third
-generates numbers from `min` to `max;` the bounds will be swapped if they are
-in the wrong order.
+generates numbers from `min` to `max.`
 
-In all cases (except a degenerate range that always returns the same value),
-it is unspecified whether or not values exactly equal to either of the bounds
-can be returned.
+If the range is degenerate (the bounds are equal), the call operator will
+always return the single value. Otherwise, it will never return a value
+exactly equal to either of the bounds.
 
 ### Random choice class
 
