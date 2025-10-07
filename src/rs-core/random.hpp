@@ -252,6 +252,56 @@ namespace RS {
 
     // Uniform floating point distribution
 
+    // Badizadegan's algorithm
+    // https://specbranch.com/posts/fp-rand/
+
+    namespace Detail {
+
+        template <std::floating_point T, std::unsigned_integral U, std::uniform_random_bit_generator RNG>
+        constexpr T generate_real(RNG& r) noexcept {
+
+            static_assert(sizeof(T) == sizeof(U));
+
+            using limits = std::numeric_limits<T>;
+
+            static constexpr auto significand_bits = limits::digits - 1;
+            static constexpr auto exponent_range = static_cast<U>(significand_bits) << significand_bits;
+            static constexpr auto underflow_tail = (limits::max_exponent - 1) % significand_bits;
+            static constexpr auto underflow_shift = significand_bits - underflow_tail;
+
+            auto generate_bits = [&r] (int bits) {
+                static constexpr UniformInteger<U> uniform_bits;
+                auto u = uniform_bits(r);
+                auto mask = (U{1} << bits) - 1;
+                return u & mask;
+            };
+
+            auto one_scaled = std::bit_cast<U>(T{1});
+            auto tail_bits = 0;
+            auto significand = generate_bits(significand_bits);
+
+            while (significand == 0) {
+                one_scaled -= exponent_range;
+                if (one_scaled < exponent_range) {
+                    significand = generate_bits(underflow_tail) << underflow_shift;
+                    tail_bits = underflow_shift;
+                    break;
+                }
+                significand = generate_bits(significand_bits);
+            }
+
+            auto fp_number = std::bit_cast<T>(one_scaled | significand) - std::bit_cast<T>(one_scaled);
+            auto uint_number = std::bit_cast<U>(fp_number);
+            tail_bits += (one_scaled >> significand_bits) - (uint_number >> significand_bits);
+            tail_bits = std::min(tail_bits, significand_bits);
+            auto tail = (generate_bits(tail_bits) + 1) >> 1;
+
+            return std::bit_cast<T>(uint_number + tail);
+
+        }
+
+    }
+
     template <std::floating_point T>
     class UniformReal {
 
@@ -286,15 +336,24 @@ namespace RS {
         template <std::floating_point T>
         template <std::uniform_random_bit_generator RNG>
         constexpr T UniformReal<T>::operator()(RNG& rng) const {
-            static constexpr auto k = T{1} / static_cast<T>(RNG::max() - RNG::min());
+
             if (range_ == 0) {
                 return min_;
             }
+
             T x;
+
             do {
-                x = min_ + static_cast<T>(rng() - RNG::min()) * k * range_;
+                if constexpr (sizeof(T) <= sizeof(float)) {
+                    x = static_cast<T>(Detail::generate_real<float, std::uint32_t>(rng));
+                } else {
+                    x = static_cast<T>(Detail::generate_real<double, std::uint64_t>(rng));
+                }
+                x = min_ + x * range_;
             } while (x <= min_ || x >= max_);
+
             return x;
+
         }
 
     // Random choice class
