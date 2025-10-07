@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.106
+    VERSION 0.1.107
     LANGUAGES CXX
 )
 
@@ -34,8 +34,6 @@ else()
         add_compile_definitions(_DARWIN_C_SOURCE=1)
     endif()
 endif()
-
-# add_compile_definitions(RS_TEST_UINT128=1)
 
 find_package(Threads REQUIRED)
 include_directories(.)
@@ -76,6 +74,7 @@ add_executable(${unittest}
     test/scope-test.cpp
     test/terminal-test.cpp
     test/typename-test.cpp
+    test/uint128-test.cpp
     test/uuid-test.cpp
     test/version-test.cpp
     test/unit-test.cpp

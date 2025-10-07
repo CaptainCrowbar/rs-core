@@ -3,6 +3,7 @@
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/mp-integer.hpp"
+#include "rs-core/uint128.hpp"
 #include <algorithm>
 #include <bit>
 #include <concepts>
@@ -19,106 +20,6 @@
 #include <vector>
 
 namespace RS {
-
-    namespace Detail {
-
-        template <typename T>
-        concept LessThan32Engine = std::uniform_random_bit_generator<T>
-            && T::max() <= max32
-            && (T::min() != 0 || T::max() < max32);
-
-        template <typename T>
-        concept Exact32Engine = std::uniform_random_bit_generator<T>
-            && T::min() == 0
-            && T::max() == max32;
-
-        template <typename T>
-        concept LessThan64Engine = std::uniform_random_bit_generator<T>
-            && T::max() > max32
-            && T::max() <= max64
-            && (T::min() != 0 || T::max() < max64);
-
-        template <typename T>
-        concept Exact64Engine = std::uniform_random_bit_generator<T>
-            && T::min() == 0
-            && T::max() == max64;
-
-        #if defined(__GNUC__) && ! defined(RS_TEST_UINT128)
-
-            using Uint128 = __uint128_t;
-
-        #else
-
-            class Uint128 {
-
-            public:
-
-                constexpr Uint128() = default;
-                constexpr Uint128(std::uint64_t lo) noexcept: lo_{lo} {}
-
-                constexpr explicit operator std::uint64_t() const noexcept { return lo_; }
-
-                constexpr Uint128 operator<<(int y) const noexcept {
-                    if (y >= 128) {
-                        return {};
-                    } else if (y >= 64) {
-                        return {lo_ << (y - 64), 0};
-                    } else if (y >= 1) {
-                        return {(hi_ << y) + (lo_ >> (64 - y)), lo_ << y};
-                    } else {
-                        return *this;
-                    }
-                }
-
-                constexpr Uint128 operator>>(int y) const noexcept {
-                    if (y >= 128) {
-                        return {};
-                    } else if (y >= 64) {
-                        return hi_ >> (y - 64);
-                    } else if (y >= 1) {
-                        return {hi_ >> y, (lo_ >> y) + (hi_ << (64 - y))};
-                    } else {
-                        return *this;
-                    }
-                }
-
-                constexpr Uint128 operator|(Uint128 y) const noexcept {
-                    return {hi_ | y.hi_, lo_ | y.lo_};
-                }
-
-                constexpr Uint128 operator+(Uint128 y) const noexcept {
-                    Uint128 z{hi_ + y.hi_, lo_ + y.lo_};
-                    if (z.lo_ < lo_) {
-                        ++z.hi_;
-                    }
-                    return z;
-                }
-
-                constexpr Uint128 operator*(Uint128 y) const noexcept {
-                    static constexpr std::uint64_t max32 = (1ull << 32) - 1;
-                    Uint128 z;
-                    for (auto a = 0; a < 128; a += 32) {
-                        auto c = (*this >> a).lo_ & max32;
-                        for (auto b = 0; b < 128; b += 32) {
-                            auto d = (y >> b).lo_ & max32;
-                            z = z + (Uint128{c * d} << (a + b));
-                        }
-                    }
-                    return z;
-                }
-
-            private:
-
-                std::uint64_t hi_{};
-                std::uint64_t lo_{};
-
-                constexpr Uint128(std::uint64_t hi, std::uint64_t lo) noexcept: hi_{hi}, lo_{lo} {}
-
-            };
-
-        #endif
-
-    }
 
     // PCG64-DXSM algorithm by Melissa O'Neill and Tony Finch
     // http://www.pcg-random.org/
@@ -150,8 +51,8 @@ namespace RS {
 
         static constexpr std::uint64_t default_seed = 0xcafe'f00d'd15e'a5e5ull;
 
-        Detail::Uint128 state_;
-        Detail::Uint128 delta_;
+        uint128_t state_;
+        uint128_t delta_;
 
     };
 
@@ -169,8 +70,8 @@ namespace RS {
         }
 
         constexpr void Pcg::seed(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept {
-            state_ = (Detail::Uint128{s0} << 64) + s1;
-            delta_ = (Detail::Uint128{s2} << 64) + s3;
+            state_ = (uint128_t{s0} << 64) + s1;
+            delta_ = (uint128_t{s2} << 64) + s3;
             delta_ = (delta_ << 1) | 1;
             state_ = state_ + delta_;
             (*this)();
@@ -187,12 +88,33 @@ namespace RS {
 
     namespace Detail {
 
+        template <typename T>
+        concept LessThan32Engine = std::uniform_random_bit_generator<T>
+            && T::max() <= max32
+            && (T::min() != 0 || T::max() < max32);
+
+        template <typename T>
+        concept Exact32Engine = std::uniform_random_bit_generator<T>
+            && T::min() == 0
+            && T::max() == max32;
+
+        template <typename T>
+        concept LessThan64Engine = std::uniform_random_bit_generator<T>
+            && T::max() > max32
+            && T::max() <= max64
+            && (T::min() != 0 || T::max() < max64);
+
+        template <typename T>
+        concept Exact64Engine = std::uniform_random_bit_generator<T>
+            && T::min() == 0
+            && T::max() == max64;
+
         constexpr std::uint32_t lemire32(std::uint64_t r, std::uint64_t delta) noexcept {
             return static_cast<std::uint32_t>((r * (delta + 1)) >> 32);
         }
 
         constexpr std::uint64_t lemire64(std::uint64_t r, std::uint64_t delta) noexcept {
-            return static_cast<std::uint64_t>((Uint128{r} * (Uint128{delta} + 1)) >> 64);
+            return static_cast<std::uint64_t>((uint128_t{r} * (uint128_t{delta} + 1)) >> 64);
         }
 
         // Will only be called on inexact engines

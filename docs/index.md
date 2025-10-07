@@ -32,6 +32,7 @@ Requires C++23. Not yet tested on all compilers.
 * [`rs-core/scope.hpp` -- Scope guards](scope.html)
 * [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
 * [`rs-core/typename.hpp` -- Type names](typename.html)
+* [`rs-core/uint128.hpp` -- 129-bit integers](uint128.html)
 * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
 * [`rs-core/version.hpp` -- Version information](version.html)
 
