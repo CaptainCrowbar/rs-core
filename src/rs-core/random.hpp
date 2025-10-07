@@ -6,6 +6,7 @@
 #include "rs-core/uint128.hpp"
 #include <algorithm>
 #include <bit>
+#include <cmath>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -321,38 +322,82 @@ namespace RS {
 
     private:
 
+        enum class range_mode: unsigned char {
+            empty,    // Empty range, bounds are equal, range is not set
+            one_ulp,  // Bounds differ by 1 ulp, range is not set
+            two_ulp,  // Bounds differ by 2 ulp, range is the intervening value
+            general,  // General case, range is the difference between bounds
+        };
+
         T min_{0};
         T max_{1};
         T range_{1};
+        range_mode mode_{range_mode::general};
 
     };
 
         template <std::floating_point T>
         constexpr UniformReal<T>::UniformReal(T min, T max) noexcept:
         min_(std::min(min, max)),
-        max_(std::max(min, max)),
-        range_(max_ - min_) {}
+        max_(std::max(min, max)) {
+
+            if (min_ == max_) {
+                mode_ = range_mode::empty;
+                return;
+            }
+
+            auto next1 = std::nextafter(min_, max_);
+
+            if (next1 == max_) {
+                mode_ = range_mode::one_ulp;
+                return;
+            }
+
+            auto next2 = std::nextafter(next1, max_);
+
+            if (next2 == max_) {
+                range_ = next1;
+                mode_ = range_mode::two_ulp;
+            } else {
+                range_ = max_ - min_;
+                mode_ = range_mode::general;
+            }
+
+        }
 
         template <std::floating_point T>
         template <std::uniform_random_bit_generator RNG>
         constexpr T UniformReal<T>::operator()(RNG& rng) const {
 
-            if (range_ == 0) {
-                return min_;
-            }
+            switch (mode_) {
 
-            T x;
-
-            do {
-                if constexpr (sizeof(T) <= sizeof(float)) {
-                    x = static_cast<T>(Detail::generate_real<float, std::uint32_t>(rng));
-                } else {
-                    x = static_cast<T>(Detail::generate_real<double, std::uint64_t>(rng));
+                case range_mode::empty: {
+                    return min_;
                 }
-                x = min_ + x * range_;
-            } while (x <= min_ || x >= max_);
 
-            return x;
+                case range_mode::one_ulp: {
+                    static constexpr auto threshold = RNG::min() + (RNG::max() - RNG::min()) / 2;
+                    return rng() < threshold ? min_ : max_;
+                }
+
+                case range_mode::two_ulp: {
+                    return range_;
+                }
+
+                default: {
+                    T x;
+                    do {
+                        if constexpr (sizeof(T) <= sizeof(float)) {
+                            x = static_cast<T>(Detail::generate_real<float, std::uint32_t>(rng));
+                        } else {
+                            x = static_cast<T>(Detail::generate_real<double, std::uint64_t>(rng));
+                        }
+                        x = min_ + x * range_;
+                    } while (x <= min_ || x >= max_);
+                    return x;
+                }
+
+            }
 
         }
 

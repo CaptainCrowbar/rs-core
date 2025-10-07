@@ -1,6 +1,7 @@
 #include "rs-core/random.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cmath>
+#include <random>
 
 using namespace RS;
 

@@ -180,8 +180,10 @@ values from zero to `range;` in this case `range` may be negative. The third
 generates numbers from `min` to `max.`
 
 If the range is degenerate (the bounds are equal), the call operator will
-always return a value equal to the bounds. Otherwise, it will never return a
-value exactly equal to either of the bounds.
+always return a value equal to the bounds. If the bounds differ by only one
+bit in the last place, with no values between them, it will return one of the
+bounds at random. Otherwise, it will never return a value exactly equal to
+either of the bounds.
 
 This uses
 [Badizadegan's algorithm](https://specbranch.com/posts/fp-rand/).
@@ -189,9 +191,6 @@ This uses
 _TODO: The current implementation does not fill all bits in floating point
 types larger than 64 bits; in these cases it simply generates a 64-bit
 result and casts to the result type._
-
-_TODO: The special case where the bounds differ by only one ulp is not
-handled._
 
 ### Random choice class
 
