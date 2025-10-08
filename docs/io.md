@@ -284,16 +284,29 @@ This class manages an internal string buffer, manipulating it using an I/O
 like interface.
 
 ```c++
-StringBuffer::StringBuffer();
+StringBuffer::StringBuffer() noexcept;
 ```
 
 The default constructor initializes the buffer to an empty string. A
 `StringBuffer` is always opened in read-write mode.
 
 ```c++
-StringBuffer::StringBuffer(StringBuffer&& sb);
-StringBuffer::~StringBuffer() noexcept override;
-StringBuffer& StringBuffer::operator=(StringBuffer&& sb);
+explicit StringBuffer::StringBuffer(std::string& str,
+    IOMode mode = read_write) noexcept;
+```
+
+This constructor wraps a `StringBuffer` around an existing string. The only
+effect of the mode argument is to set the current position to the end of the
+string if the mode is `append` and the string is not empty; otherwise, the
+mode argument is ignored. The `StringBuffer` is always opened in read-write
+mode regardless of the mode argument. The `StringBuffer` expects to have full
+control over the string; behaviour is undefined if the string is modified by
+any other agency while the `StringBuffer` exists.
+
+```c++
+StringBuffer::StringBuffer(StringBuffer&& sb) noexcept;
+StringBuffer::~StringBuffer() noexcept;
+StringBuffer& StringBuffer::operator=(StringBuffer&& sb) noexcept;
 ```
 
 Other life cycle operations.
@@ -302,8 +315,11 @@ Other life cycle operations.
 void StringBuffer::close() override;
 ```
 
-A string buffer has no concept of open vs closed; the `close()` function does
-nothing.
+A `StringBuffer` has no concept of open vs closed. If the string is owned,
+`close()` is a synonym for `clear()`. With an external string, `close()`
+relinquishes the reference to it; the `StringBuffer` is now in a default
+constructed state, and is no longer affected by anything that happens to the
+string.
 
 ```c++
 void StringBuffer::clear() noexcept;

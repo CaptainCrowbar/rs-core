@@ -195,7 +195,7 @@ void test_rs_core_io_cstdio_line_iterator() {
 
 }
 
-void test_rs_core_io_string_buffer_class() {
+void test_rs_core_io_string_buffer_internal() {
 
     StringBuffer buf;
     std::string s;
@@ -236,6 +236,68 @@ void test_rs_core_io_string_buffer_class() {
         "Goodnight moon\n"
         "Here comes the sun\n"
     );
+
+}
+
+void test_rs_core_io_string_buffer_external() {
+
+    std::string s, t;
+    StringBuffer buf{t};
+    auto n = 0uz;
+    auto z = 0z;
+
+    TEST(buf.empty());
+    TRY(n = buf.write_str("Hello world\n"));
+    TEST_EQUAL(n, 12u);
+    TEST_EQUAL(t, "Hello world\n");
+    TRY(n = buf.write_str("Goodnight moon\n"));
+    TEST_EQUAL(n, 15u);
+    TEST_EQUAL(t,
+        "Hello world\n"
+        "Goodnight moon\n"
+    );
+    TRY(n = buf.write_str("Here comes the sun\n"));
+    TEST_EQUAL(n, 19u);
+    TEST_EQUAL(t,
+        "Hello world\n"
+        "Goodnight moon\n"
+        "Here comes the sun\n"
+    );
+    TRY(z = buf.tell());
+    TEST_EQUAL(z, 46);
+
+    TRY(buf.seek(0, IO::set));
+    TRY(z = buf.tell());
+    TEST_EQUAL(z, 0);
+    TRY(buf.seek(0, IO::end));
+    TRY(z = buf.tell());
+    TEST_EQUAL(z, 46);
+
+    TRY(buf.seek(0, IO::set));
+    TRY(s = buf.read_str(12));
+    TEST_EQUAL(s, "Hello world\n");
+    TRY(s = buf.read_str(15));
+    TEST_EQUAL(s, "Goodnight moon\n");
+    TRY(s = buf.read_str(19));
+    TEST_EQUAL(s, "Here comes the sun\n");
+    TRY(s = buf.read_str(100));
+    TEST_EQUAL(s, "");
+
+    TRY(buf.seek(0, IO::set));
+    TRY(s = buf.read_all());
+    TEST_EQUAL(s,
+        "Hello world\n"
+        "Goodnight moon\n"
+        "Here comes the sun\n"
+    );
+    TEST_EQUAL(t,
+        "Hello world\n"
+        "Goodnight moon\n"
+        "Here comes the sun\n"
+    );
+
+    TRY(buf.clear());
+    TEST_EQUAL(t, "");
 
 }
 

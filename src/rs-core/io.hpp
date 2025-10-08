@@ -409,15 +409,15 @@ namespace RS {
 
     public:
 
-        StringBuffer() = default;
+        StringBuffer() noexcept { reset(); }
+        explicit StringBuffer(std::string& str, IOMode mode = read_write) noexcept;
         StringBuffer(const StringBuffer&) = delete;
         StringBuffer(StringBuffer&& sb);
-        ~StringBuffer() override = default;
         StringBuffer& operator=(const StringBuffer&) = delete;
         StringBuffer& operator=(StringBuffer&& sb);
 
         bool can_seek() const noexcept override { return true; }
-        void close() override {}
+        void close() override { reset(); }
         std::size_t read(void* ptr, std::size_t len) override;
         std::string read_all() override;
         std::string read_line() override;
@@ -427,52 +427,78 @@ namespace RS {
         std::size_t write(const void* ptr, std::size_t len) override;
 
         void clear() noexcept;
-        bool empty() const noexcept { return buf_.empty(); }
-        std::size_t size() const noexcept { return buf_.size(); }
-        std::string_view view() const noexcept { return buf_; }
+        bool empty() const noexcept { return buf_ptr_->empty(); }
+        std::size_t size() const noexcept { return buf_ptr_->size(); }
+        std::string_view view() const noexcept { return *buf_ptr_; }
 
     private:
 
-        std::string buf_;
-        std::size_t pos_{};
+        std::string buf_str_;
+        std::string* buf_ptr_;
+        std::size_t pos_;
+        bool owner_;
+
+        void reset() noexcept;
 
     };
 
+        inline StringBuffer::StringBuffer(std::string& str, IOMode mode) noexcept:
+        buf_ptr_(&str),
+        pos_(mode == append ? str.size() : 0uz),
+        owner_(false) {}
+
+        inline StringBuffer::StringBuffer(StringBuffer&& sb):
+        buf_str_(std::move(sb.buf_str_)),
+        buf_ptr_(sb.owner_ ? &buf_str_ : sb.buf_ptr_),
+        pos_(sb.pos_),
+        owner_(sb.owner_) {
+            sb.reset();
+        }
+
+        inline StringBuffer& StringBuffer::operator=(StringBuffer&& sb) {
+            buf_str_ = std::move(sb.buf_str_);
+            buf_ptr_ = sb.owner_ ? &buf_str_ : sb.buf_ptr_;
+            pos_ = sb.pos_;
+            owner_ = sb.owner_;
+            sb.reset();
+            return *this;
+        }
+
         inline std::size_t StringBuffer::read(void* ptr, std::size_t len) {
-            auto n = std::min(len, buf_.size() - pos_);
-            std::memcpy(ptr, buf_.data() + pos_, n);
+            auto n = std::min(len, buf_ptr_->size() - pos_);
+            std::memcpy(ptr, buf_ptr_->data() + pos_, n);
             pos_ += n;
             return n;
         }
 
         inline std::string StringBuffer::read_all() {
-            auto result = buf_.substr(pos_);
-            pos_ = buf_.size();
+            auto result = buf_ptr_->substr(pos_);
+            pos_ = buf_ptr_->size();
             return result;
         }
 
         inline std::string StringBuffer::read_line() {
-            auto next = buf_.find('\n', pos_);
+            auto next = buf_ptr_->find('\n', pos_);
             if (next == npos) {
-                next = buf_.size();
+                next = buf_ptr_->size();
             } else {
                 ++next;
             }
-            auto result = buf_.substr(pos_, next - pos_);
+            auto result = buf_ptr_->substr(pos_, next - pos_);
             pos_ = next;
             return result;
         }
 
         inline std::string StringBuffer::read_str(std::size_t len) {
-            auto n = std::min(len, buf_.size() - pos_);
-            auto result = buf_.substr(pos_, n);
+            auto n = std::min(len, buf_ptr_->size() - pos_);
+            auto result = buf_ptr_->substr(pos_, n);
             pos_ += n;
             return result;
         }
 
         inline void StringBuffer::seek(std::ptrdiff_t offset, IOSeek from) {
             auto signed_pos = static_cast<std::ptrdiff_t>(pos_);
-            auto signed_size = static_cast<std::ptrdiff_t>(buf_.size());
+            auto signed_size = static_cast<std::ptrdiff_t>(buf_ptr_->size());
             switch (from) {
                 case set:  signed_pos = offset; break;
                 case end:  signed_pos = signed_size - offset; break;
@@ -482,15 +508,22 @@ namespace RS {
         }
 
         inline std::size_t StringBuffer::write(const void* ptr, std::size_t len) {
-            buf_.resize(pos_ + len);
-            std::memcpy(buf_.data() + pos_, ptr, len);
-            pos_ = buf_.size();
+            buf_ptr_->resize(pos_ + len);
+            std::memcpy(buf_ptr_->data() + pos_, ptr, len);
+            pos_ = buf_ptr_->size();
             return len;
         }
 
         inline void StringBuffer::clear() noexcept {
-            buf_.clear();
+            buf_ptr_->clear();
             pos_ = 0;
+        }
+
+        inline void StringBuffer::reset() noexcept {
+            buf_str_.clear();
+            buf_ptr_ = &buf_str_;
+            pos_ = 0;
+            owner_ = true;
         }
 
 }
