@@ -3,6 +3,7 @@
 #include "rs-core/arithmetic.hpp"
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
+#include "rs-core/io.hpp"
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -10,19 +11,6 @@
 #include <cstdlib>
 #include <string>
 #include <string_view>
-
-#ifdef _WIN32
-
-    extern "C" {
-        _declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
-        _declspec(dllimport) int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
-    }
-
-#else
-
-    #include <unistd.h>
-
-#endif
 
 namespace RS {
 
@@ -50,8 +38,8 @@ namespace RS {
         static std::size_t columns() noexcept { return getenv_size("COLUMNS", 80); }
         static std::size_t lines() noexcept { return getenv_size("LINES", 25); }
         static XtermMode guess_mode() noexcept;
-        static bool is_tty(std::FILE* stream = stdout) noexcept;
-        static bool is_tty(int fd) noexcept;
+        static bool is_tty(std::FILE* stream = stdout) noexcept { return Cstdio::file_is_tty(stream); }
+        static bool is_tty(int fd) noexcept { return Cstdio::file_is_tty(fd); }
 
         // Cursor control sequences
 
@@ -164,29 +152,6 @@ namespace RS {
                 return dark;
             }
 
-        }
-
-        inline bool Xterm::is_tty(std::FILE* stream) noexcept {
-            if (stream == stdin) {
-                return is_tty(0);
-            } else if (stream == stdout) {
-                return is_tty(1);
-            } else if (stream == stderr) {
-                return is_tty(2);
-            } else {
-                return false;
-            }
-        }
-
-        inline bool Xterm::is_tty(int fd) noexcept {
-            #ifdef _WIN32
-                static constexpr auto std_input_handle = static_cast<unsigned long>(-10);
-                auto handle = GetStdHandle(std_input_handle - fd);
-                auto mode = 0ul;
-                return GetConsoleMode(handle, &mode) != 0;
-            #else
-                return isatty(fd) != 0;
-            #endif
         }
 
         inline std::size_t Xterm::getenv_size(const char* name, std::size_t default_value) noexcept {

@@ -111,6 +111,12 @@ Reads one byte from the file, returning true on a successful read. If the read
 fails the argument will be left unchanged.
 
 ```c++
+virtual bool IO::is_tty() const noexcept;
+```
+
+Query whether the I/O stream is connected to a terminal.
+
+```c++
 IO::line_range IO::lines();
 ```
 
@@ -251,19 +257,25 @@ Move constructor and assignment operator.
 Cstdio::~Cstdio() noexcept override;
 ```
 
-The destructor will close the stream handle, unless the handle is null or one
-of the three standard streams.
+The destructor will close the stream handle if it is owned.
+
+```c++
+bool Cstdio::is_tty() const noexcept override;
+```
+
+This will only work for the three standard I/O streams
+(`stdin,stdout,stderr`); for other file streams it will always return false.
 
 ```c++
 void Cstdio::close() override;
 ```
 
-Closes the stream and resets the internal `FILE*` pointer to null. This will
-do nothing if the stream was already null; if it is one of the three standard
-streams, the pointer will be reset but the stream will not be affected. This
-can throw if something goes wrong while closing the stream, but the pointer
-will be reset regardless. Other operations (destructor and assignment
-operator) that close the stream will ignore errors while closing.
+Closes the stream (if it was owned) and resets the internal `FILE*` pointer to
+null. This will do nothing if the stream was already null; if it is one of
+the three standard streams, the pointer will be reset but the stream will not
+be affected. This can throw if something goes wrong while closing the stream,
+but the pointer will be reset regardless. Other operations (destructor and
+assignment operator) that close the stream will ignore errors while closing.
 
 ```c++
 std::FILE* Cstdio::handle() const noexcept;
@@ -320,6 +332,12 @@ A `StringBuffer` has no concept of open vs closed. If the string is owned,
 relinquishes the reference to it; the `StringBuffer` is now in a default
 constructed state, and is no longer affected by anything that happens to the
 string.
+
+```c++
+bool StringBuffer::is_tty() const noexcept override;
+```
+
+Always false for a string buffer.
 
 ```c++
 void StringBuffer::clear() noexcept;

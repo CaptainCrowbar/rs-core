@@ -19,6 +19,19 @@
 #include <system_error>
 #include <utility>
 
+#ifdef _WIN32
+
+    extern "C" {
+        _declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
+        _declspec(dllimport) int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
+    }
+
+#else
+
+    #include <unistd.h>
+
+#endif
+
 namespace RS {
 
     RS_ENUM(IOMode, int,
@@ -69,6 +82,7 @@ namespace RS {
         virtual void flush() {}
         virtual bool get(char& c) { return read(&c, 1) == 1; }
         virtual void put(char c) { write(&c, 1); }
+        virtual bool is_tty() const noexcept = 0;
         virtual std::size_t read(void* ptr, std::size_t len) = 0;
         virtual std::string read_all();
         virtual std::size_t read_into(std::string& buf, std::size_t pos = 0);
@@ -195,7 +209,7 @@ namespace RS {
         Cstdio() = default;
         explicit Cstdio(const std::filesystem::path& path, IOMode mode = read_only);
         explicit Cstdio(const std::filesystem::path& path, const char* mode);
-        explicit Cstdio(std::FILE* stream) noexcept: stream_(stream), owner_(! is_stdio(stream)) {}
+        explicit Cstdio(std::FILE* stream) noexcept: stream_(stream), owner_(! file_is_stdio(stream)) {}
         explicit Cstdio(std::FILE* stream, bool own);
         Cstdio(Cstdio&& io) noexcept: stream_(std::exchange(io.stream_, nullptr)) {}
         Cstdio& operator=(Cstdio&& io) noexcept;
@@ -207,6 +221,7 @@ namespace RS {
         void close() override { close_stream(true); }
         void flush() override;
         bool get(char& c) override;
+        bool is_tty() const noexcept override { return file_is_tty(stream_); }
         void put(char c) override;
         std::size_t read(void* ptr, std::size_t len) override;
         std::string read_line() override;
@@ -219,13 +234,18 @@ namespace RS {
 
     private:
 
+        friend class Xterm;
+
         std::FILE* stream_ = nullptr;
         bool owner_ = false;
 
         void check(int err) const;
         void close_stream(bool checked);
 
-        static bool is_stdio(std::FILE* stream) noexcept;
+        static bool file_is_stdio(std::FILE* stream) noexcept;
+        static bool file_is_tty(std::FILE* stream) noexcept;
+        static bool file_is_tty(int fd) noexcept;
+
         static const char* translate_mode(IOMode mode) noexcept;
 
     };
@@ -259,7 +279,7 @@ namespace RS {
         inline Cstdio::Cstdio(std::FILE* stream, bool own):
         stream_(stream),
         owner_(own) {
-            if (is_stdio(stream) && own) {
+            if (file_is_stdio(stream) && own) {
                 throw std::invalid_argument("Can't take ownership of a standard stream");
             }
         }
@@ -390,8 +410,31 @@ namespace RS {
             }
         }
 
-        inline bool Cstdio::is_stdio(std::FILE* stream) noexcept {
+        inline bool Cstdio::file_is_stdio(std::FILE* stream) noexcept {
             return stream == stdin || stream == stdout || stream == stderr;
+        }
+
+        inline bool Cstdio::file_is_tty(std::FILE* stream) noexcept {
+            if (stream == stdin) {
+                return file_is_tty(0);
+            } else if (stream == stdout) {
+                return file_is_tty(1);
+            } else if (stream == stderr) {
+                return file_is_tty(2);
+            } else {
+                return false;
+            }
+        }
+
+        inline bool Cstdio::file_is_tty(int fd) noexcept {
+            #ifdef _WIN32
+                static constexpr auto std_input_handle = static_cast<unsigned long>(-10);
+                auto handle = GetStdHandle(std_input_handle - fd);
+                auto mode = 0ul;
+                return GetConsoleMode(handle, &mode) != 0;
+            #else
+                return ::isatty(fd) != 0;
+            #endif
         }
 
         inline const char* Cstdio::translate_mode(IOMode mode) noexcept {
@@ -418,6 +461,7 @@ namespace RS {
 
         bool can_seek() const noexcept override { return true; }
         void close() override { reset(); }
+        bool is_tty() const noexcept override { return false; }
         std::size_t read(void* ptr, std::size_t len) override;
         std::string read_all() override;
         std::string read_line() override;
