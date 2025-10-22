@@ -356,3 +356,97 @@ void test_rs_core_random_uniform_mp_integer() {
     }
 
 }
+
+void test_rs_core_random_dice() {
+
+    static constexpr auto n = 10'000;
+    static constexpr auto nx = static_cast<double>(n);
+
+    {
+
+        std::minstd_rand rng(42);
+        Dice<int> dist;
+
+        TEST_EQUAL(dist.min(), 1);
+        TEST_EQUAL(dist.max(), 6);
+
+        std::unordered_map<int, int> census;
+        int x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            ++census[x];
+        }
+
+        TEST_NEAR(census[1] / nx, 0.1667, 0.01);
+        TEST_NEAR(census[2] / nx, 0.1667, 0.01);
+        TEST_NEAR(census[3] / nx, 0.1667, 0.01);
+        TEST_NEAR(census[4] / nx, 0.1667, 0.01);
+        TEST_NEAR(census[5] / nx, 0.1667, 0.01);
+        TEST_NEAR(census[6] / nx, 0.1667, 0.01);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        Dice<int> dist{3};
+
+        TEST_EQUAL(dist.min(), 3);
+        TEST_EQUAL(dist.max(), 18);
+
+        int x{};
+        double dx{};
+        double sum{};
+        double sum2{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            dx = static_cast<double>(x);
+            sum += dx;
+            sum2 += dx * dx;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, 10.5, 0.1);
+        TEST_NEAR(sd, 2.9580, 0.1);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        Dice<int> dist{2, 100};
+
+        TEST_EQUAL(dist.min(), 2);
+        TEST_EQUAL(dist.max(), 200);
+
+        int x{};
+        double dx{};
+        double sum{};
+        double sum2{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            dx = static_cast<double>(x);
+            sum += dx;
+            sum2 += dx * dx;
+        }
+
+        auto mean = sum / nx;
+        auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
+
+        TEST_NEAR(mean, 101, 1);
+        TEST_NEAR(sd, 40.8228, 1);
+
+    }
+
+}

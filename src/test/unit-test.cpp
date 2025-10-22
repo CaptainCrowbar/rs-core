@@ -94,6 +94,7 @@ void test_rs_core_random_uniform_real();
 void test_rs_core_random_bernoulli_distribution();
 void test_rs_core_random_uniform_integer();
 void test_rs_core_random_uniform_mp_integer();
+void test_rs_core_random_dice();
 void test_rs_core_rational_int_construction();
 void test_rs_core_rational_int_properties();
 void test_rs_core_rational_int_arithmetic();
@@ -216,6 +217,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_bernoulli_distribution, "test_rs_core_random_bernoulli_distribution");
     call_me_maybe(test_rs_core_random_uniform_integer, "test_rs_core_random_uniform_integer");
     call_me_maybe(test_rs_core_random_uniform_mp_integer, "test_rs_core_random_uniform_mp_integer");
+    call_me_maybe(test_rs_core_random_dice, "test_rs_core_random_dice");
     call_me_maybe(test_rs_core_rational_int_construction, "test_rs_core_rational_int_construction");
     call_me_maybe(test_rs_core_rational_int_properties, "test_rs_core_rational_int_properties");
     call_me_maybe(test_rs_core_rational_int_arithmetic, "test_rs_core_rational_int_arithmetic");

@@ -251,6 +251,41 @@ namespace RS {
             return dist_(rng) <= threshold_;
         }
 
+    // Dice roll distribution
+
+    template <Integral T>
+    class Dice {
+
+    public:
+
+        using result_type = T;
+
+        constexpr Dice() noexcept: Dice{T{1}, T{6}} {}
+        constexpr explicit Dice(T number, T faces = T{6}) noexcept: number_(number), single_(T{1}, faces) {}
+
+        template <std::uniform_random_bit_generator RNG>
+            constexpr T operator()(RNG& rng) const;
+
+        constexpr T min() const noexcept { return number_; }
+        constexpr T max() const noexcept { return number_ * single_.max(); }
+
+    private:
+
+        T number_;
+        UniformInteger<T> single_;
+
+    };
+
+        template <Integral T>
+        template <std::uniform_random_bit_generator RNG>
+        constexpr T Dice<T>::operator()(RNG& rng) const {
+            auto sum = T{0};
+            for (auto i = T{0}; i < number_; ++i) {
+                sum += single_(rng);
+            }
+            return sum;
+        }
+
     // Uniform floating point distribution
 
     // Badizadegan's algorithm
