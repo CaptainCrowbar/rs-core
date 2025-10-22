@@ -154,6 +154,25 @@ This uses
 _TODO: The current implementation exhibits undefined behaviour if the output
 range is larger than that of a 64-bit unsigned integer._
 
+### Dice roll distribution
+
+```c++
+template <Integral T>
+class Dice {
+    using result_type = T;
+    constexpr Dice() noexcept;
+    constexpr explicit Dice(T number, T faces = 6) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        constexpr T operator()(RNG& rng) const;
+    constexpr T min() const noexcept;
+    constexpr T max() const noexcept;
+};
+```
+
+Generates the result of rolling `number` dice (default 1), each numbered from
+1 to `faces` (default 6). Behaviour is undefined if `number<0, faces<1,` or
+the maximum possible value is out of range for the return type.
+
 ### Uniform floating point distribution
 
 ```c++
