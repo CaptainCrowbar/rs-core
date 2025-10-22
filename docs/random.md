@@ -100,8 +100,8 @@ class BernoulliDistribution {
     using result_type = bool;
     constexpr BernoulliDistribution() noexcept;
     constexpr explicit BernoulliDistribution(double p) noexcept;
-    constexpr explicit BernoulliDistribution(std::uint64_t den,
-        std::uint64_t num) noexcept;
+    constexpr explicit BernoulliDistribution(std::uint64_t num,
+        std::uint64_t den) noexcept;
     template <std::uniform_random_bit_generator RNG>
         constexpr bool operator()(RNG& rng) const;
     constexpr static bool min() noexcept { return false; }
