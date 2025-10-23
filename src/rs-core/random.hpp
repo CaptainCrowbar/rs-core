@@ -455,8 +455,8 @@ namespace RS {
             const T& operator()(RNG& rng) const; // UB if empty
 
         void insert(const T& t) { vec_.push_back(t); update(); }
-        std::size_t size() const noexcept { return vec_.size(); }
         bool empty() const noexcept { return vec_.empty(); }
+        std::size_t size() const noexcept { return vec_.size(); }
 
     private:
 
@@ -526,8 +526,9 @@ namespace RS {
             const T& operator()(RNG& rng) const; // UB if empty
 
         void insert(const T& t, W w = static_cast<W>(1)); // Ignored if w<=0
-        std::size_t size() const noexcept { return map_.size(); }
         bool empty() const noexcept { return map_.empty(); }
+        std::size_t size() const noexcept { return map_.size(); }
+        W total() const { return empty() ? W{} : std::prev(map_.end())->first; }
 
     private:
 

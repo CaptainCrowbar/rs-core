@@ -179,6 +179,9 @@ void test_rs_core_random_weighted_choice() {
         TRY(choice.insert("Charlie",  30));
         TRY(choice.insert("Delta",    40));
 
+        TEST_EQUAL(choice.size(), 4u);
+        TEST_EQUAL(choice.total(), 100);
+
         for (auto i = 0; i < iterations; ++i) {
             TRY(s = choice(rng));
             TEST_MATCH(s, "^[A-E][a-z]+$");
@@ -200,6 +203,9 @@ void test_rs_core_random_weighted_choice() {
             { "Charlie",  30 },
             { "Delta",    40 },
         };
+
+        TEST_EQUAL(choice.size(), 4u);
+        TEST_EQUAL(choice.total(), 100);
 
         std::minstd_rand rng(42);
         std::map<std::string, int> census;
@@ -230,6 +236,9 @@ void test_rs_core_random_weighted_choice() {
         TRY(choice.insert("Charlie"));
         TRY(choice.insert("Delta"));
 
+        TEST_EQUAL(choice.size(), 4u);
+        TEST_EQUAL(choice.total(), 4);
+
         for (auto i = 0; i < iterations; ++i) {
             TRY(s = choice(rng));
             TEST_MATCH(s, "^[A-E][a-z]+$");
@@ -251,6 +260,9 @@ void test_rs_core_random_weighted_choice() {
             "Charlie",
             "Delta",
         };
+
+        TEST_EQUAL(choice.size(), 4u);
+        TEST_EQUAL(choice.total(), 4);
 
         std::minstd_rand rng(42);
         std::map<std::string, int> census;

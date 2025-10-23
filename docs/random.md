@@ -225,8 +225,8 @@ class RandomChoice {
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
     void insert(const T& t);
-    std::size_t size() const noexcept;
     bool empty() const noexcept;
+    std::size_t size() const noexcept;
 };
 ```
 
@@ -267,8 +267,9 @@ class WeightedChoice {
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
     void insert(const T& t, W w = 1);
-    std::size_t size() const noexcept;
     bool empty() const noexcept;
+    std::size_t size() const noexcept;
+    W total() const;
 };
 ```
 
@@ -278,9 +279,12 @@ at a time through the `insert()` function. The weight defaults to 1 if not
 explicitly supplied. Pairs with a zero or negative weight are discarded.
 
 The `size()` function returns the number of items in the list (note that this
-may include duplicate `T` values). Entries that were discarded because the
-weight was not positive are not counted. Behaviour is undefined if the
-function call operator is called on an empty list.
+may include duplicate `T` values). The `total()` function returns the sum of
+all weights. Entries that were discarded because the weight was not positive
+are not counted towards `empty(), size(),` or `total().`
+
+Behaviour is undefined if the function call operator is called on an empty
+list.
 
 ## Random algorithms
 
