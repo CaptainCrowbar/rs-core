@@ -18,55 +18,59 @@ namespace RS::Detail {
         || std::convertible_to<T, std::string_view>;
 
     template <typename T>
-    concept FormatByMemberFunction = requires (const T& t) {
+    concept FormatByMemberFunction = requires (const T t) {
         { t.rs_core_format() } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByMemberFunctionWithFlags = requires (const T& t, std::string_view s) {
+    concept FormatByMemberFunctionWithFlags = requires (const T t, std::string_view s) {
         { t.rs_core_format(s) } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByMemberFunctionWithSize = requires (const T& t, std::size_t n) {
+    concept FormatByMemberFunctionWithSize = requires (const T t, std::size_t n) {
         { t.rs_core_format(n) } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByMemberFunctionWithBoth = requires (const T& t, std::string_view s, std::size_t n) {
+    concept FormatByMemberFunctionWithBoth = requires (const T t, std::string_view s, std::size_t n) {
         { t.rs_core_format(s, n) } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByFreeFunction = requires (const T& t) {
+    concept FormatByFreeFunction = requires (const T t) {
         { rs_core_format(t) } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByFreeFunctionWithFlags = requires (const T& t, std::string_view s) {
+    concept FormatByFreeFunctionWithFlags = requires (const T t, std::string_view s) {
         { rs_core_format(t, s) } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByFreeFunctionWithSize = requires (const T& t, std::size_t n) {
+    concept FormatByFreeFunctionWithSize = requires (const T t, std::size_t n) {
         { rs_core_format(t, n) } -> StringOrView;
     };
 
     template <typename T>
-    concept FormatByFreeFunctionWithBoth = requires (const T& t, std::string_view s, std::size_t n) {
+    concept FormatByFreeFunctionWithBoth = requires (const T t, std::string_view s, std::size_t n) {
         { rs_core_format(t, s, n) } -> StringOrView;
     };
 
     template <typename T>
-    concept AutoFormat =
-        FormatByMemberFunction<T>
-        || FormatByMemberFunctionWithFlags<T>
-        || FormatByMemberFunctionWithSize<T>
-        || FormatByMemberFunctionWithBoth<T>
-        || FormatByFreeFunction<T>
-        || FormatByFreeFunctionWithFlags<T>
-        || FormatByFreeFunctionWithSize<T>
-        || FormatByFreeFunctionWithBoth<T>;
+    struct PoisonFormat:
+    std::false_type {};
+
+    template <typename T>
+    concept AutoFormat = (FormatByMemberFunction<T>
+            || FormatByMemberFunctionWithFlags<T>
+            || FormatByMemberFunctionWithSize<T>
+            || FormatByMemberFunctionWithBoth<T>
+            || FormatByFreeFunction<T>
+            || FormatByFreeFunctionWithFlags<T>
+            || FormatByFreeFunctionWithSize<T>
+            || FormatByFreeFunctionWithBoth<T>)
+        && ! PoisonFormat<T>::value;
 
 }
 

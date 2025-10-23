@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstdint>
 #include <format>
+#include <string>
 #include <type_traits>
 
 using namespace RS;
@@ -31,8 +32,16 @@ namespace {
         charlie = 4,
     )
 
+    struct Confusing {
+        Simple sim {};
+        Confusing(Simple s): sim(s) {}
+    };
+
+    [[maybe_unused]] std::string to_string(Confusing c) { return std::to_string(static_cast<int>(c.sim)); }
+    [[maybe_unused]] std::string rs_core_format(Confusing c) { return to_string(c); }
+
     enum class Raw: int {
-        alpha,
+        zulu,
     };
 
 }
@@ -48,6 +57,11 @@ void test_rs_core_enum_concepts() {
     static_assert(! AutoBitmask<Complicated>);
     static_assert(AutoBitmask<Mask>);
     static_assert(! AutoBitmask<Raw>);
+
+    static_assert(! Detail::AutoFormat<Simple>);
+    static_assert(! Detail::AutoFormat<Complicated>);
+    static_assert(! Detail::AutoFormat<Mask>);
+    static_assert(! Detail::AutoFormat<Raw>);
 
 }
 

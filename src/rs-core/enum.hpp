@@ -56,23 +56,23 @@
         } \
     }
 
-#define RS_BITMASK(EnumType, IntType, ...) \
-    enum class EnumType: IntType { \
+#define RS_BITMASK(BitmaskType, IntType, ...) \
+    enum class BitmaskType: IntType { \
         __VA_ARGS__ \
     }; \
-    [[maybe_unused]] inline void rs_core_bitmask_signature(EnumType) {} \
-    [[maybe_unused]] inline const std::set<EnumType>& enum_values(EnumType) { \
+    [[maybe_unused]] inline void rs_core_bitmask_signature(BitmaskType) {} \
+    [[maybe_unused]] inline const std::set<BitmaskType>& enum_values(BitmaskType) { \
         static const auto static_set = [] { \
-            std::set<EnumType> temp_set {}; \
+            std::set<BitmaskType> temp_set {}; \
             auto table = ::RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
             for (auto& [k,v]: table) { \
-                temp_set.insert(static_cast<EnumType>(k)); \
+                temp_set.insert(static_cast<BitmaskType>(k)); \
             } \
             return temp_set; \
         }(); \
         return static_set; \
     } \
-    [[maybe_unused]] inline std::string to_string(EnumType t) { \
+    [[maybe_unused]] inline std::string to_string(BitmaskType t) { \
         static_assert(std::unsigned_integral<IntType>); \
         static const auto static_table = ::RS::Detail::linear_enum_table(# __VA_ARGS__); \
         auto index = static_cast<unsigned long long>(t); \
@@ -94,32 +94,43 @@
             return std::format("0x{:x}", index); \
         } \
     } \
-    [[maybe_unused]] constexpr bool operator!(EnumType t) noexcept { \
+    [[maybe_unused]] constexpr bool operator!(BitmaskType t) noexcept { \
         return ! static_cast<bool>(t); \
     } \
-    [[maybe_unused]] constexpr EnumType operator~(EnumType t) noexcept { \
-        return static_cast<EnumType>(~ static_cast<IntType>(t)); \
+    [[maybe_unused]] constexpr BitmaskType operator~(BitmaskType t) noexcept { \
+        return static_cast<BitmaskType>(~ static_cast<IntType>(t)); \
     } \
-    [[maybe_unused]] constexpr EnumType operator&(EnumType t, EnumType u) noexcept { \
-        return static_cast<EnumType>(static_cast<IntType>(t) & static_cast<IntType>(u)); \
+    [[maybe_unused]] constexpr BitmaskType operator&(BitmaskType t, BitmaskType u) noexcept { \
+        return static_cast<BitmaskType>(static_cast<IntType>(t) & static_cast<IntType>(u)); \
     } \
-    [[maybe_unused]] constexpr EnumType operator|(EnumType t, EnumType u) noexcept { \
-        return static_cast<EnumType>(static_cast<IntType>(t) | static_cast<IntType>(u)); \
+    [[maybe_unused]] constexpr BitmaskType operator|(BitmaskType t, BitmaskType u) noexcept { \
+        return static_cast<BitmaskType>(static_cast<IntType>(t) | static_cast<IntType>(u)); \
     } \
-    [[maybe_unused]] constexpr EnumType operator^(EnumType t, EnumType u) noexcept { \
-        return static_cast<EnumType>(static_cast<IntType>(t) ^ static_cast<IntType>(u)); \
+    [[maybe_unused]] constexpr BitmaskType operator^(BitmaskType t, BitmaskType u) noexcept { \
+        return static_cast<BitmaskType>(static_cast<IntType>(t) ^ static_cast<IntType>(u)); \
     } \
-    [[maybe_unused]] constexpr EnumType& operator&=(EnumType& t, EnumType u) noexcept { \
+    [[maybe_unused]] constexpr BitmaskType& operator&=(BitmaskType& t, BitmaskType u) noexcept { \
         return t = t & u; \
     } \
-    [[maybe_unused]] constexpr EnumType& operator|=(EnumType& t, EnumType u) noexcept { \
+    [[maybe_unused]] constexpr BitmaskType& operator|=(BitmaskType& t, BitmaskType u) noexcept { \
         return t = t | u; \
     } \
-    [[maybe_unused]] constexpr EnumType& operator^=(EnumType& t, EnumType u) noexcept { \
+    [[maybe_unused]] constexpr BitmaskType& operator^=(BitmaskType& t, BitmaskType u) noexcept { \
         return t = t ^ u; \
     }
 
 namespace RS {
+
+    template <typename T>
+    concept AutoBitmask = requires (const T t) {
+        { rs_core_bitmask_signature(t) };
+    };
+
+    template <typename T>
+    concept AutoEnum = AutoBitmask<T>
+        || requires (const T t) {
+            { rs_core_enum_signature(t) };
+        };
 
     namespace Detail {
 
@@ -129,6 +140,10 @@ namespace RS {
             sentence,
             title,
         };
+
+        template <AutoEnum T>
+        struct PoisonFormat<T>:
+        std::true_type {};
 
         constexpr bool is_enum_delimiter_char(char c) noexcept {
             return c == ' '
@@ -244,17 +259,6 @@ namespace RS {
         }
 
     }
-
-    template <typename T>
-    concept AutoBitmask = requires (T t) {
-        { rs_core_bitmask_signature(t) };
-    };
-
-    template <typename T>
-    concept AutoEnum = AutoBitmask<T>
-        || requires (T t) {
-            { rs_core_enum_signature(t) };
-        };
 
 }
 
