@@ -17,7 +17,6 @@
 #include <random>
 #include <ranges>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 namespace RS {
@@ -513,13 +512,20 @@ namespace RS {
         using result_type = T;
         using weight_type = W;
 
+        struct entry_type {
+            T value;
+            W weight;
+            template <std::convertible_to<T> U> entry_type(const U& u): value(u), weight(1) {}
+            template <std::convertible_to<T> U> entry_type(const U& u, W w): value(u), weight(w) {}
+        };
+
         WeightedChoice() = default;
-        WeightedChoice(std::initializer_list<std::pair<T, W>> list);
+        WeightedChoice(std::initializer_list<entry_type> list);
 
         template <std::uniform_random_bit_generator RNG>
             const T& operator()(RNG& rng) const; // UB if empty
 
-        void insert(const T& t, W w); // Ignored if w<=0
+        void insert(const T& t, W w = static_cast<W>(1)); // Ignored if w<=0
         std::size_t size() const noexcept { return map_.size(); }
         bool empty() const noexcept { return map_.empty(); }
 
@@ -533,7 +539,7 @@ namespace RS {
     };
 
         template <std::regular T, Arithmetic W>
-        WeightedChoice<T, W>::WeightedChoice(std::initializer_list<std::pair<T, W>> list) {
+        WeightedChoice<T, W>::WeightedChoice(std::initializer_list<entry_type> list) {
             W sum{};
             for (const auto& [t,w]: list) {
                 if (w > 0) {

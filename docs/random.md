@@ -256,11 +256,17 @@ template <std::regular T, Arithmetic W = int>
 class WeightedChoice {
     using result_type = T;
     using weight_type = W;
+    struct entry_type {
+        T value;
+        W weight;
+        template <std::convertible_to<T> U> entry_type(const U& u);
+        template <std::convertible_to<T> U> entry_type(const U& u, W w);
+    };
     WeightedChoice();
-    WeightedChoice(std::initializer_list<std::pair<T, W>> list);
+    WeightedChoice(std::initializer_list<entry_type> list);
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
-    void insert(const T& t, W w);
+    void insert(const T& t, W w = 1);
     std::size_t size() const noexcept;
     bool empty() const noexcept;
 };
@@ -268,8 +274,8 @@ class WeightedChoice {
 
 Selects a random item from a list of values and weights. The value-weight
 pairs can be supplied to the constructor as an explicit list of pairs, or one
-at a time through the `insert()` function. Pairs with a weight less than or
-equal to zero are discarded.
+at a time through the `insert()` function. The weight defaults to 1 if not
+explicitly supplied. Pairs with a zero or negative weight are discarded.
 
 The `size()` function returns the number of items in the list (note that this
 may include duplicate `T` values). Entries that were discarded because the

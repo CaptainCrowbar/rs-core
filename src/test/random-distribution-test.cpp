@@ -195,10 +195,10 @@ void test_rs_core_random_weighted_choice() {
     {
 
         WeightedChoice<std::string> choice {
-            {"Alpha",    10},
-            {"Bravo",    20},
-            {"Charlie",  30},
-            {"Delta",    40},
+            { "Alpha",    10 },
+            { "Bravo",    20 },
+            { "Charlie",  30 },
+            { "Delta",    40 },
         };
 
         std::minstd_rand rng(42);
@@ -215,6 +215,57 @@ void test_rs_core_random_weighted_choice() {
         TEST_NEAR(census["Bravo"] / total,    0.2, 0.02);
         TEST_NEAR(census["Charlie"] / total,  0.3, 0.02);
         TEST_NEAR(census["Delta"] / total,    0.4, 0.02);
+
+    }
+
+    {
+
+        WeightedChoice<std::string> choice;
+        std::minstd_rand rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        TRY(choice.insert("Alpha"));
+        TRY(choice.insert("Bravo"));
+        TRY(choice.insert("Charlie"));
+        TRY(choice.insert("Delta"));
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.25, 0.02);
+        TEST_NEAR(census["Bravo"] / total,    0.25, 0.02);
+        TEST_NEAR(census["Charlie"] / total,  0.25, 0.02);
+        TEST_NEAR(census["Delta"] / total,    0.25, 0.02);
+
+    }
+
+    {
+
+        WeightedChoice<std::string> choice {
+            "Alpha",
+            "Bravo",
+            "Charlie",
+            "Delta",
+        };
+
+        std::minstd_rand rng(42);
+        std::map<std::string, int> census;
+        std::string s;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(s = choice(rng));
+            TEST_MATCH(s, "^[A-E][a-z]+$");
+            ++census[s];
+        }
+
+        TEST_NEAR(census["Alpha"] / total,    0.25, 0.02);
+        TEST_NEAR(census["Bravo"] / total,    0.25, 0.02);
+        TEST_NEAR(census["Charlie"] / total,  0.25, 0.02);
+        TEST_NEAR(census["Delta"] / total,    0.25, 0.02);
 
     }
 
@@ -253,10 +304,10 @@ void test_rs_core_random_weighted_choice_floating_point() {
     {
 
         WeightedChoice<std::string, double> choice {
-            {"Alpha",    0.01},
-            {"Bravo",    0.02},
-            {"Charlie",  0.03},
-            {"Delta",    0.04},
+            { "Alpha",    0.01 },
+            { "Bravo",    0.02 },
+            { "Charlie",  0.03 },
+            { "Delta",    0.04 },
         };
 
         std::minstd_rand rng(42);
@@ -311,10 +362,10 @@ void test_rs_core_random_weighted_choice_mp_integer() {
     {
 
         WeightedChoice<std::string, Integer> choice {
-            {"Alpha",    10},
-            {"Bravo",    20},
-            {"Charlie",  30},
-            {"Delta",    40},
+            { "Alpha",    10 },
+            { "Bravo",    20 },
+            { "Charlie",  30 },
+            { "Delta",    40 },
         };
 
         std::minstd_rand rng(42);
