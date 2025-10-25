@@ -57,6 +57,26 @@ void test_rs_core_random_bernoulli_distribution() {
     {
 
         Pcg rng(42);
+        BernoulliDistribution dist(3, 4);
+
+        auto count = 0.0;
+        auto expect = 0.75 * nx;
+        bool x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            if (x) {
+                count += 1.0;
+            }
+        }
+
+        TEST_NEAR(count, expect, tolerance);
+
+    }
+
+    {
+
+        Pcg rng(42);
         BernoulliDistribution dist(300, 400);
 
         auto count = 0.0;
@@ -84,10 +104,10 @@ void test_rs_core_random_uniform_integer() {
     {
 
         std::minstd_rand rng(42);
-        UniformInteger<int> dist(1, 10);
+        UniformInteger<int> dist(10);
 
-        TEST_EQUAL(dist.min(), 1);
-        TEST_EQUAL(dist.max(), 10);
+        TEST_EQUAL(dist.min(), 0);
+        TEST_EQUAL(dist.max(), 9);
 
         std::unordered_map<int, int> census;
         int x{};
@@ -99,6 +119,7 @@ void test_rs_core_random_uniform_integer() {
             ++census[x];
         }
 
+        TEST_NEAR(census[0] / nx, 0.1, 0.01);
         TEST_NEAR(census[1] / nx, 0.1, 0.01);
         TEST_NEAR(census[2] / nx, 0.1, 0.01);
         TEST_NEAR(census[3] / nx, 0.1, 0.01);
@@ -108,7 +129,6 @@ void test_rs_core_random_uniform_integer() {
         TEST_NEAR(census[7] / nx, 0.1, 0.01);
         TEST_NEAR(census[8] / nx, 0.1, 0.01);
         TEST_NEAR(census[9] / nx, 0.1, 0.01);
-        TEST_NEAR(census[10] / nx, 0.1, 0.01);
 
     }
 

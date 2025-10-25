@@ -247,7 +247,7 @@ namespace RS {
 
         template <std::uniform_random_bit_generator RNG>
         constexpr bool BernoulliDistribution::operator()(RNG& rng) const {
-            return dist_(rng) <= threshold_;
+            return dist_(rng) < threshold_;
         }
 
     // Dice roll distribution
