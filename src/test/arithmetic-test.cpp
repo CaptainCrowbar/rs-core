@@ -163,7 +163,7 @@ void test_rs_core_arithmetic_euclidean_division() {
 
 }
 
-void test_rs_core_arithmetic_gcd_lcm_int() {
+void test_rs_core_arithmetic_gcd_lcm() {
 
     {
 
@@ -300,6 +300,34 @@ void test_rs_core_arithmetic_gcd_lcm_int() {
         x = 75_N;  y = 30_N;  TRY(z = lcm(x, y));  TEST_EQUAL(z, 150_N);
 
     }
+
+}
+
+void test_rs_core_arithmetic_int_power() {
+
+    int x{};
+    int y{};
+    int z{};
+
+    x = 3;  y = 0;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 1);
+    x = 3;  y = 1;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 3);
+    x = 3;  y = 2;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 9);
+    x = 3;  y = 3;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 27);
+    x = 3;  y = 4;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 81);
+    x = 3;  y = 5;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 243);
+    x = 3;  y = 6;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 729);
+    x = 3;  y = 7;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 2'187);
+    x = 3;  y = 8;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 6'561);
+    x = 3;  y = 9;   TRY(z = int_power(x, y));  TEST_EQUAL(z, 19'683);
+    x = 3;  y = 10;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 59'049);
+    x = 3;  y = 11;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 177'147);
+    x = 3;  y = 12;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 531'441);
+    x = 3;  y = 13;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 1'594'323);
+    x = 3;  y = 14;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 4'782'969);
+    x = 3;  y = 15;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 14'348'907);
+    x = 3;  y = 16;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 43'046'721);
+    x = 3;  y = 17;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 129'140'163);
+    x = 3;  y = 18;  TRY(z = int_power(x, y));  TEST_EQUAL(z, 387'420'489);
 
 }
 

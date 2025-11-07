@@ -4,6 +4,7 @@
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include <algorithm>
+#include <bit>
 #include <cerrno>
 #include <cmath>
 #include <concepts>
@@ -65,7 +66,7 @@ namespace RS {
     }
 
     template <typename T>
-    constexpr T gcd(const T& x, const T& y) {
+    constexpr T gcd(T x, T y) {
 
         auto a = x < T{0} ? T{0} - x : x;
         auto b = y < T{0} ? T{0} - y : y;
@@ -90,14 +91,50 @@ namespace RS {
     }
 
     template <typename T>
-    constexpr T lcm(const T& x, const T& y) {
+    constexpr T lcm(T x, T y) {
+
         if (x == T{0} || y == T{0}) {
+
             return T{0};
+
         } else {
+
             auto div = gcd(x, y);
             auto z = (x / div) * y;
+
             return z < T{0} ? T{0} - z : z;
+
         }
+
+    }
+
+    template <typename T>
+    constexpr T int_power(T x, int y) {
+
+        if (y == 0) {
+
+            return T{1};
+
+        } else if (y == 1) {
+
+            return x;
+
+        } else {
+
+            auto bits = std::bit_width(static_cast<unsigned>(y));
+            auto z = T{1};
+
+            for (auto bit = bits - 1; bit >= 0; --bit) {
+                z *= z;
+                if (((y >> bit) & 1) == 1) {
+                    z *= x;
+                }
+            }
+
+            return z;
+
+        }
+
     }
 
     // Bitmask functions

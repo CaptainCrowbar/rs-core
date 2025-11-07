@@ -25,8 +25,8 @@ undefined if the divisor is zero or if the correct result is outside the
 range of the type.
 
 ```c++
-template <typename T> constexpr T gcd(const T& x, const T& y);
-template <typename T> constexpr T lcm(const T& x, const T& y);
+template <typename T> constexpr T gcd(T x, T y);
+template <typename T> constexpr T lcm(T x, T y);
 ```
 
 Greatest common divisor and least common multiple algorithms. Generalized
@@ -37,6 +37,14 @@ If `T` is signed, the signs of the arguments are ignored. The `gcd()` function
 will return zero if both arguments are zero; `lcm()` will return zero if
 either argument is zero. For the `lcm()` function, behaviour is undefined if
 the correct result would be out of range for the type.
+
+```c++
+template <typename T> constexpr T int_power(T x, int y);
+```
+
+Calculates `x` to the power of `y` quickly using a binary algorithm. `T` can
+be any type that supports multiplication. Behaviour is undefined if `y` is
+negative, or if the result would be out of range for the return type.
 
 ## Bitmask operations
 
