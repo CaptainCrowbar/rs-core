@@ -3,6 +3,7 @@
 #include "rs-core/unit-test.hpp"
 #include <cmath>
 #include <cstdint>
+#include <format>
 #include <random>
 #include <unordered_map>
 
@@ -389,6 +390,37 @@ void test_rs_core_random_dice() {
 
         TEST_EQUAL(dist.min(), 1);
         TEST_EQUAL(dist.max(), 6);
+        TEST_EQUAL(dist.number(), 1);
+        TEST_EQUAL(dist.faces(), 6);
+        TEST_EQUAL(dist.str(), "1d6");
+        TEST_EQUAL(std::format("{}", dist), "1d6");
+
+        TEST_EQUAL(dist.pdf(0), 0);
+        TEST_NEAR(dist.pdf(1), 0.166'667, 1e-6);
+        TEST_NEAR(dist.pdf(2), 0.166'667, 1e-6);
+        TEST_NEAR(dist.pdf(3), 0.166'667, 1e-6);
+        TEST_NEAR(dist.pdf(4), 0.166'667, 1e-6);
+        TEST_NEAR(dist.pdf(5), 0.166'667, 1e-6);
+        TEST_NEAR(dist.pdf(6), 0.166'667, 1e-6);
+        TEST_EQUAL(dist.pdf(7), 0);
+
+        TEST_EQUAL(dist.cdf(0), 0);
+        TEST_NEAR(dist.cdf(1), 0.166'667, 1e-6);
+        TEST_NEAR(dist.cdf(2), 0.333'333, 1e-6);
+        TEST_NEAR(dist.cdf(3), 0.500'000, 1e-6);
+        TEST_NEAR(dist.cdf(4), 0.666'667, 1e-6);
+        TEST_NEAR(dist.cdf(5), 0.833'333, 1e-6);
+        TEST_EQUAL(dist.cdf(6), 1);
+        TEST_EQUAL(dist.cdf(7), 1);
+
+        TEST_EQUAL(dist.ccdf(0), 1);
+        TEST_EQUAL(dist.ccdf(1), 1);
+        TEST_NEAR(dist.ccdf(2), 0.833'333, 1e-6);
+        TEST_NEAR(dist.ccdf(3), 0.666'667, 1e-6);
+        TEST_NEAR(dist.ccdf(4), 0.500'000, 1e-6);
+        TEST_NEAR(dist.ccdf(5), 0.333'333, 1e-6);
+        TEST_NEAR(dist.ccdf(6), 0.166'667, 1e-6);
+        TEST_EQUAL(dist.ccdf(7), 0);
 
         std::unordered_map<int, int> census;
         int x{};
@@ -416,6 +448,67 @@ void test_rs_core_random_dice() {
 
         TEST_EQUAL(dist.min(), 3);
         TEST_EQUAL(dist.max(), 18);
+        TEST_EQUAL(dist.number(), 3);
+        TEST_EQUAL(dist.faces(), 6);
+        TEST_EQUAL(dist.str(), "3d6");
+        TEST_EQUAL(std::format("{}", dist), "3d6");
+
+        TEST_EQUAL(dist.pdf(2), 0);
+        TEST_NEAR(dist.pdf(3), 0.004'630, 1e-6);
+        TEST_NEAR(dist.pdf(4), 0.013'889, 1e-6);
+        TEST_NEAR(dist.pdf(5), 0.027'778, 1e-6);
+        TEST_NEAR(dist.pdf(6), 0.046'296, 1e-6);
+        TEST_NEAR(dist.pdf(7), 0.069'444, 1e-6);
+        TEST_NEAR(dist.pdf(8), 0.097'222, 1e-6);
+        TEST_NEAR(dist.pdf(9), 0.115'741, 1e-6);
+        TEST_NEAR(dist.pdf(10), 0.125'000, 1e-6);
+        TEST_NEAR(dist.pdf(11), 0.125'000, 1e-6);
+        TEST_NEAR(dist.pdf(12), 0.115'741, 1e-6);
+        TEST_NEAR(dist.pdf(13), 0.097'222, 1e-6);
+        TEST_NEAR(dist.pdf(14), 0.069'444, 1e-6);
+        TEST_NEAR(dist.pdf(15), 0.046'296, 1e-6);
+        TEST_NEAR(dist.pdf(16), 0.027'778, 1e-6);
+        TEST_NEAR(dist.pdf(17), 0.013'889, 1e-6);
+        TEST_NEAR(dist.pdf(18), 0.004'630, 1e-6);
+        TEST_EQUAL(dist.pdf(19), 0);
+
+        TEST_EQUAL(dist.cdf(2), 0);
+        TEST_NEAR(dist.cdf(3), 0.004'630, 1e-6);
+        TEST_NEAR(dist.cdf(4), 0.018'519, 1e-6);
+        TEST_NEAR(dist.cdf(5), 0.046'296, 1e-6);
+        TEST_NEAR(dist.cdf(6), 0.092'593, 1e-6);
+        TEST_NEAR(dist.cdf(7), 0.162'037, 1e-6);
+        TEST_NEAR(dist.cdf(8), 0.259'259, 1e-6);
+        TEST_NEAR(dist.cdf(9), 0.375'000, 1e-6);
+        TEST_NEAR(dist.cdf(10), 0.500'000, 1e-6);
+        TEST_NEAR(dist.cdf(11), 0.625'000, 1e-6);
+        TEST_NEAR(dist.cdf(12), 0.740'741, 1e-6);
+        TEST_NEAR(dist.cdf(13), 0.837'963, 1e-6);
+        TEST_NEAR(dist.cdf(14), 0.907'407, 1e-6);
+        TEST_NEAR(dist.cdf(15), 0.953'704, 1e-6);
+        TEST_NEAR(dist.cdf(16), 0.981'481, 1e-6);
+        TEST_NEAR(dist.cdf(17), 0.995'370, 1e-6);
+        TEST_EQUAL(dist.cdf(18), 1);
+        TEST_EQUAL(dist.cdf(19), 1);
+
+        TEST_EQUAL(dist.ccdf(2), 1);
+        TEST_EQUAL(dist.ccdf(3), 1);
+        TEST_NEAR(dist.ccdf(4), 0.995'370, 1e-6);
+        TEST_NEAR(dist.ccdf(5), 0.981'481, 1e-6);
+        TEST_NEAR(dist.ccdf(6), 0.953'704, 1e-6);
+        TEST_NEAR(dist.ccdf(7), 0.907'407, 1e-6);
+        TEST_NEAR(dist.ccdf(8), 0.837'963, 1e-6);
+        TEST_NEAR(dist.ccdf(9), 0.740'741, 1e-6);
+        TEST_NEAR(dist.ccdf(10), 0.625'000, 1e-6);
+        TEST_NEAR(dist.ccdf(11), 0.500'000, 1e-6);
+        TEST_NEAR(dist.ccdf(12), 0.375'000, 1e-6);
+        TEST_NEAR(dist.ccdf(13), 0.259'259, 1e-6);
+        TEST_NEAR(dist.ccdf(14), 0.162'037, 1e-6);
+        TEST_NEAR(dist.ccdf(15), 0.092'593, 1e-6);
+        TEST_NEAR(dist.ccdf(16), 0.046'296, 1e-6);
+        TEST_NEAR(dist.ccdf(17), 0.018'519, 1e-6);
+        TEST_NEAR(dist.ccdf(18), 0.004'630, 1e-6);
+        TEST_EQUAL(dist.ccdf(19), 0);
 
         int x{};
         double dx{};
@@ -446,6 +539,10 @@ void test_rs_core_random_dice() {
 
         TEST_EQUAL(dist.min(), 2);
         TEST_EQUAL(dist.max(), 200);
+        TEST_EQUAL(dist.number(), 2);
+        TEST_EQUAL(dist.faces(), 100);
+        TEST_EQUAL(dist.str(), "2d100");
+        TEST_EQUAL(std::format("{}", dist), "2d100");
 
         int x{};
         double dx{};

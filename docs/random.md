@@ -168,12 +168,26 @@ class Dice {
     constexpr T max() const noexcept;
     constexpr T number() const noexcept;
     constexpr T faces() const noexcept;
+    double pdf(T x) const;
+    double cdf(T x) const;
+    double ccdf(T x) const;
+    std::string str() const;
 };
+template <Integral T> class std::formatter<Dice<T>>;
 ```
 
 Generates the result of rolling `number` dice (default 1), each numbered from
 1 to `faces` (default 6). Behaviour is undefined if `number<0, faces<1,` or
 the maximum possible value is out of range for the return type.
+
+The `pdf(), cdf(),` and `ccdf()` functions calculate the probability density
+function, cumulative density function, and complementary cumulative density
+function. These correspond respectively to the probability of generating a
+result exactly equal to `x,` less than or equal to `x,` and greater than or
+equal to `x.`
+
+The `str()` function, and the formatter, return conventional dice notation,
+e.g. `"3d6"`.
 
 ### Uniform floating point distribution
 

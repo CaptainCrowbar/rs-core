@@ -24,6 +24,7 @@ void test_rs_core_arithmetic_try_parse_integers();
 void test_rs_core_arithmetic_parse_floating_point();
 void test_rs_core_arithmetic_parse_floating_point_maybe();
 void test_rs_core_arithmetic_try_parse_floating_point();
+void test_rs_core_arithmetic_binomial_coefficient();
 void test_rs_core_arithmetic_euclidean_division();
 void test_rs_core_arithmetic_gcd_lcm();
 void test_rs_core_arithmetic_int_power();
@@ -149,6 +150,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_arithmetic_parse_floating_point, "test_rs_core_arithmetic_parse_floating_point");
     call_me_maybe(test_rs_core_arithmetic_parse_floating_point_maybe, "test_rs_core_arithmetic_parse_floating_point_maybe");
     call_me_maybe(test_rs_core_arithmetic_try_parse_floating_point, "test_rs_core_arithmetic_try_parse_floating_point");
+    call_me_maybe(test_rs_core_arithmetic_binomial_coefficient, "test_rs_core_arithmetic_binomial_coefficient");
     call_me_maybe(test_rs_core_arithmetic_euclidean_division, "test_rs_core_arithmetic_euclidean_division");
     call_me_maybe(test_rs_core_arithmetic_gcd_lcm, "test_rs_core_arithmetic_gcd_lcm");
     call_me_maybe(test_rs_core_arithmetic_int_power, "test_rs_core_arithmetic_int_power");

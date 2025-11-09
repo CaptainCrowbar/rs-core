@@ -3,6 +3,7 @@
 #include "rs-core/character.hpp"
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
+#include "rs-core/mp-integer.hpp"
 #include <algorithm>
 #include <bit>
 #include <cerrno>
@@ -22,6 +23,36 @@
 namespace RS {
 
     // Arithmetic functions
+
+    template <typename T>
+    constexpr std::conditional_t<Integral<T>, double, T>
+    binomial(T a, T b) {
+
+        using R = std::conditional_t<Integral<T>, double, T>;
+
+        if (a < T{0} || b < T{0} || b > a) {
+            return R{0};
+        } else if (b == T{0} || b == a) {
+            return R{1};
+        } else if (b == T{1} || b == a - T{1}) {
+            return static_cast<R>(a);
+        }
+
+        auto result = static_cast<R>(a);
+        auto limit = std::min(b, a - b);
+        auto i = T{2};
+        auto j = a - T{1};
+
+        while (i <= limit) {
+            result *= static_cast<R>(j);
+            result /= static_cast<R>(i);
+            j -= T{1};
+            i += T{1};
+        }
+
+        return result;
+
+    }
 
     template <typename T>
     constexpr std::pair<T, T> euclidean_divide(T x, T y) {

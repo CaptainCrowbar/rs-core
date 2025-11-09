@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/arithmetic.hpp"
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/mp-integer.hpp"
@@ -10,6 +11,7 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <initializer_list>
 #include <iterator>
 #include <limits>
@@ -17,6 +19,7 @@
 #include <numbers>
 #include <random>
 #include <ranges>
+#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -268,6 +271,13 @@ namespace RS {
         constexpr T number() const noexcept { return number_; }
         constexpr T faces() const noexcept { return single_.max(); }
 
+        double pdf(T x) const;
+        double cdf(T x) const;
+        double ccdf(T x) const;
+
+        std::string str() const { return std::to_string(number_) + 'd' + std::to_string(faces()); }
+        std::string rs_core_format() const { return str(); }
+
     private:
 
         T number_;
@@ -283,6 +293,88 @@ namespace RS {
                 sum += single_(rng);
             }
             return sum;
+        }
+
+        template <Integral T>
+        double Dice<T>::pdf(T x) const {
+
+            auto n = number();
+            auto f = faces();
+
+            if (x < n || x > n * f) {
+                return 0.0;
+            }
+
+            auto sum = 0.0;
+            auto sign = 1.0;
+
+            for (auto i: std::views::iota(T{0}, n)) {
+                auto a = binomial(n, i);
+                auto b = binomial(x - f * i - T{1}, n - T{1});
+                sum += sign * a * b;
+                sign = - sign;
+            }
+
+            auto divisor = std::pow(static_cast<double>(f), static_cast<double>(n));
+
+            return sum / divisor;
+
+        }
+
+        template <Integral T>
+        double Dice<T>::cdf(T x) const {
+
+            auto n = number();
+            auto f = faces();
+
+            if (x < n) {
+                return 0.0;
+            } else if (x >= n * f) {
+                return 1.0;
+            }
+
+            auto sum = 0.0;
+            auto sign = 1.0;
+
+            for (auto i: std::views::iota(T{0}, n)) {
+                auto a = binomial(n, i);
+                auto b = binomial(x - f * i, n);
+                sum += sign * a * b;
+                sign = - sign;
+            }
+
+            auto divisor = std::pow(static_cast<double>(f), static_cast<double>(n));
+
+            return sum / divisor;
+
+        }
+
+        template <Integral T>
+        double Dice<T>::ccdf(T x) const {
+
+            auto n = number();
+            auto f = faces();
+
+            if (x <= n) {
+                return 1.0;
+            } else if (x > n * f) {
+                return 0.0;
+            }
+
+            auto sum = 0.0;
+            auto sign = 1.0;
+
+            for (auto i: std::views::iota(T{0}, n)) {
+                auto a = binomial(n, i);
+                auto b = binomial(f * (n - i) + n - x, n);
+                sum += sign * a * b;
+                sign = - sign;
+            }
+
+            auto divisor = std::pow(static_cast<double>(f), static_cast<double>(n));
+
+            return sum / divisor;
+
         }
 
     // Uniform floating point distribution

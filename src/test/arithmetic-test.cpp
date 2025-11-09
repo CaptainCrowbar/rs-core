@@ -9,6 +9,86 @@
 using namespace RS;
 using namespace RS::Literals;
 
+void test_rs_core_arithmetic_binomial_coefficient() {
+
+    TEST_EQUAL(binomial(0, -1),   0);
+    TEST_EQUAL(binomial(0, 0),    1);
+    TEST_EQUAL(binomial(0, 1),    0);
+    TEST_EQUAL(binomial(1, -1),   0);
+    TEST_EQUAL(binomial(1, 0),    1);
+    TEST_EQUAL(binomial(1, 1),    1);
+    TEST_EQUAL(binomial(1, 2),    0);
+    TEST_EQUAL(binomial(2, -1),   0);
+    TEST_EQUAL(binomial(2, 0),    1);
+    TEST_EQUAL(binomial(2, 1),    2);
+    TEST_EQUAL(binomial(2, 2),    1);
+    TEST_EQUAL(binomial(2, 3),    0);
+    TEST_EQUAL(binomial(3, -1),   0);
+    TEST_EQUAL(binomial(3, 0),    1);
+    TEST_EQUAL(binomial(3, 1),    3);
+    TEST_EQUAL(binomial(3, 2),    3);
+    TEST_EQUAL(binomial(3, 3),    1);
+    TEST_EQUAL(binomial(3, 4),    0);
+    TEST_EQUAL(binomial(4, -1),   0);
+    TEST_EQUAL(binomial(4, 0),    1);
+    TEST_EQUAL(binomial(4, 1),    4);
+    TEST_EQUAL(binomial(4, 2),    6);
+    TEST_EQUAL(binomial(4, 3),    4);
+    TEST_EQUAL(binomial(4, 4),    1);
+    TEST_EQUAL(binomial(4, 5),    0);
+    TEST_EQUAL(binomial(5, -1),   0);
+    TEST_EQUAL(binomial(5, 0),    1);
+    TEST_EQUAL(binomial(5, 1),    5);
+    TEST_EQUAL(binomial(5, 2),    10);
+    TEST_EQUAL(binomial(5, 3),    10);
+    TEST_EQUAL(binomial(5, 4),    5);
+    TEST_EQUAL(binomial(5, 5),    1);
+    TEST_EQUAL(binomial(5, 6),    0);
+    TEST_EQUAL(binomial(20, 0),   1);
+    TEST_EQUAL(binomial(20, 1),   20);
+    TEST_EQUAL(binomial(20, 2),   190);
+    TEST_EQUAL(binomial(20, 3),   1'140);
+    TEST_EQUAL(binomial(20, 4),   4'845);
+    TEST_EQUAL(binomial(20, 5),   15'504);
+    TEST_EQUAL(binomial(20, 6),   38'760);
+    TEST_EQUAL(binomial(20, 7),   77'520);
+    TEST_EQUAL(binomial(20, 8),   125'970);
+    TEST_EQUAL(binomial(20, 9),   167'960);
+    TEST_EQUAL(binomial(20, 10),  184'756);
+    TEST_EQUAL(binomial(20, 11),  167'960);
+    TEST_EQUAL(binomial(20, 12),  125'970);
+    TEST_EQUAL(binomial(20, 13),  77'520);
+    TEST_EQUAL(binomial(20, 14),  38'760);
+    TEST_EQUAL(binomial(20, 15),  15'504);
+    TEST_EQUAL(binomial(20, 16),  4'845);
+    TEST_EQUAL(binomial(20, 17),  1'140);
+    TEST_EQUAL(binomial(20, 18),  190);
+    TEST_EQUAL(binomial(20, 19),  20);
+    TEST_EQUAL(binomial(20, 20),  1);
+    TEST_EQUAL(binomial(97, 0),   1);
+    TEST_EQUAL(binomial(97, 1),   97);
+    TEST_EQUAL(binomial(97, 2),   4'656);
+    TEST_EQUAL(binomial(97, 3),   147'440);
+    TEST_EQUAL(binomial(97, 4),   3'464'840);
+    TEST_EQUAL(binomial(97, 5),   64'446'024);
+    TEST_EQUAL(binomial(97, 6),   988'172'368);
+    TEST_NEAR(binomial(97, 7),    1.284'624'078e10, 1e1);
+    TEST_NEAR(binomial(97, 8),    1.445'202'088e11, 1e2);
+    TEST_NEAR(binomial(97, 9),    1.429'144'287e12, 1e3);
+    TEST_NEAR(binomial(97, 10),   1.257'646'973e13, 1e4);
+    TEST_NEAR(binomial(97, 11),   9.946'844'239e13, 1e4);
+    TEST_NEAR(binomial(97, 12),   7.128'571'705e14, 1e5);
+    TEST_NEAR(binomial(97, 13),   4.660'989'192e15, 1e6);
+    TEST_NEAR(binomial(97, 14),   2.796'593'515e16, 1e7);
+    TEST_NEAR(binomial(97, 15),   1.547'448'412e17, 1e8);
+    TEST_NEAR(binomial(97, 16),   7.930'673'109e17, 1e8);
+    TEST_NEAR(binomial(97, 17),   3.778'732'482e18, 1e9);
+    TEST_NEAR(binomial(97, 18),   1.679'436'658e19, 1e10);
+    TEST_NEAR(binomial(97, 19),   6.982'920'843e19, 1e10);
+    TEST_NEAR(binomial(97, 20),   2.723'339'129e20, 1e11);
+
+}
+
 void test_rs_core_arithmetic_euclidean_division() {
 
     {

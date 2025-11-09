@@ -15,6 +15,15 @@ namespace RS;
 ## Arithmetic functions
 
 ```c++
+template <typename T> constexpr [see below] binomial(T a, T b);
+```
+
+Returns the binomial coefficient of `(a,b).` Returns zero if `a<0, b<0,` or
+`b>a.` The return type is `double` if `T` is integral, otherwise `T`.
+Behaviour is undefined if the correct result would be out of range for the
+return type.
+
+```c++
 template <typename T>
     constexpr std::pair<T, T> euclidean_divide(T x, T y);
 ```
