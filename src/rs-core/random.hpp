@@ -528,6 +528,44 @@ namespace RS {
 
     // Normal distribution
 
+    namespace Detail {
+
+        template <std::floating_point T>
+        T inverse_erfc(T x) noexcept {
+
+            using namespace std::numbers;
+
+            using Limits = std::numeric_limits<T>;
+
+            static constexpr auto epsilon = T{2} * Limits::epsilon();
+            static constexpr auto sqrtpi_over_2 = T{1} / (T{2} * inv_sqrtpi_v<T>);
+
+            static const auto inverse_derivative = [] (T x) {
+                return - sqrtpi_over_2 * std::exp(x * x);
+            };
+
+            if (x > T{1}) {
+                return - inverse_erfc(T{2} - x);
+            }
+
+            auto y = std::sqrt(- std::log(x));
+
+            for (;;) {
+                auto z = std::erfc(y) - x;
+                if (z == T{0}) {
+                    return y;
+                }
+                auto delta = - z * inverse_derivative(y);
+                if (std::abs(delta) < epsilon * std::abs(y)) {
+                    return y + delta / T{2};
+                }
+                y += delta;
+            }
+
+        }
+
+    }
+
     template <std::floating_point T>
     class NormalDistribution {
 
@@ -545,10 +583,20 @@ namespace RS {
         constexpr T mean() const noexcept { return mean_; }
         constexpr T sd() const noexcept { return sd_; }
 
+        T pdf(T x) const noexcept { return pdf_z((x - mean_) / sd_); }
+        T cdf(T x) const noexcept { return cdf_z((x - mean_) / sd_); }
+        T ccdf(T x) const noexcept { return cdf_z((mean_ - x) / sd_); }
+        T quantile(T p) const noexcept { return mean_ + sd_ * q_z(p); }
+        T cquantile(T q) const noexcept { return mean_ - sd_ * q_z(q); }
+
     private:
 
         T mean_{0};
         T sd_{1};
+
+        T pdf_z(T z) const noexcept;
+        T cdf_z(T z) const noexcept;
+        T q_z(T p) const noexcept;
 
     };
 
@@ -566,6 +614,26 @@ namespace RS {
             auto v = unit(rng);
             auto z = std::sqrt(T{-2} * std::log(u)) * std::cos(T{2} * pi_v<T> * v);
             return mean_ + z * sd_;
+        }
+
+        template <std::floating_point T>
+        T NormalDistribution<T>::pdf_z(T z) const noexcept {
+            using namespace std::numbers;
+            static constexpr auto k = inv_sqrtpi_v<T> / sqrt2_v<T>;
+            return k * std::exp(- z * z / T{2});
+        }
+
+        template <std::floating_point T>
+        T NormalDistribution<T>::cdf_z(T z) const noexcept {
+            using namespace std::numbers;
+            static constexpr auto k = T{1} / sqrt2_v<T>;
+            return std::erfc(- k * z) / T{2};
+        }
+
+        template <std::floating_point T>
+        T NormalDistribution<T>::q_z(T p) const noexcept {
+            using namespace std::numbers;
+            return - sqrt2_v<T> * Detail::inverse_erfc(T{2} * p);
         }
 
     // Random choice class

@@ -240,6 +240,11 @@ template <std::floating_point T> class NormalDistribution {
     constexpr T max() const noexcept;
     constexpr T mean() const noexcept;
     constexpr T sd() const noexcept;
+    T pdf(T x) const noexcept;
+    T cdf(T x) const noexcept;
+    T ccdf(T x) const noexcept;
+    T quantile(T p) const noexcept;
+    T cquantile(T q) const noexcept;
 };
 ```
 
@@ -248,7 +253,21 @@ function call operator is `const.` This uses the same algorithm regardless of
 the standard C++ implementation, but cannot guarantee predictable results
 because of nondeterministic floating point arithmetic.
 
-The default constructor sets the mean to 0 and the standard deviation to 1.
+The default constructor sets the mean to 0 and the standard deviation to 1. In
+the second constructor, the internal standard deviation is set to the
+absolute value of the `sd` argument.
+
+The five statistics functions are:
+
+* `pdf(x)` = Probability density function
+* `cdf(x)` = Cumulative density function = Probability of a result less than `x`
+* `ccdf(x)` = Complementary cumulative density function = Probability of a result greater than `x`
+* `quantile(p)` = Quantile function = Value of `x` for a given value of `cdf(x).`
+* `cquantile(q)` = Complementary quantile function = Value of `x` for a given value of `ccdf(x).`
+
+For all of the statistics functions, behaviour is undefined if the standard
+deviation is zero. For the quantile functions, behaviour is undefined if the
+argument is less than or equal to zero or greater than or equal to 1.
 
 ### Random choice class
 
