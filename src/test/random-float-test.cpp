@@ -136,3 +136,68 @@ void test_rs_core_random_uniform_real() {
     }
 
 }
+
+void test_rs_core_random_normal_distribution() {
+
+    static constexpr auto n = 1'000'000;
+    static constexpr auto nd = static_cast<double>(n);
+
+    {
+
+        std::minstd_rand rng(42);
+        NormalDistribution<double> dist;
+
+        TEST_EQUAL(dist.mean(), 0.0);
+        TEST_EQUAL(dist.sd(), 1.0);
+
+        auto tolerance = 5.0 * dist.sd() / std::sqrt(nd);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        double x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            sum += x;
+            sum2 += x * x;
+        }
+
+        auto mean = sum / nd;
+        auto sd = std::sqrt((nd / (nd - 1.0)) * (sum2 / nd - mean * mean));
+
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        NormalDistribution<double> dist(100, 50);
+
+        TEST_EQUAL(dist.mean(), 100.0);
+        TEST_EQUAL(dist.sd(), 50.0);
+
+        auto tolerance = 5.0 * dist.sd() / std::sqrt(nd);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        double x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            sum += x;
+            sum2 += x * x;
+        }
+
+        auto mean = sum / nd;
+        auto sd = std::sqrt((nd / (nd - 1.0)) * (sum2 / nd - mean * mean));
+
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
+
+    }
+
+}

@@ -14,6 +14,7 @@
 #include <iterator>
 #include <limits>
 #include <map>
+#include <numbers>
 #include <random>
 #include <ranges>
 #include <type_traits>
@@ -144,8 +145,7 @@ namespace RS {
         constexpr explicit UniformInteger(T range) noexcept: min_{0}, max_{range - 1} {} // UB if range<1
         constexpr explicit UniformInteger(T min, T max) noexcept;
 
-        template <std::uniform_random_bit_generator RNG>
-            constexpr T operator()(RNG& rng) const;
+        template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
 
         constexpr T min() const noexcept { return min_; }
         constexpr T max() const noexcept { return max_; }
@@ -222,8 +222,7 @@ namespace RS {
         constexpr explicit BernoulliDistribution(double p) noexcept;
         constexpr explicit BernoulliDistribution(std::uint64_t num, std::uint64_t den) noexcept;
 
-        template <std::uniform_random_bit_generator RNG>
-            constexpr bool operator()(RNG& rng) const;
+        template <std::uniform_random_bit_generator RNG> constexpr bool operator()(RNG& rng) const;
 
         constexpr static bool min() noexcept { return false; }
         constexpr static bool max() noexcept { return true; }
@@ -262,11 +261,12 @@ namespace RS {
         constexpr Dice() noexcept: Dice{T{1}, T{6}} {}
         constexpr explicit Dice(T number, T faces = T{6}) noexcept: number_(number), single_(T{1}, faces) {}
 
-        template <std::uniform_random_bit_generator RNG>
-            constexpr T operator()(RNG& rng) const;
+        template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
 
         constexpr T min() const noexcept { return number_; }
         constexpr T max() const noexcept { return number_ * single_.max(); }
+        constexpr T number() const noexcept { return number_; }
+        constexpr T faces() const noexcept { return single_.max(); }
 
     private:
 
@@ -348,8 +348,7 @@ namespace RS {
         constexpr explicit UniformReal(T range) noexcept: UniformReal(T{0}, range) {}
         constexpr explicit UniformReal(T min, T max) noexcept;
 
-        template <std::uniform_random_bit_generator RNG>
-            constexpr T operator()(RNG& rng) const;
+        template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
 
         constexpr T min() const noexcept { return min_; }
         constexpr T max() const noexcept { return max_; }
@@ -433,6 +432,48 @@ namespace RS {
 
             }
 
+        }
+
+    // Normal distribution
+
+    template <std::floating_point T>
+    class NormalDistribution {
+
+    public:
+
+        using result_type = T;
+
+        constexpr NormalDistribution() = default;
+        constexpr explicit NormalDistribution(T mean, T sd) noexcept;
+
+        template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
+
+        constexpr T min() const noexcept { return - std::numeric_limits<T>::infinity(); }
+        constexpr T max() const noexcept { return std::numeric_limits<T>::infinity(); }
+        constexpr T mean() const noexcept { return mean_; }
+        constexpr T sd() const noexcept { return sd_; }
+
+    private:
+
+        T mean_{0};
+        T sd_{1};
+
+    };
+
+        template <std::floating_point T>
+        constexpr NormalDistribution<T>::NormalDistribution(T mean, T sd) noexcept:
+        mean_(mean),
+        sd_(std::abs(sd)) {}
+
+        template <std::floating_point T>
+        template <std::uniform_random_bit_generator RNG>
+        constexpr T NormalDistribution<T>::operator()(RNG& rng) const {
+            using namespace std::numbers;
+            UniformReal<T> unit;
+            auto u = unit(rng);
+            auto v = unit(rng);
+            auto z = std::sqrt(T{-2} * std::log(u)) * std::cos(T{2} * pi_v<T> * v);
+            return mean_ + z * sd_;
         }
 
     // Random choice class

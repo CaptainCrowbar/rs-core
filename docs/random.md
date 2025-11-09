@@ -166,6 +166,8 @@ class Dice {
         constexpr T operator()(RNG& rng) const;
     constexpr T min() const noexcept;
     constexpr T max() const noexcept;
+    constexpr T number() const noexcept;
+    constexpr T faces() const noexcept;
 };
 ```
 
@@ -210,6 +212,29 @@ This uses
 _TODO: The current implementation does not fill all bits in floating point
 types larger than 64 bits; in these cases it simply generates a 64-bit
 result and casts to the result type._
+
+### Normal distribution
+
+```c++
+template <std::floating_point T> class NormalDistribution {
+    using result_type = T;
+    constexpr NormalDistribution() noexcept;
+    constexpr explicit NormalDistribution(T mean, T sd) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        constexpr T operator()(RNG& rng) const;
+    constexpr T min() const noexcept;
+    constexpr T max() const noexcept;
+    constexpr T mean() const noexcept;
+    constexpr T sd() const noexcept;
+};
+```
+
+This is functionally the same as `std::normal_distribution,` except that the
+function call operator is `const.` This uses the same algorithm regardless of
+the standard C++ implementation, but cannot guarantee predictable results
+because of nondeterministic floating point arithmetic.
+
+The default constructor sets the mean to 0 and the standard deviation to 1.
 
 ### Random choice class
 
