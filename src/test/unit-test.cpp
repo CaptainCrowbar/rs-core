@@ -123,8 +123,11 @@ void test_rs_core_uint128_parsing();
 void test_rs_core_uint128_formatting();
 void test_rs_core_uint128_arithmetic();
 void test_rs_core_uint128_bitwise_operations();
-void test_rs_core_uuid_class();
-void test_rs_core_uuid_random();
+void test_rs_core_uuid_conversion();
+void test_rs_core_uuid_variant_and_version();
+void test_rs_core_uuid_comparison();
+void test_rs_core_uuid_random_v4();
+void test_rs_core_uuid_random_v7();
 void test_rs_core_version();
 
 int main(int argc, char** argv) {
@@ -250,8 +253,11 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_uint128_formatting, "test_rs_core_uint128_formatting");
     call_me_maybe(test_rs_core_uint128_arithmetic, "test_rs_core_uint128_arithmetic");
     call_me_maybe(test_rs_core_uint128_bitwise_operations, "test_rs_core_uint128_bitwise_operations");
-    call_me_maybe(test_rs_core_uuid_class, "test_rs_core_uuid_class");
-    call_me_maybe(test_rs_core_uuid_random, "test_rs_core_uuid_random");
+    call_me_maybe(test_rs_core_uuid_conversion, "test_rs_core_uuid_conversion");
+    call_me_maybe(test_rs_core_uuid_variant_and_version, "test_rs_core_uuid_variant_and_version");
+    call_me_maybe(test_rs_core_uuid_comparison, "test_rs_core_uuid_comparison");
+    call_me_maybe(test_rs_core_uuid_random_v4, "test_rs_core_uuid_random_v4");
+    call_me_maybe(test_rs_core_uuid_random_v7, "test_rs_core_uuid_random_v7");
     call_me_maybe(test_rs_core_version, "test_rs_core_version");
 
     std::println("{}{}{}", xrule, rule, xreset);

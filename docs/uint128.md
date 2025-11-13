@@ -154,11 +154,13 @@ Return the high and low 64-bit halves of the value.
 
 ```c++
 std::string Uint128::str(int base = 10, std::size_t digits = 1) const;
+std::string Uint128::hex() const { return str(16, 32); }
 ```
 
 Formats the value as a string, in the specified base and with at least the
 specified number of digits. This will throw `std::out_of_range` if the base
-is out of range (2-36).
+is out of range (2-36). The `hex()` function displays the full length of the
+value as hex digits.
 
 ```c++
 template <> struct std::formatter<::RS::Uint128>;

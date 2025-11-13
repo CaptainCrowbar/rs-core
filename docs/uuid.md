@@ -37,6 +37,13 @@ constexpr Uuid::Uuid
 Constructor from an explicit list of bytes.
 
 ```c++
+constexpr explicit Uuid::Uuid(Uint128 u,
+    std::endian order = std::endian::big) noexcept;
+```
+
+Constructor from a 128-bit integer, in big or little endian byte order.
+
+```c++
 explicit Uuid::Uuid(std::string_view str);
 ```
 
@@ -76,6 +83,12 @@ These allow iteration over the bytes in a UUID, starting with the most
 significant.
 
 ```c++
+constexpr Uint128 as_integer(std::endian order = std::endian::big) const noexcept;
+```
+
+Copies the UUID into a 128-bit integer, in big or little endian byte order.
+
+```c++
 constexpr std::size_t Uuid::hash() const noexcept;
 struct std::hash<Uuid>;
 ```
@@ -92,10 +105,22 @@ These convert the UUID to a string, in the standard format:
 `"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".`
 
 ```c++
+constexpr int Uuid::variant() const noexcept;
 constexpr int Uuid::version() const noexcept;
+constexpr void Uuid::set_variant(int v) noexcept;
+constexpr void Uuid::set_version(int v) noexcept;
 ```
 
-Returns the UUID version.
+Query or set the UUID variant and version (type) fields. When setting either
+field, bits beyond the 4 least significant are masked out. When querying or
+setting the variant, the "don't care" bits of the variant field are masked
+out.
+
+```c++
+static constexpr Uuid Uuid::max() noexcept;
+```
+
+Returns the maximum UUID (all bits 1).
 
 ```c++
 static Uuid Uuid::read(const void* ptr) noexcept;
@@ -106,10 +131,11 @@ the pointer is null or does not point to a valid array of at least 16 bytes.
 
 ```c++
 template <std::uniform_random_bit_generator RNG>
-    static Uuid Uuid::random(RNG& rng);
+    static Uuid Uuid::random(RNG& rng, int type = 4);
 ```
 
-Generates a random type 4 UUID.
+Generates a random UUID. Only types 4 and 7 are supported; this will throw
+`std::invalid_argument` if `type` has any other value.
 
 ```c++
 constexpr bool operator==(const Uuid& u, const Uuid& v) noexcept;

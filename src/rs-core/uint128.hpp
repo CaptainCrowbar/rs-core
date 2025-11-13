@@ -57,6 +57,7 @@ namespace RS {
         constexpr word high() const noexcept { return hi_; }
         constexpr word low() const noexcept { return lo_; }
         std::string str(int base = 10, std::size_t digits = 1) const;
+        std::string hex() const { return str(16, 32); }
 
         friend constexpr bool operator==(Uint128 x, Uint128 y) noexcept = default;
         friend constexpr auto operator<=>(Uint128 x, Uint128 y) noexcept = default;

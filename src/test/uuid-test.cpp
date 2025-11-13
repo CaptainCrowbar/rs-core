@@ -1,16 +1,19 @@
 #include "rs-core/uuid.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/random.hpp"
+#include "rs-core/uint128.hpp"
 #include "rs-core/unit-test.hpp"
+#include <bit>
 #include <format>
 #include <stdexcept>
 #include <string>
 
 using namespace RS;
 
-void test_rs_core_uuid_class() {
+void test_rs_core_uuid_conversion() {
 
-    Uuid u, v, w, z;
+    Uuid u;
+    Uint128 x, y;
     std::string s;
 
     TEST_EQUAL(u.str(),                      "00000000-0000-0000-0000-000000000000");
@@ -33,9 +36,22 @@ void test_rs_core_uuid_class() {
     TEST_EQUAL(static_cast<std::string>(u),  "12345678-9abc-def0-1234-56789abcdef0");
     TEST_EQUAL(std::format("{}", u),         "12345678-9abc-def0-1234-56789abcdef0");
 
-    s = "abcdefghijklmnopqrstuvwxyz";
-    TRY(u = Uuid::read(s.data()));
-    TEST_EQUAL(u.str(), "61626364-6566-6768-696a-6b6c6d6e6f70");
+    TRY(u = Uuid::max());
+
+    TEST_EQUAL(u.str(),                      "ffffffff-ffff-ffff-ffff-ffffffffffff");
+    TEST_EQUAL(static_cast<std::string>(u),  "ffffffff-ffff-ffff-ffff-ffffffffffff");
+    TEST_EQUAL(std::format("{}", u),         "ffffffff-ffff-ffff-ffff-ffffffffffff");
+
+    TRY((x = Uint128{"123456789abcdef12345fedcba987654", 16}));
+    TRY((u = Uuid{x}));
+    TEST_EQUAL(u.str(), "12345678-9abc-def1-2345-fedcba987654");
+    TRY(y = u.as_integer());
+    TEST_EQUAL(y.hex(), "123456789abcdef12345fedcba987654");
+    TRY(y = u.as_integer(std::endian::little));
+    TEST_EQUAL(y.hex(), "547698badcfe4523f1debc9a78563412");
+
+    TRY((u = Uuid{x, std::endian::little}));
+    TEST_EQUAL(u.str(), "547698ba-dcfe-4523-f1de-bc9a78563412");
 
     TRY(u = Uuid(""));                                                                                   TEST_EQUAL(u.str(), "00000000-0000-0000-0000-000000000000");
     TRY(u = Uuid("123456789abcdef123456789abcdef12"));                                                   TEST_EQUAL(u.str(), "12345678-9abc-def1-2345-6789abcdef12");
@@ -50,6 +66,54 @@ void test_rs_core_uuid_class() {
     TEST_THROW(u = Uuid("123456789abcdef123456789abcdef123"),     std::invalid_argument,  "Invalid UUID");
     TEST_THROW(u = Uuid("123456789abcdef123456789abcdef1234"),    std::invalid_argument,  "Invalid UUID");
     TEST_THROW(u = Uuid("123456789-abc-def1-2345-6789abcdef12"),  std::invalid_argument,  "Invalid UUID");
+
+    s = "abcdefghijklmnopqrstuvwxyz";
+    TRY(u = Uuid::read(s.data()));
+    TEST_EQUAL(u.str(), "61626364-6566-6768-696a-6b6c6d6e6f70");
+
+}
+
+void test_rs_core_uuid_variant_and_version() {
+
+    Uuid u;
+
+    TEST_EQUAL(u.str(), "00000000-0000-0000-0000-000000000000");
+    TEST_EQUAL(u.variant(), 0);
+    TEST_EQUAL(u.version(), 0);
+    TRY(u.set_variant(15));
+    TRY(u.set_version(4));
+    TEST_EQUAL(u.str(), "00000000-0000-4000-e000-000000000000");
+    TEST_EQUAL(u.variant(), 14);
+    TEST_EQUAL(u.version(), 4);
+
+    TRY(u = Uuid::max());
+
+    TEST_EQUAL(u.str(), "ffffffff-ffff-ffff-ffff-ffffffffffff");
+    TEST_EQUAL(u.variant(), 14);
+    TEST_EQUAL(u.version(), 15);
+    TRY(u.set_variant(8));
+    TRY(u.set_version(7));
+    TEST_EQUAL(u.str(), "ffffffff-ffff-7fff-bfff-ffffffffffff");
+    TEST_EQUAL(u.variant(), 8);
+    TEST_EQUAL(u.version(), 7);
+
+    TRY((u = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}));
+
+    TEST_EQUAL(u.str(), "01020304-0506-0708-090a-0b0c0d0e0f10");
+    TEST_EQUAL(u.variant(), 0);
+    TEST_EQUAL(u.version(), 0);
+
+    TRY((u = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}));
+
+    TEST_EQUAL(u.str(), "12345678-9abc-def0-1234-56789abcdef0");
+    TEST_EQUAL(u.variant(), 0);
+    TEST_EQUAL(u.version(), 13);
+
+}
+
+void test_rs_core_uuid_comparison() {
+
+    Uuid u, v, w, z;
 
     TRY((u = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf1, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef, 0x12}));
     TRY((v = {0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf1, 0x23, 0x45, 0x67, 0x89, 0xab}));
@@ -70,9 +134,9 @@ void test_rs_core_uuid_class() {
 
 }
 
-void test_rs_core_uuid_random() {
+void test_rs_core_uuid_random_v4() {
 
-    static constexpr auto iterations = 20;
+    static constexpr auto iterations = 1000;
 
     Uuid u, v;
     std::string s;
@@ -81,9 +145,29 @@ void test_rs_core_uuid_random() {
     for (auto i = 0; i < iterations; ++i) {
         TRY(u = Uuid::random(rng));
         TEST(u != v);
+        TEST_EQUAL(u.variant(), 8);
         TEST_EQUAL(u.version(), 4);
         TRY(s = u.str());
         TEST_MATCH(s, "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
+    }
+
+}
+
+void test_rs_core_uuid_random_v7() {
+
+    static constexpr auto iterations = 1000;
+
+    Uuid u, v;
+    std::string s;
+    Pcg rng;
+
+    for (auto i = 0; i < iterations; ++i) {
+        TRY(u = Uuid::random(rng, 7));
+        TEST(u != v);
+        TEST_EQUAL(u.variant(), 8);
+        TEST_EQUAL(u.version(), 7);
+        TRY(s = u.str());
+        TEST_MATCH(s, "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$");
     }
 
 }
