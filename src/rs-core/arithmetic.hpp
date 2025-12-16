@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <format>
 #include <limits>
+#include <numbers>
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -262,6 +263,27 @@ namespace RS {
         } else {
             return {};
         }
+    }
+
+    template <std::floating_point T>
+    constexpr T degrees(T rad) noexcept {
+        return rad * T{180} * std::numbers::inv_pi_v<T>;
+    }
+
+    template <std::floating_point T>
+    constexpr T radians(T deg) noexcept {
+        return deg * std::numbers::pi_v<T> / T{180};
+    }
+
+    namespace Literals {
+
+        constexpr float operator""_degf(long double rad) noexcept { return radians(static_cast<float>(rad)); }
+        constexpr float operator""_degf(unsigned long long rad) noexcept { return radians(static_cast<float>(rad)); }
+        constexpr double operator""_deg(long double rad) noexcept { return radians(static_cast<double>(rad)); }
+        constexpr double operator""_deg(unsigned long long rad) noexcept { return radians(static_cast<double>(rad)); }
+        constexpr long double operator""_degld(long double rad) noexcept { return radians(rad); }
+        constexpr long double operator""_degld(unsigned long long rad) noexcept { return radians(static_cast<long double>(rad)); }
+
     }
 
     // Integer literals

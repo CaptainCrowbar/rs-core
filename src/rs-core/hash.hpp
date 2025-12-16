@@ -47,7 +47,7 @@ namespace RS {
     requires (std::convertible_to<std::ranges::range_value_t<Range>, std::size_t>)
     std::size_t hash_mix(const Range& range, std::size_t init = 0) {
         for (auto x: range) {
-            init = hash_mix(init, x);
+            init = hash_mix(init, static_cast<std::size_t>(x));
         }
         return init;
     }

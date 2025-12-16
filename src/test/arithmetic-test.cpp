@@ -2,12 +2,14 @@
 #include "rs-core/mp-integer.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cstdint>
+#include <numbers>
 #include <numeric>
 #include <optional>
 #include <tuple>
 
 using namespace RS;
 using namespace RS::Literals;
+using std::numbers::pi;
 
 void test_rs_core_arithmetic_binomial_coefficient() {
 
@@ -553,6 +555,27 @@ void test_rs_core_arithmetic_checked_cast() {
     u32 = 32768;  TRY(oi = checked_cast<std::int16_t>(u32));  TEST(! oi);
     u32 = 65535;  TRY(oi = checked_cast<std::int16_t>(u32));  TEST(! oi);
     u32 = 65536;  TRY(oi = checked_cast<std::int16_t>(u32));  TEST(! oi);
+
+}
+
+void test_rs_core_arithmetic_angle_conversions() {
+
+    TEST_NEAR(degrees(0.0),     0,       1e-10);
+    TEST_NEAR(degrees(pi / 2),  90,      1e-10);
+    TEST_NEAR(degrees(pi),      180,     1e-10);
+    TEST_NEAR(degrees(2 * pi),  360,     1e-10);
+    TEST_NEAR(radians(0.0),     0,       1e-10);
+    TEST_NEAR(radians(90.0),    pi / 2,  1e-10);
+    TEST_NEAR(radians(180.0),   pi,      1e-10);
+    TEST_NEAR(radians(360.0),   2 * pi,  1e-10);
+    TEST_NEAR(0_deg,            0,       1e-10);
+    TEST_NEAR(90_deg,           pi / 2,  1e-10);
+    TEST_NEAR(180_deg,          pi,      1e-10);
+    TEST_NEAR(360_deg,          2 * pi,  1e-10);
+    TEST_NEAR(0.0_deg,          0,       1e-10);
+    TEST_NEAR(90.0_deg,         pi / 2,  1e-10);
+    TEST_NEAR(180.0_deg,        pi,      1e-10);
+    TEST_NEAR(360.0_deg,        2 * pi,  1e-10);
 
 }
 

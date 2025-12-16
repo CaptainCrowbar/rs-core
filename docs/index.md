@@ -14,27 +14,33 @@ Requires C++23. Not yet tested on all compilers.
 
 ## Index of headers
 
-* [`rs-core/global.hpp` -- Global utilities](global.html)
-* [`rs-core/alias.hpp` -- Hard type alias](alias.html)
-* [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
-* [`rs-core/character.hpp` -- Character functions](character.html)
-* [`rs-core/constants.hpp` -- Physical constants](constants.html)
-* [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
-* [`rs-core/format.hpp` -- Formatting helpers](format.html)
-* [`rs-core/hash.hpp` -- Hash functions](hash.html)
-* [`rs-core/io.hpp` -- I/O utilities](io.html)
-* [`rs-core/iterator.hpp` -- Iterator base classes](iterator.html)
-* [`rs-core/log.hpp` -- Logging](log.html)
-* [`rs-core/markup.hpp` -- Text markup](markup.html)
-* [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
-* [`rs-core/random.hpp` -- Random number generators](random.html)
-* [`rs-core/rational.hpp` -- Rational numbers](rational.html)
-* [`rs-core/scope.hpp` -- Scope guards](scope.html)
-* [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
-* [`rs-core/typename.hpp` -- Type names](typename.html)
-* [`rs-core/uint128.hpp` -- 129-bit integers](uint128.html)
-* [`rs-core/uuid.hpp` -- UUID class](uuid.html)
-* [`rs-core/version.hpp` -- Version information](version.html)
+* General utilities
+    * [`rs-core/global.hpp` -- Global utilities](global.html)
+    * [`rs-core/hash.hpp` -- Hash functions](hash.html)
+    * [`rs-core/scope.hpp` -- Scope guards](scope.html)
+    * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
+    * [`rs-core/version.hpp` -- Version information](version.html)
+* I/O utilities
+    * [`rs-core/io.hpp` -- I/O utilities](io.html)
+    * [`rs-core/log.hpp` -- Logging](log.html)
+    * [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
+* Mathematical utilities
+    * [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
+    * [`rs-core/constants.hpp` -- Physical constants](constants.html)
+    * [`rs-core/linear-algebra.hpp` -- Linear algebra](linear-algebra.html)
+    * [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
+    * [`rs-core/random.hpp` -- Random number generators](random.html)
+    * [`rs-core/rational.hpp` -- Rational numbers](rational.html)
+    * [`rs-core/uint128.hpp` -- 129-bit integers](uint128.html)
+* Text utilities
+    * [`rs-core/character.hpp` -- Character functions](character.html)
+    * [`rs-core/format.hpp` -- Formatting helpers](format.html)
+    * [`rs-core/markup.hpp` -- Text markup](markup.html)
+* Type system utilities
+    * [`rs-core/alias.hpp` -- Hard type alias](alias.html)
+    * [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
+    * [`rs-core/iterator.hpp` -- Iterator base classes](iterator.html)
+    * [`rs-core/typename.hpp` -- Type names](typename.html)
 
 ## Using the library
 

@@ -82,6 +82,21 @@ template <std::integral To, std::integral From>
 Convert an integer to a different type, returning null if the argument is out
 of range for the return type.
 
+```c++
+template <std::floating_point T> constexpr T degrees(T rad) noexcept;
+template <std::floating_point T> constexpr T radians(T deg) noexcept;
+namespace Literals {
+    constexpr float operator""_degf(long double rad) noexcept;
+    constexpr float operator""_degf(unsigned long long rad) noexcept;
+    constexpr double operator""_deg(long double rad) noexcept;
+    constexpr double operator""_deg(unsigned long long rad) noexcept;
+    constexpr long double operator""_degld(long double rad) noexcept;
+    constexpr long double operator""_degld(unsigned long long rad) noexcept;
+}
+```
+
+Degree/radian conversions.
+
 ## Integer literals
 
 ```c++
