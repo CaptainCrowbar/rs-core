@@ -60,6 +60,7 @@ void test_rs_core_iterator_forward_iterators();
 void test_rs_core_iterator_bidirectional_iterators();
 void test_rs_core_iterator_random_access_iterators();
 void test_rs_core_iterator_contiguous_iterators();
+void test_rs_linear_algebra_concepts();
 void test_rs_linear_algebra_vector_integer_construction();
 void test_rs_linear_algebra_vector_integer_arithmetic();
 void test_rs_linear_algebra_vector_integer_hash();
@@ -206,6 +207,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_iterator_bidirectional_iterators, "test_rs_core_iterator_bidirectional_iterators");
     call_me_maybe(test_rs_core_iterator_random_access_iterators, "test_rs_core_iterator_random_access_iterators");
     call_me_maybe(test_rs_core_iterator_contiguous_iterators, "test_rs_core_iterator_contiguous_iterators");
+    call_me_maybe(test_rs_linear_algebra_concepts, "test_rs_linear_algebra_concepts");
     call_me_maybe(test_rs_linear_algebra_vector_integer_construction, "test_rs_linear_algebra_vector_integer_construction");
     call_me_maybe(test_rs_linear_algebra_vector_integer_arithmetic, "test_rs_linear_algebra_vector_integer_arithmetic");
     call_me_maybe(test_rs_linear_algebra_vector_integer_hash, "test_rs_linear_algebra_vector_integer_hash");

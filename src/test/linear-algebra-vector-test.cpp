@@ -9,6 +9,22 @@
 using namespace RS;
 using std::numbers::pi;
 
+void test_rs_linear_algebra_concepts() {
+
+    static_assert(Scalar<signed char>);
+    static_assert(Scalar<unsigned char>);
+    static_assert(Scalar<int>);
+    static_assert(Scalar<unsigned>);
+    static_assert(Scalar<long>);
+    static_assert(Scalar<unsigned long>);
+    static_assert(Scalar<long long>);
+    static_assert(Scalar<unsigned long long>);
+    static_assert(Scalar<float>);
+    static_assert(Scalar<double>);
+    static_assert(Scalar<long double>);
+
+}
+
 void test_rs_linear_algebra_vector_integer_construction() {
 
     Int3 v1, v2, v3;

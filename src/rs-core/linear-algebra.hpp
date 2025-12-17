@@ -18,13 +18,31 @@
 
 namespace RS {
 
+    // Concepts
+
+    template <typename T>
+    concept Scalar = std::constructible_from<T, int>
+        && std::equality_comparable<T>
+        && std::regular<T>
+        && std::three_way_comparable<T>
+        && requires (const T t, T& tr) {
+            { tr += t } -> std::convertible_to<T&>;
+            { tr -= t } -> std::convertible_to<T&>;
+            { tr *= t } -> std::convertible_to<T&>;
+            { tr /= t } -> std::convertible_to<T&>;
+            { t + t } -> std::convertible_to<T>;
+            { t - t } -> std::convertible_to<T>;
+            { t * t } -> std::convertible_to<T>;
+            { t / t } -> std::convertible_to<T>;
+        };
+
     // Supporting types
 
     RS_ENUM(MatrixLayout, int, column, row)
 
     // Vector class
 
-    template <typename T, std::size_t N>
+    template <Scalar T, std::size_t N>
     class Vector {
 
     public:
@@ -131,7 +149,7 @@ namespace RS {
     using Ldouble3 = Vector<long double, 3>;
     using Ldouble4 = Vector<long double, 4>;
 
-    template <typename T, std::size_t N>
+    template <Scalar T, std::size_t N>
     constexpr Vector<T, N> clampv(const Vector<T, N>& x, const Vector<T, N>& min, const Vector<T, N>& max) noexcept {
         Vector<T, N> y;
         for (auto i = 0uz; i < N; ++i) {
@@ -140,7 +158,7 @@ namespace RS {
         return y;
     }
 
-    template <typename T, std::size_t N>
+    template <Scalar T, std::size_t N>
     constexpr Vector<T, N> minv(const Vector<T, N>& x, const Vector<T, N>& y) noexcept {
         Vector<T, N> z;
         for (auto i = 0uz; i < N; ++i) {
@@ -149,7 +167,7 @@ namespace RS {
         return z;
     }
 
-    template <typename T, std::size_t N>
+    template <Scalar T, std::size_t N>
     constexpr Vector<T, N> maxv(const Vector<T, N>& x, const Vector<T, N>& y) noexcept {
         Vector<T, N> z;
         for (auto i = 0uz; i < N; ++i) {
@@ -158,7 +176,7 @@ namespace RS {
         return z;
     }
 
-    template <typename T, std::size_t N>
+    template <Scalar T, std::size_t N>
     constexpr std::pair<Vector<T, N>, Vector<T, N>> minmaxv(const Vector<T, N>& x, const Vector<T, N>& y) noexcept {
         std::pair<Vector<T, N>, Vector<T, N>> pair;
         for (auto i = 0uz; i < N; ++i) {
@@ -167,7 +185,7 @@ namespace RS {
         return pair;
     }
 
-    template <typename T, std::size_t N, typename U>
+    template <Scalar T, std::size_t N, Scalar U>
     constexpr Vector<T, N> lerp(const Vector<T, N>& a, const Vector<T, N>& b, U x) noexcept {
         Vector<T, N> result;
         for (auto i = 0uz; i < N; ++i) {
@@ -180,10 +198,10 @@ namespace RS {
 
     namespace Detail {
 
-        template <typename T, std::size_t N, MatrixLayout L>
+        template <Scalar T, std::size_t N, MatrixLayout L>
         struct MatrixLayoutTraits;
 
-        template <typename T, std::size_t N>
+        template <Scalar T, std::size_t N>
         struct MatrixLayoutTraits<T, N, MatrixLayout::column> {
 
             using V = Vector<T, N>;
@@ -231,7 +249,7 @@ namespace RS {
 
         };
 
-        template <typename T, std::size_t N>
+        template <Scalar T, std::size_t N>
         struct MatrixLayoutTraits<T, N, MatrixLayout::row> {
 
             using V = Vector<T, N>;
@@ -282,7 +300,7 @@ namespace RS {
 
     }
 
-    template <typename T, std::size_t N, MatrixLayout L = MatrixLayout::column>
+    template <Scalar T, std::size_t N, MatrixLayout L = MatrixLayout::column>
     class Matrix {
 
     private:
@@ -384,7 +402,7 @@ namespace RS {
     using Ldouble3x3r = Matrix<long double, 3, MatrixLayout::row>;
     using Ldouble4x4r = Matrix<long double, 4, MatrixLayout::row>;
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Matrix<T, N, L> operator*(const Matrix<T, N, L>& a, const Matrix<T, N, L>& b) noexcept {
         Matrix<T, N, L> m;
         for (auto r = 0uz; r < N; ++r) {
@@ -397,7 +415,7 @@ namespace RS {
         return m;
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Vector<T, N> operator*(const Matrix<T, N, L>& a, const Vector<T, N>& b) noexcept {
         Vector<T, N> v;
         for (auto r = 0uz; r < N; ++r) {
@@ -408,7 +426,7 @@ namespace RS {
         return v;
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Vector<T, N> operator*(const Vector<T, N>& a, const Matrix<T, N, L>& b) noexcept {
         Vector<T, N> v;
         for (auto r = 0uz; r < N; ++r) {
@@ -419,21 +437,21 @@ namespace RS {
         return v;
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Matrix<T, N, L> Matrix<T, N, L>::swap_columns(std::size_t c1, std::size_t c2) const noexcept {
         auto m = *this;
         layout_traits::swap_columns(m.begin(), c1, c2);
         return m;
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Matrix<T, N, L> Matrix<T, N, L>::swap_rows(std::size_t r1, std::size_t r2) const noexcept {
         auto m = *this;
         layout_traits::swap_rows(m.begin(), r1, r2);
         return m;
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr T Matrix<T, N, L>::det() const noexcept {
 
         auto& v = *this;
@@ -490,7 +508,7 @@ namespace RS {
 
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Matrix<T, N, L> Matrix<T, N, L>::inverse() const noexcept {
 
         auto& m = *this;
@@ -566,7 +584,7 @@ namespace RS {
 
     }
 
-    template <typename T, std::size_t N, MatrixLayout L>
+    template <Scalar T, std::size_t N, MatrixLayout L>
     constexpr Matrix<T, N, L> Matrix<T, N, L>::transposed() const noexcept {
         Matrix m;
         for (auto r = 0uz; r < N; ++r) {
@@ -579,7 +597,7 @@ namespace RS {
 
     // Quaternion class
 
-    template <typename T>
+    template <Scalar T>
     class Quaternion {
 
     public:
@@ -643,7 +661,7 @@ namespace RS {
     using Qdouble = Quaternion<double>;
     using Qldouble = Quaternion<long double>;
 
-    template <typename T>
+    template <Scalar T>
     constexpr Quaternion<T> operator*(const Quaternion<T>& x, const Quaternion<T>& y) noexcept {
         return {
             x.a() * y.a() - x.b() * y.b() - x.c() * y.c() - x.d() * y.d(),
@@ -655,27 +673,27 @@ namespace RS {
 
     // Coordinate transformations
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 2> cartesian_to_polar(const Vector<T, 2>& xy) noexcept {
         using std::atan2;
         return {xy.r(), atan2(xy[1], xy[0])};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 2> polar_to_cartesian(const Vector<T, 2>& rt) noexcept {
         using std::cos;
         using std::sin;
         return {rt[0] * cos(rt[1]), rt[0] * sin(rt[1])};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> cartesian_to_cylindrical(const Vector<T, 3>& xyz) noexcept {
         using std::atan2;
         using std::sqrt;
         return {sqrt(xyz[0] * xyz[0] + xyz[1] * xyz[1]), atan2(xyz[1], xyz[0]), xyz[2]};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> cartesian_to_spherical(const Vector<T, 3>& xyz) noexcept {
         using std::atan2;
         using std::sqrt;
@@ -683,21 +701,21 @@ namespace RS {
         return {xyz.r(), atan2(xyz[1], xyz[0]), atan2(rho, xyz[2])};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> cylindrical_to_cartesian(const Vector<T, 3>& rpz) noexcept {
         using std::cos;
         using std::sin;
         return {rpz[0] * cos(rpz[1]), rpz[0] * sin(rpz[1]), rpz[2]};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> cylindrical_to_spherical(const Vector<T, 3>& rpz) noexcept {
         using std::atan2;
         using std::sqrt;
         return {sqrt(rpz[0] * rpz[0] + rpz[2] * rpz[2]), rpz[1], atan2(rpz[0], rpz[2])};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> spherical_to_cartesian(const Vector<T, 3>& rpt) noexcept {
         using std::cos;
         using std::sin;
@@ -705,7 +723,7 @@ namespace RS {
         return {rho * cos(rpt[1]), rho * sin(rpt[1]), rpt[0] * cos(rpt[2])};
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> spherical_to_cylindrical(const Vector<T, 3>& rpt) noexcept {
         using std::cos;
         using std::sin;
@@ -714,22 +732,22 @@ namespace RS {
 
     // Projective geometry
 
-    template <typename T>
+    template <Scalar T>
     inline Vector<T, 4> vector4(const Vector<T, 3>& v, T w) noexcept {
         return {v.x(), v.y(), v.z(), w};
     }
 
-    template <typename T>
+    template <Scalar T>
     inline Vector<T, 4> point4(const Vector<T, 3>& v) noexcept {
         return vector4(v, T{1});
     }
 
-    template <typename T>
+    template <Scalar T>
     inline Vector<T, 4> normal4(const Vector<T, 3>& v) noexcept {
         return vector4(v, T{0});
     }
 
-    template <typename T>
+    template <Scalar T>
     inline Vector<T, 3> point3(const Vector<T, 4>& v) noexcept {
         Vector<T, 3> u{v.x(), v.y(), v.z()};
         if (v.w() != T{0}) {
@@ -738,12 +756,12 @@ namespace RS {
         return u;
     }
 
-    template <typename T>
+    template <Scalar T>
     inline Vector<T, 3> normal3(const Vector<T, 4>& v) noexcept {
         return {v.x(), v.y(), v.z()};
     }
 
-    template <typename T, MatrixLayout L>
+    template <Scalar T, MatrixLayout L>
     Matrix<T, 4, L> make_transform(const Matrix<T, 3, L>& m, const Vector<T, 3>& v) noexcept {
         auto t = Matrix<T, 4, L>::identity();
         for (auto r = 0uz; r < 3uz; ++r) {
@@ -755,14 +773,14 @@ namespace RS {
         return t;
     }
 
-    template <typename T, MatrixLayout L>
+    template <Scalar T, MatrixLayout L>
     inline Matrix<T, 4, L> normal_transform(const Matrix<T, 4, L>& m) noexcept {
         return m.inverse().transposed();
     }
 
     // Primitive transformations
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 3> rotate3(T angle, std::size_t index) noexcept {
         auto c = std::cos(angle);
         auto s = std::sin(angle);
@@ -776,7 +794,7 @@ namespace RS {
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 4> rotate4(T angle, std::size_t index) noexcept {
         auto c = std::cos(angle);
         auto s = std::sin(angle);
@@ -790,12 +808,12 @@ namespace RS {
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 3> scale3(T t) noexcept {
         return Matrix<T, 3>{t, T{0}};
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 3> scale3(const Vector<T, 3>& v) noexcept {
         Matrix<T, 3> m;
         for (auto i = 0uz; i < 3uz; ++i) {
@@ -804,14 +822,14 @@ namespace RS {
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 4> scale4(T t) noexcept {
         Matrix<T, 4> m{t, T{0}};
         m[3, 3] = T{1};
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 4> scale4(const Vector<T, 3>& v) noexcept {
         Matrix<T, 4> m;
         for (auto i = 0uz; i < 3uz; ++i) {
@@ -821,7 +839,7 @@ namespace RS {
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 4> translate4(const Vector<T, 3>& v) noexcept {
         auto m = Matrix<T, 4>::identity();
         for (auto i = 0uz; i < 3uz; ++i) {
@@ -834,7 +852,7 @@ namespace RS {
 
     namespace Detail {
 
-        template <typename T, std::size_t N>
+        template <Scalar T, std::size_t N>
         void build_matrix(const Quaternion<T>& q, Matrix<T, N>& m) noexcept {
             m[0, 0] = q.a() * q.a() + q.b() * q.b() - q.c() * q.c() - q.d() * q.d();
             m[0, 1] = T{2} * q.b() * q.c() - T{2} * q.a() * q.d();
@@ -849,12 +867,12 @@ namespace RS {
 
     }
 
-    template <typename T>
+    template <Scalar T>
     Vector<T, 3> rotate(const Quaternion<T>& q, const Vector<T, 3>& v) noexcept {
         return q.conj({T{0}, v}).vector_part();
     }
 
-    template <typename T>
+    template <Scalar T>
     Quaternion<T> q_rotate(T angle, const Vector<T, 3>& axis) noexcept {
         using std::cos;
         using std::sin;
@@ -865,14 +883,14 @@ namespace RS {
         return {cos(angle), sin(angle) * axis.dir()};
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 3> rotate3(const Quaternion<T>& q) noexcept {
         Matrix<T, 3> m;
         Detail::build_matrix(q, m);
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 4> rotate4(const Quaternion<T>& q) noexcept {
         Matrix<T, 4> m;
         Detail::build_matrix(q, m);
@@ -880,12 +898,12 @@ namespace RS {
         return m;
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 3> rotate3(T angle, const Vector<T, 3>& axis) noexcept {
         return rotate3(q_rotate(angle, axis));
     }
 
-    template <typename T>
+    template <Scalar T>
     Matrix<T, 4> rotate4(T angle, const Vector<T, 3>& axis) noexcept {
         return rotate4(q_rotate(angle, axis));
     }
@@ -894,7 +912,7 @@ namespace RS {
 
 namespace std {
 
-    template <typename T, std::size_t N>
+    template <RS::Scalar T, std::size_t N>
     struct formatter<RS::Vector<T, N>>:
     formatter<T> {
         template <typename FormatContext>
@@ -912,7 +930,7 @@ namespace std {
         }
     };
 
-    template <typename T, std::size_t N, RS::MatrixLayout L>
+    template <RS::Scalar T, std::size_t N, RS::MatrixLayout L>
     struct std::formatter<RS::Matrix<T, N, L>>:
     std::formatter<T> {
         template <typename FormatContext>
@@ -936,7 +954,7 @@ namespace std {
         }
     };
 
-    template <typename T>
+    template <RS::Scalar T>
     struct formatter<RS::Quaternion<T>>:
     formatter<T> {
         template <typename FormatContext>
@@ -955,35 +973,35 @@ namespace std {
         }
     };
 
-    template <typename T, std::size_t N>
+    template <RS::Scalar T, std::size_t N>
     struct greater<RS::Vector<T, N>> {
         bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
             return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::greater<T>());
         }
     };
 
-    template <typename T, std::size_t N>
+    template <RS::Scalar T, std::size_t N>
     struct less<RS::Vector<T, N>> {
         bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
             return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::less<T>());
         }
     };
 
-    template <typename T, std::size_t N>
+    template <RS::Scalar T, std::size_t N>
     struct hash<RS::Vector<T, N>> {
         std::size_t operator()(const RS::Vector<T, N>& v) const noexcept {
             return v.hash();
         }
     };
 
-    template <typename T, std::size_t N, RS::MatrixLayout L>
+    template <RS::Scalar T, std::size_t N, RS::MatrixLayout L>
     struct hash<RS::Matrix<T, N, L>> {
         std::size_t operator()(const RS::Matrix<T, N, L>& m) const noexcept {
             return m.hash();
         }
     };
 
-    template <typename T>
+    template <RS::Scalar T>
     struct hash<RS::Quaternion<T>> {
         std::size_t operator()(const RS::Quaternion<T>& q) const noexcept {
             return q.hash();
