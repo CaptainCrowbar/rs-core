@@ -8,6 +8,7 @@
 #include <exception>
 #include <filesystem>
 #include <format>
+#include <iterator>
 #include <print>
 #include <ranges>
 #include <regex>
@@ -183,19 +184,18 @@ namespace RS::UnitTest {
 } while (false)
 
 // Compare two floating point expressions. Fails if the expressions differ by
-// more than the tolerance in either direction, or if any exception is
-// thrown.
+// more than epsilon in either direction, or if any exception is thrown.
 
-#define TEST_NEAR(lhs, rhs, tolerance) do { \
+#define TEST_NEAR(lhs, rhs, epsilon) do { \
     try { \
         auto _test_lhs = static_cast<double>(lhs); \
         auto _test_rhs = static_cast<double>(rhs); \
-        auto _test_tolerance = static_cast<double>(tolerance); \
+        auto _test_epsilon = static_cast<double>(epsilon); \
         auto _test_delta = std::abs(_test_lhs - _test_rhs); \
-        if (_test_delta > _test_tolerance) { \
+        if (_test_delta > _test_epsilon) { \
             FAIL("Difference between expressions is too great\n" \
-                "\t{} = {}\n\t{} = {}\n\ttolerance = {}", \
-                # lhs, _test_lhs, # rhs, _test_rhs, _test_tolerance); \
+                "\t{} = {}\n\t{} = {}\n\tepsilon = {}", \
+                # lhs, _test_lhs, # rhs, _test_rhs, _test_epsilon); \
         } \
     } \
     catch (const std::exception& ex) { \
@@ -205,6 +205,38 @@ namespace RS::UnitTest {
         FAIL("Unexpected exception"); \
     } \
 } while (false)
+
+// Check that every element of two ranges matches within epsilon.
+
+#define TEST_RANGES_NEAR(lhs, rhs, epsilon) \
+    try { \
+        const auto& _test_lhs = lhs; \
+        const auto& _test_rhs = rhs; \
+        auto _test_lhs_size = std::ranges::distance(_test_lhs); \
+        auto _test_rhs_size = std::ranges::distance(_test_rhs); \
+        if (_test_lhs_size != _test_rhs_size) { \
+            FAIL("Ranges are not the same size\n\t{} [{}]\n\t{} [{}]", \
+                # lhs, _test_lhs_size, # rhs, _test_rhs_size); \
+        } \
+        auto _test_epsilon = static_cast<double>(epsilon); \
+        auto _test_i = std::ranges::begin(_test_lhs); \
+        auto _test_j = std::ranges::begin(_test_rhs); \
+        auto _test_lhs_end = std::ranges::end(_test_lhs); \
+        for (; _test_i != _test_lhs_end; ++_test_i, ++_test_j) { \
+            if (std::abs(static_cast<double>(*_test_i) - static_cast<double>(*_test_j)) > _test_epsilon) { \
+                FAIL("Ranges are not close enough\n", \
+                    "\t{} = {}\n\t{} = {}\n\tepsilon = {}", \
+                    # lhs, _test_lhs, # rhs, _test_rhs, _test_epsilon); \
+                break; \
+            } \
+        } \
+    } \
+    catch (const std::exception& ex) { \
+        FAIL("Unexpected exception: ", ex.what()); \
+    } \
+    catch (...) { \
+        FAIL("Unexpected exception"); \
+    }
 
 // Check an expression against a range. Fails if the expression is outside the
 // range, or if any exception is thrown.

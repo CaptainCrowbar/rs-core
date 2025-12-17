@@ -1,8 +1,5 @@
 #include "rs-core/linear-algebra.hpp"
 #include "rs-core/unit-test.hpp"
-#include <cmath>
-#include <cstdlib>
-#include <exception>
 #include <format>
 #include <numbers>
 #include <set>
@@ -11,31 +8,6 @@
 
 using namespace RS;
 using std::numbers::pi;
-
-// Check that every element of two vectors matches within epsilon
-
-#define TEST_VECTORS(lhs, rhs, epsilon) \
-    try { \
-        auto lhs_value = lhs; \
-        auto rhs_value = rhs; \
-        REQUIRE(lhs_value.size() == rhs_value.size()); \
-        auto epsilon_value = double(epsilon); \
-        for (auto i = 0uz; i < lhs_value.size(); ++i) { \
-            if (std::abs(double(rhs_value[i]) - double(lhs_value[i])) > epsilon_value) { \
-                FAIL("Vectors are not close enough: ", \
-                    # lhs, " = ", lhs_value, ", ", \
-                    # rhs, " = ", rhs_value, ", ", \
-                    "epsilon = ", epsilon_value); \
-                break; \
-            } \
-        } \
-    } \
-    catch (const std::exception& ex) { \
-        FAIL("Unexpected exception: ", ex.what()); \
-    } \
-    catch (...) { \
-        FAIL("Unexpected exception"); \
-    }
 
 void test_rs_linear_algebra_vector_integer_construction() {
 
@@ -281,9 +253,9 @@ void test_rs_linear_algebra_vector_floating_arithmetic() {
     TEST_EQUAL(std::format("{:.4f}", v3), "[5.8947,8.8421,14.7368]");
     TEST_EQUAL(std::format("{:.4f}", v4), "[1.1053,2.1579,-1.7368]");
     TRY(v5 = v3 + v4);
-    TEST_VECTORS(v5, v2, 1e-10);
+    TEST_RANGES_NEAR(v5, v2, 1e-10);
     TRY(v5 = v1 ^ v3);
-    TEST_VECTORS(v5, Double3::null(), 1e-10);
+    TEST_RANGES_NEAR(v5, Double3::null(), 1e-10);
     TEST_NEAR(v1 % v4, 0, 1e-6);
     TEST_NEAR(v3 % v4, 0, 1e-6);
 
@@ -311,14 +283,14 @@ void test_rs_linear_algebra_vector_floating_interpolation() {
     Double3 v = {12,34,56};
     Double3 w;
 
-    TRY(w = lerp(u, v, -0.50));  TEST_VECTORS(w, (Double3{9.0,13.0,17.0}), 0);
-    TRY(w = lerp(u, v, -0.25));  TEST_VECTORS(w, (Double3{9.5,16.5,23.5}), 0);
-    TRY(w = lerp(u, v, 0.00));   TEST_VECTORS(w, (Double3{10.0,20.0,30.0}), 0);
-    TRY(w = lerp(u, v, 0.25));   TEST_VECTORS(w, (Double3{10.5,23.5,36.5}), 0);
-    TRY(w = lerp(u, v, 0.50));   TEST_VECTORS(w, (Double3{11.0,27.0,43.0}), 0);
-    TRY(w = lerp(u, v, 0.75));   TEST_VECTORS(w, (Double3{11.5,30.5,49.5}), 0);
-    TRY(w = lerp(u, v, 1.00));   TEST_VECTORS(w, (Double3{12.0,34.0,56.0}), 0);
-    TRY(w = lerp(u, v, 1.25));   TEST_VECTORS(w, (Double3{12.5,37.5,62.5}), 0);
-    TRY(w = lerp(u, v, 1.50));   TEST_VECTORS(w, (Double3{13.0,41.0,69.0}), 0);
+    TRY(w = lerp(u, v, -0.50));  TEST_RANGES_NEAR(w, (Double3{9.0,13.0,17.0}), 0);
+    TRY(w = lerp(u, v, -0.25));  TEST_RANGES_NEAR(w, (Double3{9.5,16.5,23.5}), 0);
+    TRY(w = lerp(u, v, 0.00));   TEST_RANGES_NEAR(w, (Double3{10.0,20.0,30.0}), 0);
+    TRY(w = lerp(u, v, 0.25));   TEST_RANGES_NEAR(w, (Double3{10.5,23.5,36.5}), 0);
+    TRY(w = lerp(u, v, 0.50));   TEST_RANGES_NEAR(w, (Double3{11.0,27.0,43.0}), 0);
+    TRY(w = lerp(u, v, 0.75));   TEST_RANGES_NEAR(w, (Double3{11.5,30.5,49.5}), 0);
+    TRY(w = lerp(u, v, 1.00));   TEST_RANGES_NEAR(w, (Double3{12.0,34.0,56.0}), 0);
+    TRY(w = lerp(u, v, 1.25));   TEST_RANGES_NEAR(w, (Double3{12.5,37.5,62.5}), 0);
+    TRY(w = lerp(u, v, 1.50));   TEST_RANGES_NEAR(w, (Double3{13.0,41.0,69.0}), 0);
 
 }
