@@ -224,7 +224,7 @@ namespace RS::UnitTest {
         auto _test_lhs_end = std::ranges::end(_test_lhs); \
         for (; _test_i != _test_lhs_end; ++_test_i, ++_test_j) { \
             if (std::abs(static_cast<double>(*_test_i) - static_cast<double>(*_test_j)) > _test_epsilon) { \
-                FAIL("Ranges are not close enough\n", \
+                FAIL("Ranges are not close enough\n" \
                     "\t{} = {}\n\t{} = {}\n\tepsilon = {}", \
                     # lhs, _test_lhs, # rhs, _test_rhs, _test_epsilon); \
                 break; \
