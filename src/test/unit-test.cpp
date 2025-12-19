@@ -8,7 +8,8 @@
 using namespace RS::UnitTest;
 
 void test_rs_core_global_concepts();
-void test_rs_core_global_range_functions();
+void test_rs_core_global_as_range();
+void test_rs_core_global_sorted_range();
 void test_rs_core_alias_constructors();
 void test_rs_core_alias_conversions();
 void test_rs_core_alias_arithmetic_operators();
@@ -155,7 +156,8 @@ int main(int argc, char** argv) {
     std::println("{}{}{}", xrule, rule, xreset);
 
     call_me_maybe(test_rs_core_global_concepts, "test_rs_core_global_concepts");
-    call_me_maybe(test_rs_core_global_range_functions, "test_rs_core_global_range_functions");
+    call_me_maybe(test_rs_core_global_as_range, "test_rs_core_global_as_range");
+    call_me_maybe(test_rs_core_global_sorted_range, "test_rs_core_global_sorted_range");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
     call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");
     call_me_maybe(test_rs_core_alias_arithmetic_operators, "test_rs_core_alias_arithmetic_operators");

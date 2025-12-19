@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <concepts>
 #include <format>
+#include <functional>
 #include <iterator>
 #include <list>
 #include <map>
@@ -184,7 +185,7 @@ void test_rs_core_global_concepts() {
 
 }
 
-void test_rs_core_global_range_functions() {
+void test_rs_core_global_as_range() {
 
     std::multimap<int, std::string> map = {
         { 1, "alpha" },
@@ -213,5 +214,23 @@ void test_rs_core_global_range_functions() {
     TEST_EQUAL(i->second, "delta");
     ++i;
     TEST(i == j);
+
+}
+
+void test_rs_core_global_sorted_range() {
+
+    std::vector<int> u, v;
+
+    u = {};
+    TRY(v = sorted(u));
+    TEST_EQUAL(std::format("{}", v), "[]");
+
+    u = {5, 4, 3, 2, 1};
+    TRY(v = sorted(u));
+    TEST_EQUAL(std::format("{}", v), "[1, 2, 3, 4, 5]");
+
+    u = {1, 2, 3, 4, 5};
+    TRY(v = sorted(u, std::greater<int>{}));
+    TEST_EQUAL(std::format("{}", v), "[5, 4, 3, 2, 1]");
 
 }

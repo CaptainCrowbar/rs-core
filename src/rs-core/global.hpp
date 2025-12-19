@@ -1,13 +1,16 @@
 #pragma once
 
+#include <algorithm>
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <iterator>
 #include <limits>
 #include <print>
 #include <ranges>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 namespace RS {
 
@@ -88,6 +91,19 @@ namespace RS {
     template <std::input_or_output_iterator I, std::sentinel_for<I> S>
     std::ranges::subrange<I, S> as_range(std::pair<I, S> pair) noexcept {
         return std::ranges::subrange(pair.first, pair.second);
+    }
+
+    template <std::ranges::range Range,
+        std::strict_weak_order<std::ranges::range_value_t<Range>, std::ranges::range_value_t<Range>> Compare>
+    std::vector<std::ranges::range_value_t<Range>> sorted(const Range& range, Compare compare) {
+        auto vec = std::vector(std::from_range, range);
+        std::ranges::sort(vec, compare);
+        return vec;
+    }
+
+    template <std::ranges::range Range>
+    std::vector<std::ranges::range_value_t<Range>> sorted(const Range& range) {
+        return sorted(range, std::less<std::ranges::range_value_t<Range>>{});
     }
 
 }

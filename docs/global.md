@@ -72,3 +72,14 @@ std::ranges::subrange<I, S> as_range(std::pair<I, S> pair) noexcept {
 ```
 
 Turns an iterator pair returned by `equal_range()` into an actual range.
+
+```c++
+template <std::ranges::range Range>
+    std::vector<[value type]> sorted(const Range& range);
+template <std::ranges::range Range,
+        std::strict_weak_order<[value type]> Compare>
+    std::vector<[value type]> sorted(const Range& range,
+        Compare compare);
+```
+
+Return a sorted copy of the range.
