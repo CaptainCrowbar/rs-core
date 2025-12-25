@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -29,7 +30,8 @@ namespace RS {
         using colour = std::array<int, 3>;
 
         Xterm() noexcept: colour_(is_tty(stdout)) {}
-        explicit Xterm(bool use_colour) noexcept: colour_(use_colour) {}
+        explicit Xterm(bool colour) noexcept: colour_(colour) {}
+        explicit Xterm(std::optional<bool> colour) noexcept: colour_(colour ? *colour : is_tty(stdout)) {}
 
         // Terminal properties
 

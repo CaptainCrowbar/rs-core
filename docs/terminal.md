@@ -25,12 +25,14 @@ terminal emulator and may not be reliable on some systems. The colour flag
 
 ```c++
 Xterm::Xterm() noexcept;
-explicit Xterm::Xterm(bool use_colour) noexcept;
+explicit Xterm::Xterm(bool colour) noexcept;
+explicit Xterm::Xterm(std::optional<bool> colour) noexcept;
 ```
 
 The constructor determines whether to generate colour control codes, and
 related codes such as font control. The default constructor will set colour
-mode only if `is_tty(stdout)` (see below) is true.
+mode only if `is_tty(stdout)` (see below) is true, as will the third
+constructor if the argument is null.
 
 ```c++
 Xterm::Xterm(const Xterm& xt) noexcept;
