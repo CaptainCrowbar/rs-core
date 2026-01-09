@@ -162,8 +162,17 @@ specified number of digits. This will throw `std::out_of_range` if the base
 is out of range (2-36). The `hex()` function displays the full length of the
 value as hex digits.
 
+## Specializations
+
 ```c++
-template <> struct std::formatter<::RS::Uint128>;
+template <typename T> struct std::common_type<Uint128, T>;
+template <typename T> struct std::common_type<T, Uint128>;
+```
+
+Common types. These follow the usual rules for integer types.
+
+```c++
+template <> struct std::formatter<Uint128>;
 ```
 
 Formatter for `Uint128` objects. The only formatting flags recognized are
@@ -171,7 +180,13 @@ Formatter for `Uint128` objects. The only formatting flags recognized are
 of digits can also be supplied.
 
 ```c++
-template <> struct std::hash<::RS::Uint128>;
+template <> struct std::hash<Uint128>;
 ```
 
 Hash function.
+
+```c++
+template <> class std::numeric_limits<Uint128>;
+```
+
+Numeric limits.

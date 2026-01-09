@@ -1,0 +1,31 @@
+Types                Member                         Default            Description
+all                  bool is_specialized            false              Specialization exists
+all                  bool is_bounded                false              Finite set of values
+all                  bool is_exact                  false              Representation is exact
+all                  bool is_integer                false              Integer type
+all                  bool is_modulo                 false              Modular arithmetic
+all                  bool is_signed                 false              Signed type
+all                  int radix                      0                  Base of representation
+all                  bool traps                     false              Trap value exists
+bounded              int digits                     0                  Radix digits without loss
+bounded              int digits10                   0                  Base 10 digits without loss
+bounded              T lowest()                     T{}                Least finite value
+bounded              T max()                        T{}                Maximum finite value
+bounded or unsigned  T min()                        T{}                Minimum finite or positive normalized
+floating point       bool has_infinity              false              Has positive infinity
+floating point       bool has_quiet_NaN             false              Has quiet NaN
+floating point       bool has_signaling_NaN         false              Has signalling NaN
+floating point       bool is_iec559                 false              Follows ISO/IEC 60559
+floating point       int max_digits10               0                  Base 10 digits required to differentiate
+floating point       int max_exponent               0                  Maximum normalized positive power of radix
+floating point       int max_exponent10             0                  Maximum normalized positive power of 10
+floating point       int min_exponent               0                  Minimum normalized negative power of radix
+floating point       int min_exponent10             0                  Minimum normalized negative power of 10
+floating point       float_round_style round_style  round_toward_zero  Rounding style
+floating point       bool tinyness_before           false              Tinyness detected before rounding
+floating point       T denorm_min()                 T{}                Minimum positive subnormal or normal
+floating point       T epsilon()                    T{}                Difference between 1 and next value
+floating point       T round_error()                T{}                Maximum rounding error
+has_infinity         T infinity()                   T{}                Positive infinity
+has_quiet_NaN        T quiet_NaN()                  T{}                Quiet NaN
+has_signaling_NaN    T signaling_NaN()              T{}                Signalling NaN

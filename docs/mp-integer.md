@@ -317,7 +317,7 @@ template <typename T> struct std::common_type<Mpitype, T>;
 template <typename T> struct std::common_type<T, Mpitype>;
 ```
 
-Common type. THis follows these rules:
+Common type. This follows these rules:
 
 * Common type of `Natural` and `Integer` is `Integer.`
 * Common type of `Natural` and any signed primitive integral type is `Integer.`
@@ -341,7 +341,7 @@ struct std::hash<Mpitype>;
 Hash function.
 
 ```c++
-struct std::numeric_limits<Mpitype>;
+class std::numeric_limits<Mpitype>;
 ```
 
 Numeric type properties.
