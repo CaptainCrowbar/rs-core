@@ -368,18 +368,19 @@ public std::numeric_limits<void> {
 
 public:
 
-    static constexpr bool is_specialized              = true;
-    static constexpr bool is_bounded                  = true;
-    static constexpr bool is_exact                    = true;
-    static constexpr bool is_integer                  = true;
-    static constexpr bool is_modulo                   = true;
-    static constexpr bool is_signed                   = false;
-    static constexpr int radix                        = 2;
-    static constexpr bool traps                       = false;
-    static constexpr int digits                       = 128;
-    static constexpr int digits10                     = 38;
-    static constexpr ::RS::Uint128 lowest() noexcept  { return ::RS::Uint128{}; }
-    static constexpr ::RS::Uint128 max() noexcept     { return ~ ::RS::Uint128{}; }
-    static constexpr ::RS::Uint128 min() noexcept     { return ::RS::Uint128{}; }
+    static constexpr bool is_specialized  = true;
+    static constexpr bool is_bounded      = true;
+    static constexpr bool is_exact        = true;
+    static constexpr bool is_integer      = true;
+    static constexpr bool is_modulo       = true;
+    static constexpr bool is_signed       = false;
+    static constexpr int radix            = 2;
+    static constexpr bool traps           = false;
+    static constexpr int digits           = 128;
+    static constexpr int digits10         = 38;
+
+    static constexpr auto lowest() noexcept  { return ::RS::Uint128{}; }
+    static constexpr auto max() noexcept     { return ~ ::RS::Uint128{}; }
+    static constexpr auto min() noexcept     { return ::RS::Uint128{}; }
 
 };

@@ -1005,15 +1005,19 @@ namespace std {
     template <RS::Mpitype M>
     class numeric_limits<M>:
     public std::numeric_limits<void> {
+
     public:
-        static const bool is_exact = true;
-        static const bool is_integer = true;
-        static const bool is_signed = std::same_as<M, RS::Integer>;
-        static const bool is_specialized = true;
-        static const int radix = 2;
-        static const M lowest() noexcept { return {}; }
-        static const M max() noexcept { return {}; }
-        static const M min() noexcept { return {}; }
+
+        static constexpr bool is_exact        = true;
+        static constexpr bool is_integer      = true;
+        static constexpr bool is_signed       = std::same_as<M, RS::Integer>;
+        static constexpr bool is_specialized  = true;
+        static constexpr int radix            = 2;
+
+        static const M lowest()  { return {}; }
+        static const M max()     { return {}; }
+        static const M min()     { return {}; }
+
     };
 
 }

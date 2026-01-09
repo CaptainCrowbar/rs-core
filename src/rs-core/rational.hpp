@@ -10,10 +10,12 @@
 #include <concepts>
 #include <format>
 #include <functional>
+#include <limits>
 #include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 namespace RS {
@@ -310,7 +312,62 @@ namespace RS {
 
 }
 
+template <std::signed_integral T, std::signed_integral U>
+struct std::common_type<RS::Rational<T>, RS::Rational<U>> {
+    using type = RS::Rational<std::common_type_t<T, U>>;
+};
+
+template <std::signed_integral T>
+struct std::common_type<RS::Rational<T>, RS::Rational<RS::Integer>> {
+    using type = RS::Rational<RS::Integer>;
+};
+
+template <std::signed_integral T, std::integral U>
+struct std::common_type<RS::Rational<T>, U> {
+    using type = RS::Rational<std::make_signed_t<std::common_type_t<T, U>>>;
+};
+
+template <std::signed_integral T, RS::Mpitype M>
+struct std::common_type<RS::Rational<T>, M> {
+    using type = RS::Rational<RS::Integer>;
+};
+
+template <std::integral T>
+struct std::common_type<RS::Rational<RS::Integer>, T> {
+    using type = RS::Rational<RS::Integer>;
+};
+
+template <RS::Mpitype M>
+struct std::common_type<RS::Rational<RS::Integer>, M> {
+    using type = RS::Rational<RS::Integer>;
+};
+
+template <typename T, RS::SignedIntegral U>
+struct std::common_type<T, RS::Rational<U>>:
+std::common_type<RS::Rational<U>, T> {};
+
 template <RS::SignedIntegral T>
 struct std::hash<RS::Rational<T>> {
     std::size_t operator()(const RS::Rational<T>& r) const noexcept { return r.hash(); }
+};
+
+template <RS::SignedIntegral T>
+class std::numeric_limits<RS::Rational<T>>:
+public std::numeric_limits<T> {
+
+private:
+
+    using L = std::numeric_limits<T>;
+    using R = RS::Rational<T>;
+
+public:
+
+    static constexpr bool is_integer  = false;
+    static constexpr bool is_modulo   = false;
+    static constexpr bool is_signed   = true;
+
+    static auto lowest()  { return static_cast<R>(L::lowest()); }
+    static auto max()     { return static_cast<R>(L::max()); }
+    static auto min()     { return static_cast<R>(L::min()); }
+
 };

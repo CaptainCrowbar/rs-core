@@ -153,7 +153,6 @@ fractional part will have the same sign as the original rational number.
 
 ```c++
 std::size_t Rational::hash() const noexcept;
-struct std::hash<Rational>;
 ```
 
 Hash function.
@@ -161,13 +160,10 @@ Hash function.
 ```c++
 std::string str() const;
 std::string mixed() const;
-struct std::formatter<Rational>;
 ```
 
 Format a rational number as a string, either as a simple fraction or a mixed
-fraction (both will return a single number if the value is an integer). The
-formatter recognizes only one flag, `'m'` causing the value to be formatted
-using `mixed()` instead of `str().`
+fraction (both will return a single number if the value is an integer).
 
 ```c++
 static std::optional<Rational> parse(std::string_view str);
@@ -176,3 +172,36 @@ static std::optional<Rational> parse(std::string_view str);
 Parses a string into a rational number. This works the same way as the
 constructor that takes a string argument, except that an invalid argument
 will result in a null optional instead of an exception.
+
+## Specializations
+
+```c++
+template <typename T, typename U> struct std::common_type<Rational<T>, U>;
+template <typename T, typename U> struct std::common_type<T, Rational<U>>;
+```
+
+Common types. The common type of two `Rational` instances is a rational based
+on the common type of their underlying integer types. The common type of a
+`Rational` and any other type is a rational based on the common type of the
+rational's integer type and the other type; if this underlying common type is
+not an integer or rational type, the rational and the second type have no
+common type.
+
+```c++
+struct std::formatter<Rational>;
+```
+
+The formatter recognizes only one flag, `'m'` causing the value to be
+formatted as a mixed fraction instead of a vulgar fraction.
+
+```c++
+struct std::hash<Rational>;
+```
+
+Hash function.
+
+```c++
+class std::numeric_limits<Rational>;
+```
+
+Numeric limits.
