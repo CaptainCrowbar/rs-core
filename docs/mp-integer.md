@@ -15,15 +15,17 @@ namespace RS;
 ## Concepts
 
 ```c++
+template <typename T> concept Mpitype;
 template <typename T> concept SignedIntegral;
 template <typename T> concept UnsignedIntegral;
 template <typename T> concept Integral;
 template <typename T> concept Arithmetic;
 ```
 
-These are satisfied by the same primitive types that satisfy `std::integral`
-etc, minus `bool,` plus `Integer` and `Natural.` The `Arithmetic` type
-matches `Integral` plus floating point.
+The `Mpitype` concept is satisfied by `Natural` or `Integer`. The integral
+concepts are satisfied by the same primitive types that satisfy
+`std::integral` etc, minus `bool,` plus `Integer` and `Natural.` The
+`Arithmetic` type matches `Integral` plus floating point.
 
 ## Multiple precision integer classes
 
@@ -271,7 +273,6 @@ Returns the sign (-1 if negative, 0 if zero, +1 if positive).
 
 ```c++
 std::size_t Mpitype::hash() const noexcept;
-struct std::hash<Mpitype>;
 ```
 
 Hash function.
@@ -298,15 +299,7 @@ std::string Mpitype::str(unsigned base = 10, std::size_t digits = 1) const;
 Formats the value as a string, with at least the specified number of digits.
 This will throw `std::out_of_range` if the base is out of range (2-36).
 
-```c++
-struct std::formatter<Mpitype>;
-```
-
-Standard formatter. The only flags recognized are `"b"` (binary) and `"x"`
-(hexadecimal); if neither flag is present the value will be returned in
-decimal; the result is unspecified if both are present.
-
-## Multiple precision integer literals
+## Literals
 
 ```c++
 namespace Literals {
@@ -316,3 +309,39 @@ namespace Literals {
 ```
 
 Custom literals.
+
+## Specializations
+
+```c++
+template <typename T> struct std::common_type<Mpitype, T>;
+template <typename T> struct std::common_type<T, Mpitype>;
+```
+
+Common type. THis follows these rules:
+
+* Common type of `Natural` and `Integer` is `Integer.`
+* Common type of `Natural` and any signed primitive integral type is `Integer.`
+* Common type of `Natural` and any unsigned primitive integral type is `Natural.`
+* Common type of `Integer` and any primitive integral type is `Integer.`
+* Common type of `Natural` or `Integer` and any primitive floating point type
+  is the larger of the floating point type and `double.`
+
+```c++
+struct std::formatter<Mpitype>;
+```
+
+Standard formatter. The only flags recognized are `"b"` (binary) and `"x"`
+(hexadecimal); if neither flag is present the value will be returned in
+decimal; the result is unspecified if both are present.
+
+```c++
+struct std::hash<Mpitype>;
+```
+
+Hash function.
+
+```c++
+struct std::numeric_limits<Mpitype>;
+```
+
+Numeric type properties.

@@ -144,9 +144,11 @@ the function call operator is `const,` and that this will provide predictable
 results on different C++ implementations.
 
 The default constructor generates values from zero to the maximum positive
-value of `T.` The second generates values from zero to `range-1;` behaviour
-is undefined if `range<1.` The third generates numbers from `min` to `max`
-inclusive; the bounds will be swapped if they are in the wrong order.
+value of `T,` if `T` is bounded; otherwise, the resulting generator will
+always return zero. The second constructor generates values from zero to
+`range-1;` behaviour is undefined if `range<1.` The third constructor
+generates numbers from `min` to `max` inclusive; the bounds will be swapped
+if they are in the wrong order.
 
 This uses
 [Lemire's algorithm](https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/).

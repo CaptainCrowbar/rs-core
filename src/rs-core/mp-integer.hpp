@@ -912,6 +912,9 @@ namespace RS {
     // Concepts
 
     template <typename T>
+    concept Mpitype = std::same_as<T, Natural> || std::same_as<T, Integer>;
+
+    template <typename T>
     concept SignedIntegral =
         (std::signed_integral<T> || std::same_as<T, Integer>)
         && ! std::same_as<T, bool>;
@@ -938,12 +941,79 @@ namespace RS {
 
 }
 
-template <>
-struct std::hash<RS::Natural> {
-    auto operator()(const RS::Natural& x) const noexcept { return x.hash(); }
-};
+namespace std {
 
-template <>
-struct std::hash<RS::Integer> {
-    auto operator()(const RS::Integer& x) const noexcept { return x.hash(); }
-};
+    // Specializations
+
+    template <RS::Mpitype M, typename T>
+    struct common_type<M, T> {};
+
+    template <>
+    struct common_type<RS::Natural, RS::Integer> {
+        using type = RS::Integer;
+    };
+
+    template <signed_integral T>
+    struct common_type<RS::Natural, T> {
+        using type = RS::Integer;
+    };
+
+    template <unsigned_integral T>
+    struct common_type<RS::Natural, T> {
+        using type = RS::Natural;
+    };
+
+    template <integral T>
+    struct common_type<RS::Integer, T> {
+        using type = RS::Integer;
+    };
+
+    template <RS::Mpitype M>
+    struct common_type<M, float> {
+        using type = double;
+    };
+
+    template <RS::Mpitype M>
+    struct common_type<M, double> {
+        using type = double;
+    };
+
+    template <RS::Mpitype M>
+    struct common_type<M, long double> {
+        using type = long double;
+    };
+
+    template <RS::Mpitype M, floating_point T>
+    struct common_type<M, T> {
+        using type = conditional_t<(sizeof(T) < sizeof(double)), double, T>;
+    };
+
+    template <typename T, RS::Mpitype M>
+    struct common_type<T, M>:
+    common_type<M, T> {};
+
+    template <>
+    struct hash<RS::Natural> {
+        auto operator()(const RS::Natural& x) const noexcept { return x.hash(); }
+    };
+
+    template <>
+    struct hash<RS::Integer> {
+        auto operator()(const RS::Integer& x) const noexcept { return x.hash(); }
+    };
+
+    template <RS::Mpitype M>
+    class numeric_limits<M>:
+    public std::numeric_limits<void> {
+    public:
+        static const bool is_exact = true;
+        static const bool is_integer = true;
+        static const bool is_signed = std::same_as<M, RS::Integer>;
+        static const bool is_specialized = true;
+        static const int radix = 2;
+        static const M lowest() noexcept { return {}; }
+        static const M max() noexcept { return {}; }
+        static const M min() noexcept { return {}; }
+    };
+
+}
