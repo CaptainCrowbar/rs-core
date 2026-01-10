@@ -7,7 +7,8 @@
 
 using namespace RS::UnitTest;
 
-void test_rs_core_global_concepts();
+void test_rs_core_global_arithmetic_concepts();
+void test_rs_core_global_range_concepts();
 void test_rs_core_global_as_range();
 void test_rs_core_global_sorted_range();
 void test_rs_core_alias_constructors();
@@ -117,12 +118,14 @@ void test_rs_core_random_bernoulli_distribution();
 void test_rs_core_random_uniform_integer();
 void test_rs_core_random_uniform_mp_integer();
 void test_rs_core_random_dice();
+void test_rs_core_rational_int_concepts();
 void test_rs_core_rational_int_construction();
 void test_rs_core_rational_int_properties();
 void test_rs_core_rational_int_arithmetic();
 void test_rs_core_rational_int_comparison();
 void test_rs_core_rational_int_formatting();
 void test_rs_core_rational_int_parsing();
+void test_rs_core_rational_mp_integer_concepts();
 void test_rs_core_rational_mp_integer_construction();
 void test_rs_core_rational_mp_integer_properties();
 void test_rs_core_rational_mp_integer_comparison();
@@ -136,6 +139,7 @@ void test_rs_core_scope_guard();
 void test_rs_core_terminal_escape_codes();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
+void test_rs_core_uint128_concepts();
 void test_rs_core_uint128_conversion();
 void test_rs_core_uint128_parsing();
 void test_rs_core_uint128_formatting();
@@ -155,7 +159,8 @@ int main(int argc, char** argv) {
     std::println("{}Running unit tests{}", xhead, xreset);
     std::println("{}{}{}", xrule, rule, xreset);
 
-    call_me_maybe(test_rs_core_global_concepts, "test_rs_core_global_concepts");
+    call_me_maybe(test_rs_core_global_arithmetic_concepts, "test_rs_core_global_arithmetic_concepts");
+    call_me_maybe(test_rs_core_global_range_concepts, "test_rs_core_global_range_concepts");
     call_me_maybe(test_rs_core_global_as_range, "test_rs_core_global_as_range");
     call_me_maybe(test_rs_core_global_sorted_range, "test_rs_core_global_sorted_range");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
@@ -265,12 +270,14 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_uniform_integer, "test_rs_core_random_uniform_integer");
     call_me_maybe(test_rs_core_random_uniform_mp_integer, "test_rs_core_random_uniform_mp_integer");
     call_me_maybe(test_rs_core_random_dice, "test_rs_core_random_dice");
+    call_me_maybe(test_rs_core_rational_int_concepts, "test_rs_core_rational_int_concepts");
     call_me_maybe(test_rs_core_rational_int_construction, "test_rs_core_rational_int_construction");
     call_me_maybe(test_rs_core_rational_int_properties, "test_rs_core_rational_int_properties");
     call_me_maybe(test_rs_core_rational_int_arithmetic, "test_rs_core_rational_int_arithmetic");
     call_me_maybe(test_rs_core_rational_int_comparison, "test_rs_core_rational_int_comparison");
     call_me_maybe(test_rs_core_rational_int_formatting, "test_rs_core_rational_int_formatting");
     call_me_maybe(test_rs_core_rational_int_parsing, "test_rs_core_rational_int_parsing");
+    call_me_maybe(test_rs_core_rational_mp_integer_concepts, "test_rs_core_rational_mp_integer_concepts");
     call_me_maybe(test_rs_core_rational_mp_integer_construction, "test_rs_core_rational_mp_integer_construction");
     call_me_maybe(test_rs_core_rational_mp_integer_properties, "test_rs_core_rational_mp_integer_properties");
     call_me_maybe(test_rs_core_rational_mp_integer_comparison, "test_rs_core_rational_mp_integer_comparison");
@@ -284,6 +291,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");
+    call_me_maybe(test_rs_core_uint128_concepts, "test_rs_core_uint128_concepts");
     call_me_maybe(test_rs_core_uint128_conversion, "test_rs_core_uint128_conversion");
     call_me_maybe(test_rs_core_uint128_parsing, "test_rs_core_uint128_parsing");
     call_me_maybe(test_rs_core_uint128_formatting, "test_rs_core_uint128_formatting");

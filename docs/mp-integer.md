@@ -16,16 +16,9 @@ namespace RS;
 
 ```c++
 template <typename T> concept Mpitype;
-template <typename T> concept SignedIntegral;
-template <typename T> concept UnsignedIntegral;
-template <typename T> concept Integral;
-template <typename T> concept Arithmetic;
 ```
 
-The `Mpitype` concept is satisfied by `Natural` or `Integer`. The integral
-concepts are satisfied by the same primitive types that satisfy
-`std::integral` etc, minus `bool,` plus `Integer` and `Natural.` The
-`Arithmetic` type matches `Integral` plus floating point.
+The `Mpitype` concept is satisfied by `Natural` or `Integer`.
 
 ## Multiple precision integer classes
 

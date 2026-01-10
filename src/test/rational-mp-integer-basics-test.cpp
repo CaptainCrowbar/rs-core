@@ -5,6 +5,18 @@
 using namespace RS;
 using namespace RS::Literals;
 
+void test_rs_core_rational_mp_integer_concepts() {
+
+    TEST(! SignedIntegral<MPRational>);
+    TEST(! UnsignedIntegral<MPRational>);
+    TEST(! Integral<MPRational>);
+    TEST(! FloatingPoint<MPRational>);
+    TEST(! FixedPointArithmetic<MPRational>);
+    TEST(RationalArithmetic<MPRational>);
+    TEST(Arithmetic<MPRational>);
+
+}
+
 void test_rs_core_rational_mp_integer_construction() {
 
     MPRational r;

@@ -7,6 +7,18 @@
 
 using namespace RS;
 
+void test_rs_core_rational_int_concepts() {
+
+    TEST(! SignedIntegral<IntRational>);
+    TEST(! UnsignedIntegral<IntRational>);
+    TEST(! Integral<IntRational>);
+    TEST(! FloatingPoint<IntRational>);
+    TEST(! FixedPointArithmetic<IntRational>);
+    TEST(RationalArithmetic<IntRational>);
+    TEST(Arithmetic<IntRational>);
+
+}
+
 void test_rs_core_rational_int_construction() {
 
     IntRational r;

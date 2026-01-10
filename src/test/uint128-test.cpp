@@ -5,6 +5,18 @@
 
 using namespace RS;
 
+void test_rs_core_uint128_concepts() {
+
+    TEST(! SignedIntegral<Uint128>);
+    TEST(UnsignedIntegral<Uint128>);
+    TEST(Integral<Uint128>);
+    TEST(! FloatingPoint<Uint128>);
+    TEST(! FixedPointArithmetic<Uint128>);
+    TEST(! RationalArithmetic<Uint128>);
+    TEST(Arithmetic<Uint128>);
+
+}
+
 void test_rs_core_uint128_conversion() {
 
     Uint128 u;

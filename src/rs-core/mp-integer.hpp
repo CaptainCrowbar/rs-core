@@ -914,22 +914,6 @@ namespace RS {
     template <typename T>
     concept Mpitype = std::same_as<T, Natural> || std::same_as<T, Integer>;
 
-    template <typename T>
-    concept SignedIntegral =
-        (std::signed_integral<T> || std::same_as<T, Integer>)
-        && ! std::same_as<T, bool>;
-
-    template <typename T>
-    concept UnsignedIntegral =
-        (std::unsigned_integral<T> || std::same_as<T, Natural>)
-        && ! std::same_as<T, bool>;
-
-    template <typename T>
-    concept Integral = SignedIntegral<T> || UnsignedIntegral<T>;
-
-    template <typename T>
-    concept Arithmetic = Integral<T> || std::floating_point<T>;
-
     // Literals
 
     namespace Literals {

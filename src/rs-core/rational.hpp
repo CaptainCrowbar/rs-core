@@ -364,6 +364,7 @@ public:
 
     static constexpr bool is_integer  = false;
     static constexpr bool is_modulo   = false;
+    static constexpr bool is_rational = true;
     static constexpr bool is_signed   = true;
 
     static auto lowest()  { return static_cast<R>(L::lowest()); }
