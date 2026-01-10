@@ -17,6 +17,14 @@ using namespace RS;
 
 namespace {
 
+    template <SignedIntegral T>        std::string_view select(T) { return "SignedIntegral"; }
+    template <UnsignedIntegral T>      std::string_view select(T) { return "UnsignedIntegral"; }
+    template <Integral T>              std::string_view select(T) { return "Integral"; }
+    template <FloatingPoint T>         std::string_view select(T) { return "FloatingPoint"; }
+    template <FixedPointArithmetic T>  std::string_view select(T) { return "FixedPointArithmetic"; }
+    template <RationalArithmetic T>    std::string_view select(T) { return "RationalArithmetic"; }
+    template <Arithmetic T>            std::string_view select(T) { return "Arithmetic"; }
+
     template <ReadableRange<char> R>
     std::string make_string(const R& r) {
         std::string s;
@@ -89,6 +97,10 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(! Arithmetic<bool>);
     TEST(! Arithmetic<int*>);
     TEST(! Arithmetic<std::string>);
+
+    TEST_EQUAL(select(86),     "SignedIntegral");
+    TEST_EQUAL(select(99u),    "UnsignedIntegral");
+    TEST_EQUAL(select(12.34),  "FloatingPoint");
 
 }
 

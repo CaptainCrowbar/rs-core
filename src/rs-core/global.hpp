@@ -21,42 +21,36 @@ namespace RS {
     // Concepts
 
     template <typename T>
-    concept FixedPointArithmetic = std::numeric_limits<T>::is_specialized
+    concept Arithmetic = std::numeric_limits<T>::is_specialized
+        && ! std::same_as<T, bool>;
+
+    template <typename T>
+    concept FixedPointArithmetic = Arithmetic<T>
         && std::numeric_limits<T>::is_fixed_point;
 
     template <typename T>
-    concept RationalArithmetic = std::numeric_limits<T>::is_specialized
+    concept RationalArithmetic = Arithmetic<T>
         && std::numeric_limits<T>::is_rational;
 
     template <typename T>
-    concept SignedIntegral = (std::signed_integral<T>
-            || (std::numeric_limits<T>::is_specialized
-                && std::numeric_limits<T>::is_integer
-                && std::numeric_limits<T>::is_signed))
-        && ! (FixedPointArithmetic<T> || RationalArithmetic<T>);
+    concept FloatingPoint = Arithmetic<T>
+        && ! FixedPointArithmetic<T>
+        && ! RationalArithmetic<T>
+        && ! std::numeric_limits<T>::is_integer;
 
     template <typename T>
-    concept UnsignedIntegral = (std::unsigned_integral<T>
-            || (std::numeric_limits<T>::is_specialized
-                && std::numeric_limits<T>::is_integer
-                && ! std::numeric_limits<T>::is_signed))
-        && ! (FixedPointArithmetic<T> || RationalArithmetic<T>
-            || std::same_as<T, bool>);
+    concept Integral = Arithmetic<T>
+        && ! FixedPointArithmetic<T>
+        && ! RationalArithmetic<T>
+        && std::numeric_limits<T>::is_integer;
 
     template <typename T>
-    concept Integral = SignedIntegral<T> || UnsignedIntegral<T>;
+    concept SignedIntegral = Integral<T>
+        && std::numeric_limits<T>::is_signed;
 
     template <typename T>
-    concept FloatingPoint = (std::floating_point<T>
-            || (std::numeric_limits<T>::is_specialized
-                && ! std::numeric_limits<T>::is_integer))
-        && ! (FixedPointArithmetic<T> || RationalArithmetic<T>);
-
-    template <typename T>
-    concept Arithmetic = Integral<T>
-        || FloatingPoint<T>
-        || FixedPointArithmetic<T>
-        || RationalArithmetic<T>;
+    concept UnsignedIntegral = Integral<T>
+        && ! std::numeric_limits<T>::is_signed;
 
     namespace Detail {
 
