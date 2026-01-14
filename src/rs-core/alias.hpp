@@ -12,6 +12,7 @@
 #include <format>
 #include <functional>
 #include <iterator>
+#include <limits>
 #include <ranges>
 #include <type_traits>
 #include <utility>
@@ -20,7 +21,6 @@ namespace RS {
 
     namespace Detail {
 
-        template <typename T> concept Formattable = requires { std::formatter<std::remove_cvref_t<T>>(); };
         template <typename T> struct MutableReferenceType: std::false_type {};
         template <typename T> struct MutableReferenceType<T&>: std::true_type {};
         template <typename T> struct MutableReferenceType<const T&>: std::false_type {};
@@ -176,7 +176,7 @@ namespace RS {
 }
 
 template <typename T, typename Tag, RS::AliasFlags Flags>
-requires RS::Detail::Formattable<T>
+requires std::formattable<T, char>
 struct std::formatter<RS::Alias<T, Tag, Flags>>:
 std::formatter<T> {
     template <typename FormatContext>
@@ -191,4 +191,23 @@ struct std::hash<RS::Alias<T, Tag, Flags>> {
     std::size_t operator()(const RS::Alias<T, Tag, Flags>& a) const {
         return std::hash<T>()(*a);
     }
+};
+
+template <typename T, typename Tag, RS::AliasFlags Flags>
+requires std::numeric_limits<T>::is_specialized
+class std::numeric_limits<RS::Alias<T, Tag, Flags>>:
+public std::numeric_limits<T> {
+private:
+    using alias = RS::Alias<T, Tag, Flags>;
+    using t_limits = std::numeric_limits<T>;
+public:
+    static alias denorm_min()     { return static_cast<alias>(t_limits::denorm_min()); }
+    static alias epsilon()        { return static_cast<alias>(t_limits::epsilon()); }
+    static alias infinity()       { return static_cast<alias>(t_limits::infinity()); }
+    static alias lowest()         { return static_cast<alias>(t_limits::lowest()); }
+    static alias max()            { return static_cast<alias>(t_limits::max()); }
+    static alias min()            { return static_cast<alias>(t_limits::min()); }
+    static alias quiet_NaN()      { return static_cast<alias>(t_limits::quiet_NaN()); }
+    static alias round_error()    { return static_cast<alias>(t_limits::round_error()); }
+    static alias signaling_NaN()  { return static_cast<alias>(t_limits::signaling_NaN()); }
 };

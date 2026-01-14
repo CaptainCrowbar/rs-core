@@ -72,9 +72,6 @@ alias:
 Combining `implicit_to_alias` and `implicit_from_alias` is legal but likely to
 lead to ambiguous overload resolution issues.
 
-Behaviour is undefined if instantiations of `Alias` exist with the same
-underlying type and tag type but different flags.
-
 ### Parameter visibility
 
 ```c++
@@ -289,20 +286,24 @@ Defined if `T::substr()` is defined and returns a `T` or a type convertible to
 it. This returns an `Alias` wrapped around the substring, instead of the raw
 `T` substring that `Alias->substr()` would return.
 
-### Formatting functions
+### Specializations
 
 ```c++
 struct std::formatter<Alias>;
 ```
 
-Standard formatter. This is defined if `std::formatter<T>` is defined, and
-accepts the same formatting flags.
-
-### Hash functions
+Defined if `std::formatter<T>` is defined, and accepts the same formatting
+flags.
 
 ```c++
-class std::hash<Alias>;
+struct std::hash<Alias>;
 ```
 
-Hash functions This is defined if `std::hash<T>` is defined, and returns the
-same value.
+Defined if `std::hash<T>` is defined, and returns the same value.
+
+```c++
+class std::numeric_limits<Alias>;
+```
+
+Defined if `std::numeric_limits<T>` is specialized, and contains the same
+values, converted where necessary to `Alias<T>.`
