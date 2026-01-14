@@ -34,7 +34,6 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/uint128.hpp` -- 129-bit integers](uint128.html)
 * Text utilities
     * [`rs-core/character.hpp` -- Character functions](character.html)
-    * [`rs-core/format.hpp` -- Formatting helpers](format.html)
     * [`rs-core/markup.hpp` -- Text markup](markup.html)
 * Type system utilities
     * [`rs-core/alias.hpp` -- Hard type alias](alias.html)

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "rs-core/arithmetic.hpp"
-#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include "rs-core/mp-integer.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <compare>
 #include <concepts>
@@ -44,7 +44,6 @@ namespace RS {
         constexpr std::size_t hash() const noexcept { std::hash<T> ht; return hash_mix(ht(num_), ht(den_)); }
         std::string mixed() const;
         std::string str() const;
-        std::string rs_core_format(std::string_view flags) const;
 
         constexpr explicit operator bool() const noexcept { return num_ != T{0}; }
         constexpr bool operator!() const noexcept { return num_ == T{0}; }
@@ -173,11 +172,6 @@ namespace RS {
         } else {
             return std::format("{}/{}", num_, den_);
         }
-    }
-
-    template <SignedIntegral T>
-    std::string Rational<T>::rs_core_format(std::string_view flags) const {
-        return flags.contains('m') ? mixed() : str();
     }
 
     template <SignedIntegral T>
@@ -345,6 +339,37 @@ struct std::common_type<RS::Rational<RS::Integer>, M> {
 template <typename T, RS::SignedIntegral U>
 struct std::common_type<T, RS::Rational<U>>:
 std::common_type<RS::Rational<U>, T> {};
+
+template <RS::SignedIntegral T>
+struct std::formatter<RS::Rational<T>> {
+
+    bool mixed = false;
+
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+
+        auto it = ctx.begin();
+
+        for (; it != ctx.end() && *it != '}'; ++it) {
+            if (*it == 'm') {
+                mixed = true;
+            } else {
+                throw std::format_error{std::format("Invalid format: {:?}", *it)};
+            }
+        }
+
+        return it;
+
+    }
+
+    template <typename FormatContext>
+    auto format(const RS::Rational<T>& r, FormatContext& ctx) const {
+        auto s = mixed ? r.mixed() : r.str();
+        std::copy(s.begin(), s.end(), ctx.out());
+        return ctx.out();
+    }
+
+};
 
 template <RS::SignedIntegral T>
 struct std::hash<RS::Rational<T>> {

@@ -40,8 +40,6 @@ void test_rs_core_constants();
 void test_rs_core_enum_concepts();
 void test_rs_core_enum_class();
 void test_rs_core_enum_bitmask();
-void test_rs_core_format_concepts();
-void test_rs_core_format_automation();
 void test_rs_core_hash_concepts();
 void test_rs_core_hash_kernighan();
 void test_rs_core_hash_mix();
@@ -192,8 +190,6 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_enum_concepts, "test_rs_core_enum_concepts");
     call_me_maybe(test_rs_core_enum_class, "test_rs_core_enum_class");
     call_me_maybe(test_rs_core_enum_bitmask, "test_rs_core_enum_bitmask");
-    call_me_maybe(test_rs_core_format_concepts, "test_rs_core_format_concepts");
-    call_me_maybe(test_rs_core_format_automation, "test_rs_core_format_automation");
     call_me_maybe(test_rs_core_hash_concepts, "test_rs_core_hash_concepts");
     call_me_maybe(test_rs_core_hash_kernighan, "test_rs_core_hash_kernighan");
     call_me_maybe(test_rs_core_hash_mix, "test_rs_core_hash_mix");

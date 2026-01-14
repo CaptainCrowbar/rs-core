@@ -173,8 +173,8 @@ class Dice {
     double pdf(T x) const;
     double cdf(T x) const;
     double ccdf(T x) const;
-    std::string str() const;
 };
+
 template <Integral T> class std::formatter<Dice<T>>;
 ```
 
@@ -188,8 +188,7 @@ function. These correspond respectively to the probability of generating a
 result exactly equal to `x,` less than or equal to `x,` and greater than or
 equal to `x.`
 
-The `str()` function, and the formatter, return conventional dice notation,
-e.g. `"3d6"`.
+The formatter returns conventional dice notation, e.g. `"3d6"`.
 
 ### Uniform floating point distribution
 

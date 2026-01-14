@@ -1,7 +1,6 @@
 #pragma once
 
 #include "rs-core/character.hpp"
-#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include <algorithm>
@@ -84,7 +83,6 @@ namespace RS {
         template <std::integral T> explicit operator T() const noexcept { return checked_cast<T>().value_or(0); }
         std::size_t hash() const noexcept;
         std::string str(unsigned base = 10, std::size_t digits = 1) const;
-        std::string rs_core_format(std::string_view flags, std::size_t digits) const;
 
         static std::optional<Natural> parse(std::string_view str, unsigned base = 10);
 
@@ -586,17 +584,6 @@ namespace RS {
 
     }
 
-    inline std::string Natural::rs_core_format(std::string_view flags, std::size_t digits) const {
-        digits = std::max(digits, 1uz);
-        if (flags.contains('b')) {
-            return str(2, digits);
-        } else if (flags.contains('x')) {
-            return str(16, digits);
-        } else {
-            return str(10, digits);
-        }
-    }
-
     inline std::optional<Natural> Natural::parse(std::string_view str, unsigned base) {
 
         auto body = str;
@@ -699,7 +686,6 @@ namespace RS {
         std::size_t hash() const noexcept;
         int sign() const noexcept { return sign_ ? -1 : mag_ ? 1 : 0; }
         std::string str(unsigned base = 10, std::size_t digits = 1) const;
-        std::string rs_core_format(std::string_view flags, std::size_t digits) const;
 
         static std::optional<Integer> parse(std::string_view str, unsigned base = 10);
 
@@ -872,17 +858,6 @@ namespace RS {
         return out;
     }
 
-    inline std::string Integer::rs_core_format(std::string_view flags, std::size_t digits) const {
-        digits = std::max(digits, 1uz);
-        if (flags.contains('b')) {
-            return str(2, digits);
-        } else if (flags.contains('x')) {
-            return str(16, digits);
-        } else {
-            return str(10, digits);
-        }
-    }
-
     inline std::optional<Integer> Integer::parse(std::string_view str, unsigned base) {
 
         if (str.empty()) {
@@ -925,83 +900,118 @@ namespace RS {
 
 }
 
-namespace std {
+// Specializations
 
-    // Specializations
+template <RS::Mpitype M, typename T>
+struct std::common_type<M, T> {};
 
-    template <RS::Mpitype M, typename T>
-    struct common_type<M, T> {};
+template <>
+struct std::common_type<RS::Natural, RS::Integer> {
+    using type = RS::Integer;
+};
 
-    template <>
-    struct common_type<RS::Natural, RS::Integer> {
-        using type = RS::Integer;
-    };
+template <std::signed_integral T>
+struct std::common_type<RS::Natural, T> {
+    using type = RS::Integer;
+};
 
-    template <signed_integral T>
-    struct common_type<RS::Natural, T> {
-        using type = RS::Integer;
-    };
+template <std::unsigned_integral T>
+struct std::common_type<RS::Natural, T> {
+    using type = RS::Natural;
+};
 
-    template <unsigned_integral T>
-    struct common_type<RS::Natural, T> {
-        using type = RS::Natural;
-    };
+template <std::integral T>
+struct std::common_type<RS::Integer, T> {
+    using type = RS::Integer;
+};
 
-    template <integral T>
-    struct common_type<RS::Integer, T> {
-        using type = RS::Integer;
-    };
+template <RS::Mpitype M>
+struct std::common_type<M, float> {
+    using type = double;
+};
 
-    template <RS::Mpitype M>
-    struct common_type<M, float> {
-        using type = double;
-    };
+template <RS::Mpitype M>
+struct std::common_type<M, double> {
+    using type = double;
+};
 
-    template <RS::Mpitype M>
-    struct common_type<M, double> {
-        using type = double;
-    };
+template <RS::Mpitype M>
+struct std::common_type<M, long double> {
+    using type = long double;
+};
 
-    template <RS::Mpitype M>
-    struct common_type<M, long double> {
-        using type = long double;
-    };
+template <RS::Mpitype M, std::floating_point T>
+struct std::common_type<M, T> {
+    using type = std::conditional_t<(sizeof(T) < sizeof(double)), double, T>;
+};
 
-    template <RS::Mpitype M, floating_point T>
-    struct common_type<M, T> {
-        using type = conditional_t<(sizeof(T) < sizeof(double)), double, T>;
-    };
+template <typename T, RS::Mpitype M>
+struct std::common_type<T, M>:
+std::common_type<M, T> {};
 
-    template <typename T, RS::Mpitype M>
-    struct common_type<T, M>:
-    common_type<M, T> {};
+template <RS::Mpitype M>
+struct std::formatter<M> {
 
-    template <>
-    struct hash<RS::Natural> {
-        auto operator()(const RS::Natural& x) const noexcept { return x.hash(); }
-    };
+    unsigned base = 10;
+    std::size_t digits = 0;
 
-    template <>
-    struct hash<RS::Integer> {
-        auto operator()(const RS::Integer& x) const noexcept { return x.hash(); }
-    };
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
 
-    template <RS::Mpitype M>
-    class numeric_limits<M>:
-    public std::numeric_limits<void> {
+        auto it = ctx.begin();
 
-    public:
+        for (; it != ctx.end() && *it != '}'; ++it) {
+            if (*it == 'b') {
+                base = 2;
+            } else if (*it == 'x') {
+                base = 16;
+            } else if (*it >= '0' && *it <= '9') {
+                digits *= 10;
+                digits += static_cast<std::size_t>(*it - '0');
+            } else {
+                throw std::format_error{std::format("Invalid format: {:?}", *it)};
+            }
+        }
 
-        static constexpr bool is_exact        = true;
-        static constexpr bool is_integer      = true;
-        static constexpr bool is_signed       = std::same_as<M, RS::Integer>;
-        static constexpr bool is_specialized  = true;
-        static constexpr int radix            = 2;
+        digits = std::max(digits, 1uz);
 
-        static const M lowest()  { return {}; }
-        static const M max()     { return {}; }
-        static const M min()     { return {}; }
+        return it;
 
-    };
+    }
 
-}
+    template <typename FormatContext>
+    auto format(const M& m, FormatContext& ctx) const {
+        auto s = m.str(base, digits);
+        std::copy(s.begin(), s.end(), ctx.out());
+        return ctx.out();
+    }
+
+};
+
+template <>
+struct std::hash<RS::Natural> {
+    auto operator()(const RS::Natural& x) const noexcept { return x.hash(); }
+};
+
+template <>
+struct std::hash<RS::Integer> {
+    auto operator()(const RS::Integer& x) const noexcept { return x.hash(); }
+};
+
+template <RS::Mpitype M>
+class std::numeric_limits<M>:
+public std::numeric_limits<void> {
+
+public:
+
+    static constexpr bool is_exact        = true;
+    static constexpr bool is_integer      = true;
+    static constexpr bool is_signed       = std::same_as<M, RS::Integer>;
+    static constexpr bool is_specialized  = true;
+    static constexpr int radix            = 2;
+
+    static const M lowest()  { return {}; }
+    static const M max()     { return {}; }
+    static const M min()     { return {}; }
+
+};

@@ -223,7 +223,8 @@ True if the value is within the range of the specified primitive integer
 type.
 
 ```c++
-template <std::integral T> std::optional<T> Mpitype::checked_cast() const noexcept;
+template <std::integral T> std::optional<T>
+    Mpitype::checked_cast() const noexcept;
 ```
 
 Returns the value as a primitive integer type, or a null optional if the value
@@ -273,7 +274,8 @@ Hash function.
 ### String functions
 
 ```c++
-static std::optional<Mpitype> Mpitype::parse(std::string_view str, unsigned base = 10);
+static std::optional<Mpitype> Mpitype::parse(std::string_view str,
+    unsigned base = 10);
 ```
 
 Parse a string to an integer. This will return a null optional if the string

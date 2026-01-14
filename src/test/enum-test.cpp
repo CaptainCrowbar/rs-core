@@ -1,10 +1,8 @@
 #include "rs-core/enum.hpp"
-#include "rs-core/format.hpp"
 #include "rs-core/unit-test.hpp"
 #include <concepts>
 #include <cstdint>
 #include <format>
-#include <string>
 #include <type_traits>
 
 using namespace RS;
@@ -49,11 +47,6 @@ void test_rs_core_enum_concepts() {
     static_assert(! AutoBitmask<Complicated>);
     static_assert(AutoBitmask<Mask>);
     static_assert(! AutoBitmask<Raw>);
-
-    static_assert(! Detail::AutoFormat<Simple>);
-    static_assert(! Detail::AutoFormat<Complicated>);
-    static_assert(! Detail::AutoFormat<Mask>);
-    static_assert(! Detail::AutoFormat<Raw>);
 
 }
 

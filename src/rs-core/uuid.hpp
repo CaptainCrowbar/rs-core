@@ -1,11 +1,11 @@
 #pragma once
 
 #include "rs-core/arithmetic.hpp"
-#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include "rs-core/random.hpp"
 #include "rs-core/uint128.hpp"
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <chrono>
@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <cstring>
 #include <format>
+#include <functional>
 #include <random>
 #include <stdexcept>
 #include <string>
@@ -48,7 +49,6 @@ namespace RS {
         constexpr void set_variant(int v) noexcept;
         constexpr void set_version(int v) noexcept;
         std::string str() const;
-        std::string rs_core_format() const { return str(); }
         explicit operator std::string() const { return str(); }
 
         static constexpr Uuid max() noexcept;
@@ -239,11 +239,29 @@ namespace RS {
 
 }
 
-namespace std {
+template <>
+class std::formatter<::RS::Uuid> {
 
-    template <>
-    struct hash<::RS::Uuid> {
-        std::size_t operator()(const ::RS::Uuid& u) const noexcept { return u.hash(); }
-    };
+public:
 
-}
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        if (ctx.begin() != ctx.end() && *ctx.begin() != '}') {
+            throw std::format_error{std::format("Invalid format: {:?}", *ctx.begin())};
+        }
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const ::RS::Uuid& u, FormatContext& ctx) const {
+        auto s = u.str();
+        std::copy(s.begin(), s.end(), ctx.out());
+        return ctx.out();
+    }
+
+};
+
+template <>
+struct std::hash<::RS::Uuid> {
+    std::size_t operator()(const ::RS::Uuid& u) const noexcept { return u.hash(); }
+};

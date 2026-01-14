@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <format>
 #include <initializer_list>
 #include <iterator>
 #include <limits>
@@ -274,9 +275,6 @@ namespace RS {
         double pdf(T x) const;
         double cdf(T x) const;
         double ccdf(T x) const;
-
-        std::string str() const { return std::to_string(number_) + 'd' + std::to_string(faces()); }
-        std::string rs_core_format() const { return str(); }
 
     private:
 
@@ -830,3 +828,25 @@ namespace RS {
     }
 
 }
+
+template <RS::Integral T>
+class std::formatter<RS::Dice<T>> {
+
+public:
+
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        if (ctx.begin() != ctx.end() && *ctx.begin() != '}') {
+            throw std::format_error{std::format("Invalid format: {:?}", *ctx.begin())};
+        }
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const RS::Dice<T>& d, FormatContext& ctx) const {
+        auto s = std::to_string(d.number()) + 'd' + std::to_string(d.faces());
+        std::copy(s.begin(), s.end(), ctx.out());
+        return ctx.out();
+    }
+
+};

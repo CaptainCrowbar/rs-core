@@ -392,7 +392,6 @@ void test_rs_core_random_dice() {
         TEST_EQUAL(dist.max(), 6);
         TEST_EQUAL(dist.number(), 1);
         TEST_EQUAL(dist.faces(), 6);
-        TEST_EQUAL(dist.str(), "1d6");
         TEST_EQUAL(std::format("{}", dist), "1d6");
 
         TEST_EQUAL(dist.pdf(0), 0);
@@ -450,7 +449,6 @@ void test_rs_core_random_dice() {
         TEST_EQUAL(dist.max(), 18);
         TEST_EQUAL(dist.number(), 3);
         TEST_EQUAL(dist.faces(), 6);
-        TEST_EQUAL(dist.str(), "3d6");
         TEST_EQUAL(std::format("{}", dist), "3d6");
 
         TEST_EQUAL(dist.pdf(2), 0);
@@ -541,7 +539,6 @@ void test_rs_core_random_dice() {
         TEST_EQUAL(dist.max(), 200);
         TEST_EQUAL(dist.number(), 2);
         TEST_EQUAL(dist.faces(), 100);
-        TEST_EQUAL(dist.str(), "2d100");
         TEST_EQUAL(std::format("{}", dist), "2d100");
 
         int x{};

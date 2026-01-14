@@ -1,7 +1,6 @@
 #pragma once
 
 #include "rs-core/character.hpp"
-#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include <algorithm>
 #include <concepts>
