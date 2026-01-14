@@ -141,10 +141,6 @@ namespace RS {
             title,
         };
 
-        template <AutoEnum T>
-        struct PoisonFormat<T>:
-        std::true_type {};
-
         constexpr bool is_enum_delimiter_char(char c) noexcept {
             return c == ' '
                 || (ascii_ispunct(c)

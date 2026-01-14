@@ -197,10 +197,14 @@ template <typename T, typename Tag, RS::AliasFlags Flags>
 requires std::numeric_limits<T>::is_specialized
 class std::numeric_limits<RS::Alias<T, Tag, Flags>>:
 public std::numeric_limits<T> {
+
 private:
+
     using alias = RS::Alias<T, Tag, Flags>;
     using t_limits = std::numeric_limits<T>;
+
 public:
+
     static alias denorm_min()     { return static_cast<alias>(t_limits::denorm_min()); }
     static alias epsilon()        { return static_cast<alias>(t_limits::epsilon()); }
     static alias infinity()       { return static_cast<alias>(t_limits::infinity()); }
@@ -210,4 +214,5 @@ public:
     static alias quiet_NaN()      { return static_cast<alias>(t_limits::quiet_NaN()); }
     static alias round_error()    { return static_cast<alias>(t_limits::round_error()); }
     static alias signaling_NaN()  { return static_cast<alias>(t_limits::signaling_NaN()); }
+
 };

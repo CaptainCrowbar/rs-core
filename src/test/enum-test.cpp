@@ -32,14 +32,6 @@ namespace {
         charlie = 4,
     )
 
-    struct Confusing {
-        Simple sim {};
-        Confusing(Simple s): sim(s) {}
-    };
-
-    [[maybe_unused]] std::string to_string(Confusing c) { return std::to_string(static_cast<int>(c.sim)); }
-    [[maybe_unused]] std::string rs_core_format(Confusing c) { return to_string(c); }
-
     enum class Raw: int {
         zulu,
     };

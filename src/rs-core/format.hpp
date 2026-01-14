@@ -58,19 +58,14 @@ namespace RS::Detail {
     };
 
     template <typename T>
-    struct PoisonFormat:
-    std::false_type {};
-
-    template <typename T>
-    concept AutoFormat = (FormatByMemberFunction<T>
-            || FormatByMemberFunctionWithFlags<T>
-            || FormatByMemberFunctionWithSize<T>
-            || FormatByMemberFunctionWithBoth<T>
-            || FormatByFreeFunction<T>
-            || FormatByFreeFunctionWithFlags<T>
-            || FormatByFreeFunctionWithSize<T>
-            || FormatByFreeFunctionWithBoth<T>)
-        && ! PoisonFormat<T>::value;
+    concept AutoFormat = FormatByMemberFunction<T>
+        || FormatByMemberFunctionWithFlags<T>
+        || FormatByMemberFunctionWithSize<T>
+        || FormatByMemberFunctionWithBoth<T>
+        || FormatByFreeFunction<T>
+        || FormatByFreeFunctionWithFlags<T>
+        || FormatByFreeFunctionWithSize<T>
+        || FormatByFreeFunctionWithBoth<T>;
 
 }
 

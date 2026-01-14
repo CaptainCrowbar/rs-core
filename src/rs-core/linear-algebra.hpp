@@ -910,102 +910,98 @@ namespace RS {
 
 }
 
-namespace std {
+template <RS::Scalar T, std::size_t N>
+struct std::formatter<RS::Vector<T, N>>:
+std::formatter<T> {
+    template <typename FormatContext>
+    auto format(const RS::Vector<T, N>& v, FormatContext& ctx) const {
+        const std::formatter<T>& t_format = *this;
+        auto out = ctx.out();
+        auto ch = '[';
+        for (auto x: v) {
+            *out++ = ch;
+            out = t_format.format(x, ctx);
+            ch = ',';
+        }
+        *out++ = ']';
+        return out;
+    }
+};
 
-    template <RS::Scalar T, std::size_t N>
-    struct formatter<RS::Vector<T, N>>:
-    formatter<T> {
-        template <typename FormatContext>
-        auto format(const RS::Vector<T, N>& v, FormatContext& ctx) const {
-            const std::formatter<T>& t_format = *this;
-            auto out = ctx.out();
-            auto ch = '[';
-            for (auto x: v) {
-                *out++ = ch;
-                out = t_format.format(x, ctx);
-                ch = ',';
+template <RS::Scalar T, std::size_t N, RS::MatrixLayout L>
+struct std::formatter<RS::Matrix<T, N, L>>:
+std::formatter<T> {
+    template <typename FormatContext>
+    auto format(RS::Matrix<T, N, L> m, FormatContext& ctx) const {
+        const std::formatter<T>& t_format = *this;
+        auto out = ctx.out();
+        auto ch1 = '[';
+        for (auto r = 0uz; r < N; ++r) {
+            *out++ = ch1;
+            ch1 = ',';
+            auto ch2 = '[';
+            for (auto c = 0uz; c < N; ++c) {
+                *out++ = ch2;
+                ch2 = ',';
+                out = t_format.format(m[r, c], ctx);
             }
             *out++ = ']';
-            return out;
         }
-    };
+        *out++ = ']';
+        return out;
+    }
+};
 
-    template <RS::Scalar T, std::size_t N, RS::MatrixLayout L>
-    struct std::formatter<RS::Matrix<T, N, L>>:
-    std::formatter<T> {
-        template <typename FormatContext>
-        auto format(RS::Matrix<T, N, L> m, FormatContext& ctx) const {
-            const std::formatter<T>& t_format = *this;
-            auto out = ctx.out();
-            auto ch1 = '[';
-            for (auto r = 0uz; r < N; ++r) {
-                *out++ = ch1;
-                ch1 = ',';
-                auto ch2 = '[';
-                for (auto c = 0uz; c < N; ++c) {
-                    *out++ = ch2;
-                    ch2 = ',';
-                    out = t_format.format(m[r, c], ctx);
-                }
-                *out++ = ']';
-            }
-            *out++ = ']';
-            return out;
+template <RS::Scalar T>
+struct std::formatter<RS::Quaternion<T>>:
+std::formatter<T> {
+    template <typename FormatContext>
+    auto format(const RS::Quaternion<T>& q, FormatContext& ctx) const {
+        const std::formatter<T>& t_format = *this;
+        auto out = ctx.out();
+        *out++ = 'Q';
+        auto ch = '[';
+        for (auto x: q) {
+            *out++ = ch;
+            out = t_format.format(x, ctx);
+            ch = ',';
         }
-    };
+        *out++ = ']';
+        return out;
+    }
+};
 
-    template <RS::Scalar T>
-    struct formatter<RS::Quaternion<T>>:
-    formatter<T> {
-        template <typename FormatContext>
-        auto format(const RS::Quaternion<T>& q, FormatContext& ctx) const {
-            const std::formatter<T>& t_format = *this;
-            auto out = ctx.out();
-            *out++ = 'Q';
-            auto ch = '[';
-            for (auto x: q) {
-                *out++ = ch;
-                out = t_format.format(x, ctx);
-                ch = ',';
-            }
-            *out++ = ']';
-            return out;
-        }
-    };
+template <RS::Scalar T, std::size_t N>
+struct std::greater<RS::Vector<T, N>> {
+    bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
+        return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::greater<T>());
+    }
+};
 
-    template <RS::Scalar T, std::size_t N>
-    struct greater<RS::Vector<T, N>> {
-        bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
-            return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::greater<T>());
-        }
-    };
+template <RS::Scalar T, std::size_t N>
+struct std::less<RS::Vector<T, N>> {
+    bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
+        return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::less<T>());
+    }
+};
 
-    template <RS::Scalar T, std::size_t N>
-    struct less<RS::Vector<T, N>> {
-        bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
-            return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::less<T>());
-        }
-    };
+template <RS::Scalar T, std::size_t N>
+struct std::hash<RS::Vector<T, N>> {
+    std::size_t operator()(const RS::Vector<T, N>& v) const noexcept {
+        return v.hash();
+    }
+};
 
-    template <RS::Scalar T, std::size_t N>
-    struct hash<RS::Vector<T, N>> {
-        std::size_t operator()(const RS::Vector<T, N>& v) const noexcept {
-            return v.hash();
-        }
-    };
+template <RS::Scalar T, std::size_t N, RS::MatrixLayout L>
+struct std::hash<RS::Matrix<T, N, L>> {
+    std::size_t operator()(const RS::Matrix<T, N, L>& m) const noexcept {
+        return m.hash();
+    }
+};
 
-    template <RS::Scalar T, std::size_t N, RS::MatrixLayout L>
-    struct hash<RS::Matrix<T, N, L>> {
-        std::size_t operator()(const RS::Matrix<T, N, L>& m) const noexcept {
-            return m.hash();
-        }
-    };
-
-    template <RS::Scalar T>
-    struct hash<RS::Quaternion<T>> {
-        std::size_t operator()(const RS::Quaternion<T>& q) const noexcept {
-            return q.hash();
-        }
-    };
-
-}
+template <RS::Scalar T>
+struct std::hash<RS::Quaternion<T>> {
+    std::size_t operator()(const RS::Quaternion<T>& q) const noexcept {
+        return q.hash();
+    }
+};
