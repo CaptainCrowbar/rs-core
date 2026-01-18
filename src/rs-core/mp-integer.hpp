@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-core/character.hpp"
+#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include <algorithm>
@@ -950,7 +951,8 @@ struct std::common_type<T, M>:
 std::common_type<M, T> {};
 
 template <RS::Mpitype M>
-struct std::formatter<M> {
+struct std::formatter<M>:
+RS::CommonFormatter {
 
     unsigned base = 10;
     std::size_t digits = 0;
@@ -982,8 +984,7 @@ struct std::formatter<M> {
     template <typename FormatContext>
     auto format(const M& m, FormatContext& ctx) const {
         auto s = m.str(base, digits);
-        std::copy(s.begin(), s.end(), ctx.out());
-        return ctx.out();
+        return write_out(s, ctx.out());
     }
 
 };

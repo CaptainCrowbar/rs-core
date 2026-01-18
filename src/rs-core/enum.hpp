@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-core/character.hpp"
+#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include <algorithm>
 #include <concepts>
@@ -24,12 +25,12 @@
         static const auto static_set = [] { \
             std::set<EnumType> temp_set; \
             if constexpr (std::signed_integral<IntType>) { \
-                auto table = ::RS::Detail::signed_enum_table(# __VA_ARGS__); \
+                auto table = RS::Detail::signed_enum_table(# __VA_ARGS__); \
                 for (auto& [k,v]: table) { \
                     temp_set.insert(static_cast<EnumType>(k)); \
                 } \
             } else { \
-                auto table = ::RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
+                auto table = RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
                 for (auto& [k,v]: table) { \
                     temp_set.insert(static_cast<EnumType>(k)); \
                 } \
@@ -41,9 +42,9 @@
     [[maybe_unused]] inline std::string to_string(EnumType t) { \
         static const auto static_table = [] { \
             if constexpr (std::signed_integral<IntType>) { \
-                return ::RS::Detail::signed_enum_table(# __VA_ARGS__); \
+                return RS::Detail::signed_enum_table(# __VA_ARGS__); \
             } else { \
-                return ::RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
+                return RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
             } \
         }(); \
         auto index = static_cast<IntType>(t); \
@@ -63,7 +64,7 @@
     [[maybe_unused]] inline const std::set<BitmaskType>& enum_values(BitmaskType) { \
         static const auto static_set = [] { \
             std::set<BitmaskType> temp_set {}; \
-            auto table = ::RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
+            auto table = RS::Detail::unsigned_enum_table(# __VA_ARGS__); \
             for (auto& [k,v]: table) { \
                 temp_set.insert(static_cast<BitmaskType>(k)); \
             } \
@@ -73,7 +74,7 @@
     } \
     [[maybe_unused]] inline std::string to_string(BitmaskType t) { \
         static_assert(std::unsigned_integral<IntType>); \
-        static const auto static_table = ::RS::Detail::linear_enum_table(# __VA_ARGS__); \
+        static const auto static_table = RS::Detail::linear_enum_table(# __VA_ARGS__); \
         auto index = static_cast<unsigned long long>(t); \
         if (index == 0) { \
             return "none"; \
@@ -257,23 +258,25 @@ namespace RS {
 
 }
 
-template <::RS::AutoEnum T>
-struct std::formatter<T> {
+template <RS::AutoEnum T>
+struct std::formatter<T>:
+RS::CommonFormatter {
 
-public:
+    RS::Detail::EnumCase mode = RS::Detail::EnumCase::none;
+    char delimiter = '_';
 
     constexpr auto parse(std::format_parse_context& ctx) {
-        using namespace ::RS::Detail;
+        using namespace RS::Detail;
         auto it = ctx.begin();
         for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 'i' && case_ == EnumCase::none && delimiter_ == '_') {
-                case_ = EnumCase::integer;
-            } else if (*it == 's' && case_ == EnumCase::none) {
-                case_ = EnumCase::sentence;
-            } else if (*it == 't' && case_ == EnumCase::none) {
-                case_ = EnumCase::title;
-            } else if (is_enum_delimiter_char(*it) && case_ != EnumCase::integer && delimiter_ == '_') {
-                delimiter_ = *it;
+            if (*it == 'i' && mode == EnumCase::none && delimiter == '_') {
+                mode = EnumCase::integer;
+            } else if (*it == 's' && mode == EnumCase::none) {
+                mode = EnumCase::sentence;
+            } else if (*it == 't' && mode == EnumCase::none) {
+                mode = EnumCase::title;
+            } else if (is_enum_delimiter_char(*it) && mode != EnumCase::integer && delimiter == '_') {
+                delimiter = *it;
             } else {
                 throw std::format_error{std::format("Invalid format: {:?}", *it)};
             }
@@ -283,21 +286,16 @@ public:
 
     template <typename FormatContext>
     auto format(const T& t, FormatContext& ctx) const {
-        using namespace ::RS::Detail;
+        using namespace RS::Detail;
         using U = std::underlying_type_t<T>;
         std::string str;
-        if (case_ == EnumCase::integer) {
+        if (mode == EnumCase::integer) {
             str = std::to_string(static_cast<U>(t));
         } else {
             str = to_string(t);
-            reformat_enum(str, case_, delimiter_);
+            reformat_enum(str, mode, delimiter);
         }
-        return std::ranges::copy(str, ctx.out()).out;
+        return write_out(str, ctx.out());
     }
-
-private:
-
-    ::RS::Detail::EnumCase case_ = ::RS::Detail::EnumCase::none;
-    char delimiter_ = '_';
 
 };

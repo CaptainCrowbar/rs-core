@@ -1,11 +1,11 @@
 #pragma once
 
 #include "rs-core/arithmetic.hpp"
+#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include "rs-core/random.hpp"
 #include "rs-core/uint128.hpp"
-#include <algorithm>
 #include <array>
 #include <bit>
 #include <chrono>
@@ -240,28 +240,10 @@ namespace RS {
 }
 
 template <>
-class std::formatter<::RS::Uuid> {
-
-public:
-
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx) {
-        if (ctx.begin() != ctx.end() && *ctx.begin() != '}') {
-            throw std::format_error{std::format("Invalid format: {:?}", *ctx.begin())};
-        }
-        return ctx.begin();
-    }
-
-    template <typename FormatContext>
-    auto format(const ::RS::Uuid& u, FormatContext& ctx) const {
-        auto s = u.str();
-        std::copy(s.begin(), s.end(), ctx.out());
-        return ctx.out();
-    }
-
-};
+struct std::formatter<RS::Uuid>:
+RS::BasicFormatter<RS::Uuid> {};
 
 template <>
-struct std::hash<::RS::Uuid> {
-    std::size_t operator()(const ::RS::Uuid& u) const noexcept { return u.hash(); }
+struct std::hash<RS::Uuid> {
+    std::size_t operator()(const RS::Uuid& u) const noexcept { return u.hash(); }
 };

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "rs-core/arithmetic.hpp"
+#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include "rs-core/mp-integer.hpp"
-#include <algorithm>
 #include <cstddef>
 #include <compare>
 #include <concepts>
@@ -341,7 +341,8 @@ struct std::common_type<T, RS::Rational<U>>:
 std::common_type<RS::Rational<U>, T> {};
 
 template <RS::SignedIntegral T>
-struct std::formatter<RS::Rational<T>> {
+struct std::formatter<RS::Rational<T>>:
+RS::CommonFormatter {
 
     bool mixed = false;
 
@@ -364,9 +365,7 @@ struct std::formatter<RS::Rational<T>> {
 
     template <typename FormatContext>
     auto format(const RS::Rational<T>& r, FormatContext& ctx) const {
-        auto s = mixed ? r.mixed() : r.str();
-        std::copy(s.begin(), s.end(), ctx.out());
-        return ctx.out();
+        return write_out(mixed ? r.mixed() : r.str(), ctx.out());
     }
 
 };

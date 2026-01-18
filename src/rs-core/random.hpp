@@ -2,6 +2,7 @@
 
 #include "rs-core/arithmetic.hpp"
 #include "rs-core/enum.hpp"
+#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/mp-integer.hpp"
 #include "rs-core/uint128.hpp"
@@ -830,23 +831,13 @@ namespace RS {
 }
 
 template <RS::Integral T>
-class std::formatter<RS::Dice<T>> {
-
-public:
-
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx) {
-        if (ctx.begin() != ctx.end() && *ctx.begin() != '}') {
-            throw std::format_error{std::format("Invalid format: {:?}", *ctx.begin())};
-        }
-        return ctx.begin();
-    }
+struct std::formatter<RS::Dice<T>>:
+RS::CommonFormatter {
 
     template <typename FormatContext>
     auto format(const RS::Dice<T>& d, FormatContext& ctx) const {
         auto s = std::to_string(d.number()) + 'd' + std::to_string(d.faces());
-        std::copy(s.begin(), s.end(), ctx.out());
-        return ctx.out();
+        return write_out(s, ctx.out());
     }
 
 };

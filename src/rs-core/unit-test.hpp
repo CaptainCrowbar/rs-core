@@ -105,8 +105,8 @@ namespace RS::UnitTest {
 
 #define FAIL(...) do { \
     std::println("{}... Test failed [{}:{}]{}\n\t{}", \
-        ::RS::UnitTest::xfail, __FILE__, __LINE__, ::RS::UnitTest::xreset, std::format(__VA_ARGS__)); \
-    ++::RS::UnitTest::failures; \
+        RS::UnitTest::xfail, __FILE__, __LINE__, RS::UnitTest::xreset, std::format(__VA_ARGS__)); \
+    ++RS::UnitTest::failures; \
 } while (false)
 
 // Evaluate an expression. Fails if any exception is thrown.
@@ -267,7 +267,7 @@ namespace RS::UnitTest {
 #define TEST_MATCH(expr, pattern) do { \
     try { \
         auto _test_string = static_cast<std::string>(expr); \
-        if (! ::RS::UnitTest::TextMatch{_test_string}(pattern)) { \
+        if (! RS::UnitTest::TextMatch{_test_string}(pattern)) { \
             FAIL("Expression does not match pattern: {0:?}", _test_string); \
         } \
     } \
@@ -292,7 +292,7 @@ namespace RS::UnitTest {
         FAIL("No exception thrown: {}", # expr); \
     } \
     catch (const exception_type& _test_except) { \
-        if (! ::RS::UnitTest::TextMatch{_test_except.what()}(pattern)) { \
+        if (! RS::UnitTest::TextMatch{_test_except.what()}(pattern)) { \
             FAIL("Unexpected error message: {}", _test_except.what()); \
         } \
     } \

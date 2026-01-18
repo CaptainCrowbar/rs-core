@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include <algorithm>
@@ -298,23 +299,25 @@ namespace RS {
 }
 
 template <std::integral T>
-struct std::common_type<::RS::Uint128, T> {
-    using type = ::RS::Uint128;
+struct std::common_type<RS::Uint128, T> {
+    using type = RS::Uint128;
 };
 
 template <std::floating_point T>
-struct std::common_type<::RS::Uint128, T> {
+struct std::common_type<RS::Uint128, T> {
     using type = T;
 };
 
 template <typename T>
-struct std::common_type<T, ::RS::Uint128>:
-std::common_type<::RS::Uint128, T> {};
+struct std::common_type<T, RS::Uint128>:
+std::common_type<RS::Uint128, T> {};
 
 template <>
-struct std::formatter<::RS::Uint128> {
+struct std::formatter<RS::Uint128>:
+RS::CommonFormatter {
 
-public:
+    int base = 10;
+    std::size_t digits = 0;
 
     template <typename ParseContext>
     constexpr auto parse(ParseContext& ctx) {
@@ -322,19 +325,19 @@ public:
         auto it = ctx.begin();
 
         for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 'b' && base_ == 10) {
-                base_ = 2;
-            } else if (*it == 'x' && base_ == 10) {
-                base_ = 16;
+            if (*it == 'b' && base == 10) {
+                base = 2;
+            } else if (*it == 'x' && base == 10) {
+                base = 16;
             } else if (*it >= '0' && *it <= '9') {
-                digits_ = 10 * digits_ + static_cast<std::size_t>(*it - '0');
+                digits = 10 * digits + static_cast<std::size_t>(*it - '0');
             } else {
                 throw std::format_error{std::format("Invalid format: {:?}", *it)};
             }
         }
 
-        if (digits_ == 0) {
-            digits_ = 1;
+        if (digits == 0) {
+            digits = 1;
         }
 
         return it;
@@ -342,28 +345,22 @@ public:
     }
 
     template <typename FormatContext>
-    auto format(::RS::Uint128 u, FormatContext& ctx) const {
-        auto str = u.str(base_, digits_);
-        return std::ranges::copy(str, ctx.out()).out;
+    auto format(RS::Uint128 u, FormatContext& ctx) const {
+        return write_out(u.str(base, digits), ctx.out());
     }
-
-private:
-
-    int base_ = 10;
-    std::size_t digits_ = 0;
 
 };
 
 template <>
-struct std::hash<::RS::Uint128> {
-    constexpr std::size_t operator()(::RS::Uint128 u) const noexcept {
-        using subhash = hash<::RS::Uint128::word>;
-        return ::RS::hash_mix(subhash()(u.high()), subhash()(u.low()));
+struct std::hash<RS::Uint128> {
+    constexpr std::size_t operator()(RS::Uint128 u) const noexcept {
+        using subhash = hash<RS::Uint128::word>;
+        return RS::hash_mix(subhash()(u.high()), subhash()(u.low()));
     }
 };
 
 template <>
-class std::numeric_limits<::RS::Uint128>:
+class std::numeric_limits<RS::Uint128>:
 public std::numeric_limits<void> {
 
 public:
@@ -379,8 +376,8 @@ public:
     static constexpr int digits           = 128;
     static constexpr int digits10         = 38;
 
-    static constexpr auto lowest() noexcept  { return ::RS::Uint128{}; }
-    static constexpr auto max() noexcept     { return ~ ::RS::Uint128{}; }
-    static constexpr auto min() noexcept     { return ::RS::Uint128{}; }
+    static constexpr auto lowest() noexcept  { return RS::Uint128{}; }
+    static constexpr auto max() noexcept     { return ~ RS::Uint128{}; }
+    static constexpr auto min() noexcept     { return RS::Uint128{}; }
 
 };
