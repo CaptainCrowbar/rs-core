@@ -48,5 +48,5 @@ CommonFormatter {
 
 CRTP base class that requires the argument type to have its own string
 formatting function, and simply copies the output of that function to the
-formatted output. `T` mus support either a `to_string()` function, which can
-be either a member function or a free function.
+formatted output. `T` must support a `to_string()` function, which can be
+either a member function or a free function.
