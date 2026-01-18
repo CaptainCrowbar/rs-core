@@ -57,8 +57,8 @@ namespace RS {
         constexpr std::pair<Uint128, Uint128> divide(Uint128 y) const noexcept;
         constexpr word high() const noexcept { return hi_; }
         constexpr word low() const noexcept { return lo_; }
-        std::string str(int base = 10, std::size_t digits = 1) const;
-        std::string hex() const { return str(16, 32); }
+        std::string hex() const { return to_string(16, 32); }
+        std::string to_string(int base = 10, std::size_t digits = 1) const;
 
         friend constexpr bool operator==(Uint128 x, Uint128 y) noexcept = default;
         friend constexpr auto operator<=>(Uint128 x, Uint128 y) noexcept = default;
@@ -264,7 +264,7 @@ namespace RS {
 
         }
 
-        inline std::string Uint128::str(int base, std::size_t digits) const {
+        inline std::string Uint128::to_string(int base, std::size_t digits) const {
 
             if (base < 2 || base > 36) {
                 throw std::out_of_range(std::format("Number base ({}) is out of range (2-36)", base));
@@ -346,7 +346,7 @@ RS::CommonFormatter {
 
     template <typename FormatContext>
     auto format(RS::Uint128 u, FormatContext& ctx) const {
-        return write_out(u.str(base, digits), ctx.out());
+        return write_out(u.to_string(base, digits), ctx.out());
     }
 
 };

@@ -288,7 +288,8 @@ digits will be ignored. This will throw `std::out_of_range` if the base is
 out of range (2-36) and is not zero.
 
 ```c++
-std::string Mpitype::str(unsigned base = 10, std::size_t digits = 1) const;
+std::string Mpitype::to_string(unsigned base = 10,
+    std::size_t digits = 1) const;
 ```
 
 Formats the value as a string, with at least the specified number of digits.

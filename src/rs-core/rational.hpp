@@ -43,7 +43,7 @@ namespace RS {
         constexpr Rational signed_fraction() const;
         constexpr std::size_t hash() const noexcept { std::hash<T> ht; return hash_mix(ht(num_), ht(den_)); }
         std::string mixed() const;
-        std::string str() const;
+        std::string to_string() const;
 
         constexpr explicit operator bool() const noexcept { return num_ != T{0}; }
         constexpr bool operator!() const noexcept { return num_ == T{0}; }
@@ -166,7 +166,7 @@ namespace RS {
     }
 
     template <SignedIntegral T>
-    std::string Rational<T>::str() const {
+    std::string Rational<T>::to_string() const {
         if (den_ == T{1}) {
             return std::format("{}", num_);
         } else {
@@ -365,7 +365,7 @@ RS::CommonFormatter {
 
     template <typename FormatContext>
     auto format(const RS::Rational<T>& r, FormatContext& ctx) const {
-        return write_out(mixed ? r.mixed() : r.str(), ctx.out());
+        return write_out(mixed ? r.mixed() : r.to_string(), ctx.out());
     }
 
 };

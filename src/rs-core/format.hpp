@@ -10,21 +10,6 @@
 
 namespace RS {
 
-    namespace Detail {
-
-        template <typename T>
-        concept FormatViaMemberStr = requires (const T t) {
-            { t.str() } -> std::convertible_to<std::string>;
-        };
-
-        template <typename T>
-        concept FormatViaToString = ! FormatViaMemberStr<T>
-            && requires (const T t) {
-                { to_string(t) } -> std::convertible_to<std::string>;
-            };
-
-    }
-
     struct CommonFormatter {
 
     public:
@@ -87,13 +72,17 @@ namespace RS {
     CommonFormatter {
 
         template <typename FormatContext>
-        requires (Detail::FormatViaMemberStr<T>)
+        requires requires (const T t) {
+            { t.to_string() } -> std::convertible_to<std::string>;
+        }
         auto format(const T& t, FormatContext& ctx) const {
-            return write_out(t.str(), ctx.out());
+            return write_out(t.to_string(), ctx.out());
         }
 
         template <typename FormatContext>
-        requires (Detail::FormatViaToString<T>)
+        requires requires (const T t) {
+            { to_string(t) } -> std::convertible_to<std::string>;
+        }
         auto format(const T& t, FormatContext& ctx) const {
             return write_out(to_string(t), ctx.out());
         }

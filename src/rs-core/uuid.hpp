@@ -48,8 +48,8 @@ namespace RS {
         constexpr int version() const noexcept { return static_cast<int>(bytes_[6] >> 4); }
         constexpr void set_variant(int v) noexcept;
         constexpr void set_version(int v) noexcept;
-        std::string str() const;
-        explicit operator std::string() const { return str(); }
+        std::string to_string() const;
+        explicit operator std::string() const { return to_string(); }
 
         static constexpr Uuid max() noexcept;
         template <std::uniform_random_bit_generator RNG> static Uuid random(RNG& rng, int type = 4);
@@ -174,7 +174,7 @@ namespace RS {
             bytes_[6] |= static_cast<std::uint8_t>(v) << 4;
         }
 
-        inline std::string Uuid::str() const {
+        inline std::string Uuid::to_string() const {
             return std::format
                 ("{:02x}{:02x}{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}-{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
                 bytes_[0], bytes_[1], bytes_[2], bytes_[3], bytes_[4], bytes_[5], bytes_[6], bytes_[7],

@@ -9,51 +9,51 @@ void test_rs_core_mp_integer_signed_arithmetic() {
     Integer a, b, c, d, x;
     std::string s;
 
-    TRY(x = a + b);  TRY(s = x.str());  TEST_EQUAL(s, "0");
-    TRY(x = a - b);  TRY(s = x.str());  TEST_EQUAL(s, "0");
-    TRY(x = a * b);  TRY(s = x.str());  TEST_EQUAL(s, "0");
+    TRY(x = a + b);  TRY(s = x.to_string());  TEST_EQUAL(s, "0");
+    TRY(x = a - b);  TRY(s = x.to_string());  TEST_EQUAL(s, "0");
+    TRY(x = a * b);  TRY(s = x.to_string());  TEST_EQUAL(s, "0");
 
     TRY(b = 10);
 
-    TRY(x = a + b);  TRY(s = x.str());  TEST_EQUAL(s, "10");
-    TRY(x = a - b);  TRY(s = x.str());  TEST_EQUAL(s, "-10");
-    TRY(x = b - a);  TRY(s = x.str());  TEST_EQUAL(s, "10");
-    TRY(x = a * b);  TRY(s = x.str());  TEST_EQUAL(s, "0");
-    TRY(x = a / b);  TRY(s = x.str());  TEST_EQUAL(s, "0");
-    TRY(x = a % b);  TRY(s = x.str());  TEST_EQUAL(s, "0");
+    TRY(x = a + b);  TRY(s = x.to_string());  TEST_EQUAL(s, "10");
+    TRY(x = a - b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-10");
+    TRY(x = b - a);  TRY(s = x.to_string());  TEST_EQUAL(s, "10");
+    TRY(x = a * b);  TRY(s = x.to_string());  TEST_EQUAL(s, "0");
+    TRY(x = a / b);  TRY(s = x.to_string());  TEST_EQUAL(s, "0");
+    TRY(x = a % b);  TRY(s = x.to_string());  TEST_EQUAL(s, "0");
 
     TRY(a = Integer("42"));
     TRY(b = Integer("10"));
     TRY(c = - a);
     TRY(d = - b);
 
-    TRY(x = a + b);  TRY(s = x.str());  TEST_EQUAL(s, "52");
-    TRY(x = a - b);  TRY(s = x.str());  TEST_EQUAL(s, "32");
-    TRY(x = b - a);  TRY(s = x.str());  TEST_EQUAL(s, "-32");
-    TRY(x = a * b);  TRY(s = x.str());  TEST_EQUAL(s, "420");
-    TRY(x = a / b);  TRY(s = x.str());  TEST_EQUAL(s, "4");
-    TRY(x = a % b);  TRY(s = x.str());  TEST_EQUAL(s, "2");
+    TRY(x = a + b);  TRY(s = x.to_string());  TEST_EQUAL(s, "52");
+    TRY(x = a - b);  TRY(s = x.to_string());  TEST_EQUAL(s, "32");
+    TRY(x = b - a);  TRY(s = x.to_string());  TEST_EQUAL(s, "-32");
+    TRY(x = a * b);  TRY(s = x.to_string());  TEST_EQUAL(s, "420");
+    TRY(x = a / b);  TRY(s = x.to_string());  TEST_EQUAL(s, "4");
+    TRY(x = a % b);  TRY(s = x.to_string());  TEST_EQUAL(s, "2");
 
-    TRY(x = a + d);  TRY(s = x.str());  TEST_EQUAL(s, "32");
-    TRY(x = a - d);  TRY(s = x.str());  TEST_EQUAL(s, "52");
-    TRY(x = d - a);  TRY(s = x.str());  TEST_EQUAL(s, "-52");
-    TRY(x = a * d);  TRY(s = x.str());  TEST_EQUAL(s, "-420");
-    TRY(x = a / d);  TRY(s = x.str());  TEST_EQUAL(s, "-4");
-    TRY(x = a % d);  TRY(s = x.str());  TEST_EQUAL(s, "2");
+    TRY(x = a + d);  TRY(s = x.to_string());  TEST_EQUAL(s, "32");
+    TRY(x = a - d);  TRY(s = x.to_string());  TEST_EQUAL(s, "52");
+    TRY(x = d - a);  TRY(s = x.to_string());  TEST_EQUAL(s, "-52");
+    TRY(x = a * d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-420");
+    TRY(x = a / d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-4");
+    TRY(x = a % d);  TRY(s = x.to_string());  TEST_EQUAL(s, "2");
 
-    TRY(x = c + b);  TRY(s = x.str());  TEST_EQUAL(s, "-32");
-    TRY(x = c - b);  TRY(s = x.str());  TEST_EQUAL(s, "-52");
-    TRY(x = b - c);  TRY(s = x.str());  TEST_EQUAL(s, "52");
-    TRY(x = c * b);  TRY(s = x.str());  TEST_EQUAL(s, "-420");
-    TRY(x = c / b);  TRY(s = x.str());  TEST_EQUAL(s, "-5");
-    TRY(x = c % b);  TRY(s = x.str());  TEST_EQUAL(s, "8");
+    TRY(x = c + b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-32");
+    TRY(x = c - b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-52");
+    TRY(x = b - c);  TRY(s = x.to_string());  TEST_EQUAL(s, "52");
+    TRY(x = c * b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-420");
+    TRY(x = c / b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-5");
+    TRY(x = c % b);  TRY(s = x.to_string());  TEST_EQUAL(s, "8");
 
-    TRY(x = c + d);  TRY(s = x.str());  TEST_EQUAL(s, "-52");
-    TRY(x = c - d);  TRY(s = x.str());  TEST_EQUAL(s, "-32");
-    TRY(x = d - c);  TRY(s = x.str());  TEST_EQUAL(s, "32");
-    TRY(x = c * d);  TRY(s = x.str());  TEST_EQUAL(s, "420");
-    TRY(x = c / d);  TRY(s = x.str());  TEST_EQUAL(s, "5");
-    TRY(x = c % d);  TRY(s = x.str());  TEST_EQUAL(s, "8");
+    TRY(x = c + d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-52");
+    TRY(x = c - d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-32");
+    TRY(x = d - c);  TRY(s = x.to_string());  TEST_EQUAL(s, "32");
+    TRY(x = c * d);  TRY(s = x.to_string());  TEST_EQUAL(s, "420");
+    TRY(x = c / d);  TRY(s = x.to_string());  TEST_EQUAL(s, "5");
+    TRY(x = c % d);  TRY(s = x.to_string());  TEST_EQUAL(s, "8");
 
     TRY(x = a / 1);  TEST_EQUAL(x, a);
     TRY(x = b / 1);  TEST_EQUAL(x, b);
@@ -105,42 +105,42 @@ void test_rs_core_mp_integer_signed_large_arithmetic() {
     TRY(c = - a);
     TRY(d = - b);
 
-    TRY(x = a + b);  TRY(s = x.str());  TEST_EQUAL(s, "123456789123456789124814702702592580481370368");
-    TRY(x = a - b);  TRY(s = x.str());  TEST_EQUAL(s, "123456789123456789122098875544320997765543210");
-    TRY(x = b - a);  TRY(s = x.str());  TEST_EQUAL(s, "-123456789123456789122098875544320997765543210");
-    TRY(x = a * b);  TRY(s = x.str());  TEST_EQUAL(s, "167643650387245846409206049247037049247037049079393398859791202837831");
-    TRY(x = a / b);  TRY(s = x.str());  TEST_EQUAL(s, "90916528872203810704");
-    TRY(x = a % b);  TRY(s = x.str());  TEST_EQUAL(s, "603972940850418616307173");
+    TRY(x = a + b);  TRY(s = x.to_string());  TEST_EQUAL(s, "123456789123456789124814702702592580481370368");
+    TRY(x = a - b);  TRY(s = x.to_string());  TEST_EQUAL(s, "123456789123456789122098875544320997765543210");
+    TRY(x = b - a);  TRY(s = x.to_string());  TEST_EQUAL(s, "-123456789123456789122098875544320997765543210");
+    TRY(x = a * b);  TRY(s = x.to_string());  TEST_EQUAL(s, "167643650387245846409206049247037049247037049079393398859791202837831");
+    TRY(x = a / b);  TRY(s = x.to_string());  TEST_EQUAL(s, "90916528872203810704");
+    TRY(x = a % b);  TRY(s = x.to_string());  TEST_EQUAL(s, "603972940850418616307173");
 
-    TRY(x = a + d);  TRY(s = x.str());  TEST_EQUAL(s, "123456789123456789122098875544320997765543210");
-    TRY(x = a - d);  TRY(s = x.str());  TEST_EQUAL(s, "123456789123456789124814702702592580481370368");
-    TRY(x = d - a);  TRY(s = x.str());  TEST_EQUAL(s, "-123456789123456789124814702702592580481370368");
-    TRY(x = a * d);  TRY(s = x.str());  TEST_EQUAL(s, "-167643650387245846409206049247037049247037049079393398859791202837831");
-    TRY(x = a / d);  TRY(s = x.str());  TEST_EQUAL(s, "-90916528872203810704");
-    TRY(x = a % d);  TRY(s = x.str());  TEST_EQUAL(s, "603972940850418616307173");
+    TRY(x = a + d);  TRY(s = x.to_string());  TEST_EQUAL(s, "123456789123456789122098875544320997765543210");
+    TRY(x = a - d);  TRY(s = x.to_string());  TEST_EQUAL(s, "123456789123456789124814702702592580481370368");
+    TRY(x = d - a);  TRY(s = x.to_string());  TEST_EQUAL(s, "-123456789123456789124814702702592580481370368");
+    TRY(x = a * d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-167643650387245846409206049247037049247037049079393398859791202837831");
+    TRY(x = a / d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-90916528872203810704");
+    TRY(x = a % d);  TRY(s = x.to_string());  TEST_EQUAL(s, "603972940850418616307173");
 
-    TRY(x = c + b);  TRY(s = x.str());  TEST_EQUAL(s, "-123456789123456789122098875544320997765543210");
-    TRY(x = c - b);  TRY(s = x.str());  TEST_EQUAL(s, "-123456789123456789124814702702592580481370368");
-    TRY(x = b - c);  TRY(s = x.str());  TEST_EQUAL(s, "123456789123456789124814702702592580481370368");
-    TRY(x = c * b);  TRY(s = x.str());  TEST_EQUAL(s, "-167643650387245846409206049247037049247037049079393398859791202837831");
-    TRY(x = c / b);  TRY(s = x.str());  TEST_EQUAL(s, "-90916528872203810705");
-    TRY(x = c % b);  TRY(s = x.str());  TEST_EQUAL(s, "753940638285372741606406");
+    TRY(x = c + b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-123456789123456789122098875544320997765543210");
+    TRY(x = c - b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-123456789123456789124814702702592580481370368");
+    TRY(x = b - c);  TRY(s = x.to_string());  TEST_EQUAL(s, "123456789123456789124814702702592580481370368");
+    TRY(x = c * b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-167643650387245846409206049247037049247037049079393398859791202837831");
+    TRY(x = c / b);  TRY(s = x.to_string());  TEST_EQUAL(s, "-90916528872203810705");
+    TRY(x = c % b);  TRY(s = x.to_string());  TEST_EQUAL(s, "753940638285372741606406");
 
-    TRY(x = c + d);  TRY(s = x.str());  TEST_EQUAL(s, "-123456789123456789124814702702592580481370368");
-    TRY(x = c - d);  TRY(s = x.str());  TEST_EQUAL(s, "-123456789123456789122098875544320997765543210");
-    TRY(x = d - c);  TRY(s = x.str());  TEST_EQUAL(s, "123456789123456789122098875544320997765543210");
-    TRY(x = c * d);  TRY(s = x.str());  TEST_EQUAL(s, "167643650387245846409206049247037049247037049079393398859791202837831");
-    TRY(x = c / d);  TRY(s = x.str());  TEST_EQUAL(s, "90916528872203810705");
-    TRY(x = c % d);  TRY(s = x.str());  TEST_EQUAL(s, "753940638285372741606406");
+    TRY(x = c + d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-123456789123456789124814702702592580481370368");
+    TRY(x = c - d);  TRY(s = x.to_string());  TEST_EQUAL(s, "-123456789123456789122098875544320997765543210");
+    TRY(x = d - c);  TRY(s = x.to_string());  TEST_EQUAL(s, "123456789123456789122098875544320997765543210");
+    TRY(x = c * d);  TRY(s = x.to_string());  TEST_EQUAL(s, "167643650387245846409206049247037049247037049079393398859791202837831");
+    TRY(x = c / d);  TRY(s = x.to_string());  TEST_EQUAL(s, "90916528872203810705");
+    TRY(x = c % d);  TRY(s = x.to_string());  TEST_EQUAL(s, "753940638285372741606406");
 
-    TRY(x = 1);   TRY(y = 1);   TRY(z = x * y);  TEST_EQUAL(z.str(), "1");
-    TRY(x = 1);   TRY(y = 0);   TRY(z = x * y);  TEST_EQUAL(z.str(), "0");
-    TRY(x = 1);   TRY(y = -1);  TRY(z = x * y);  TEST_EQUAL(z.str(), "-1");
-    TRY(x = 0);   TRY(y = 1);   TRY(z = x * y);  TEST_EQUAL(z.str(), "0");
-    TRY(x = 0);   TRY(y = 0);   TRY(z = x * y);  TEST_EQUAL(z.str(), "0");
-    TRY(x = 0);   TRY(y = -1);  TRY(z = x * y);  TEST_EQUAL(z.str(), "0");
-    TRY(x = -1);  TRY(y = 1);   TRY(z = x * y);  TEST_EQUAL(z.str(), "-1");
-    TRY(x = -1);  TRY(y = 0);   TRY(z = x * y);  TEST_EQUAL(z.str(), "0");
-    TRY(x = -1);  TRY(y = -1);  TRY(z = x * y);  TEST_EQUAL(z.str(), "1");
+    TRY(x = 1);   TRY(y = 1);   TRY(z = x * y);  TEST_EQUAL(z.to_string(), "1");
+    TRY(x = 1);   TRY(y = 0);   TRY(z = x * y);  TEST_EQUAL(z.to_string(), "0");
+    TRY(x = 1);   TRY(y = -1);  TRY(z = x * y);  TEST_EQUAL(z.to_string(), "-1");
+    TRY(x = 0);   TRY(y = 1);   TRY(z = x * y);  TEST_EQUAL(z.to_string(), "0");
+    TRY(x = 0);   TRY(y = 0);   TRY(z = x * y);  TEST_EQUAL(z.to_string(), "0");
+    TRY(x = 0);   TRY(y = -1);  TRY(z = x * y);  TEST_EQUAL(z.to_string(), "0");
+    TRY(x = -1);  TRY(y = 1);   TRY(z = x * y);  TEST_EQUAL(z.to_string(), "-1");
+    TRY(x = -1);  TRY(y = 0);   TRY(z = x * y);  TEST_EQUAL(z.to_string(), "0");
+    TRY(x = -1);  TRY(y = -1);  TRY(z = x * y);  TEST_EQUAL(z.to_string(), "1");
 
 }

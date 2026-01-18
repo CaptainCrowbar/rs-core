@@ -153,8 +153,8 @@ constexpr std::uint64_t Uint128::low() const noexcept;
 Return the high and low 64-bit halves of the value.
 
 ```c++
-std::string Uint128::str(int base = 10, std::size_t digits = 1) const;
-std::string Uint128::hex() const { return str(16, 32); }
+std::string Uint128::to_string(int base = 10, std::size_t digits = 1) const;
+std::string Uint128::hex() const { return to_string(16, 32); }
 ```
 
 Formats the value as a string, in the specified base and with at least the

@@ -9,7 +9,7 @@ namespace {
 
     struct Foo {
         int num = 0;
-        auto str() const { return "Foo:" + std::to_string(num); }
+        auto to_string() const { return "Foo:" + std::to_string(num); }
     };
 
     struct Bar {

@@ -96,7 +96,7 @@ struct std::hash<Uuid>;
 Hash function.
 
 ```c++
-std::string Uuid::str() const;
+std::string Uuid::to_string() const;
 explicit Uuid::operator std::string() const;
 struct std::formatter<Uuid>;
 ```

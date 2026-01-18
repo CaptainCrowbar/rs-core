@@ -158,8 +158,8 @@ std::size_t Rational::hash() const noexcept;
 Hash function.
 
 ```c++
-std::string str() const;
 std::string mixed() const;
+std::string to_string() const;
 ```
 
 Format a rational number as a string, either as a simple fraction or a mixed

@@ -14,15 +14,15 @@ void test_rs_core_rational_mp_integer_formatting() {
     MPRational r;
     std::string s;
 
-    TRY((r = {}));              TRY(s = r.str());  TEST_EQUAL(s, "0");      TRY(s = r.mixed());  TEST_EQUAL(s, "0");
-    TRY((r = {42_Z}));          TRY(s = r.str());  TEST_EQUAL(s, "42");     TRY(s = r.mixed());  TEST_EQUAL(s, "42");
-    TRY((r = {-42_Z}));         TRY(s = r.str());  TEST_EQUAL(s, "-42");    TRY(s = r.mixed());  TEST_EQUAL(s, "-42");
-    TRY((r = {2_Z, 3_Z}));      TRY(s = r.str());  TEST_EQUAL(s, "2/3");    TRY(s = r.mixed());  TEST_EQUAL(s, "2/3");
-    TRY((r = {-2_Z, 3_Z}));     TRY(s = r.str());  TEST_EQUAL(s, "-2/3");   TRY(s = r.mixed());  TEST_EQUAL(s, "-2/3");
-    TRY((r = {5_Z, 3_Z}));      TRY(s = r.str());  TEST_EQUAL(s, "5/3");    TRY(s = r.mixed());  TEST_EQUAL(s, "1 2/3");
-    TRY((r = {-5_Z, 3_Z}));     TRY(s = r.str());  TEST_EQUAL(s, "-5/3");   TRY(s = r.mixed());  TEST_EQUAL(s, "-1 2/3");
-    TRY((r = {100_Z, 30_Z}));   TRY(s = r.str());  TEST_EQUAL(s, "10/3");   TRY(s = r.mixed());  TEST_EQUAL(s, "3 1/3");
-    TRY((r = {-100_Z, 30_Z}));  TRY(s = r.str());  TEST_EQUAL(s, "-10/3");  TRY(s = r.mixed());  TEST_EQUAL(s, "-3 1/3");
+    TRY((r = {}));              TRY(s = r.to_string());  TEST_EQUAL(s, "0");      TRY(s = r.mixed());  TEST_EQUAL(s, "0");
+    TRY((r = {42_Z}));          TRY(s = r.to_string());  TEST_EQUAL(s, "42");     TRY(s = r.mixed());  TEST_EQUAL(s, "42");
+    TRY((r = {-42_Z}));         TRY(s = r.to_string());  TEST_EQUAL(s, "-42");    TRY(s = r.mixed());  TEST_EQUAL(s, "-42");
+    TRY((r = {2_Z, 3_Z}));      TRY(s = r.to_string());  TEST_EQUAL(s, "2/3");    TRY(s = r.mixed());  TEST_EQUAL(s, "2/3");
+    TRY((r = {-2_Z, 3_Z}));     TRY(s = r.to_string());  TEST_EQUAL(s, "-2/3");   TRY(s = r.mixed());  TEST_EQUAL(s, "-2/3");
+    TRY((r = {5_Z, 3_Z}));      TRY(s = r.to_string());  TEST_EQUAL(s, "5/3");    TRY(s = r.mixed());  TEST_EQUAL(s, "1 2/3");
+    TRY((r = {-5_Z, 3_Z}));     TRY(s = r.to_string());  TEST_EQUAL(s, "-5/3");   TRY(s = r.mixed());  TEST_EQUAL(s, "-1 2/3");
+    TRY((r = {100_Z, 30_Z}));   TRY(s = r.to_string());  TEST_EQUAL(s, "10/3");   TRY(s = r.mixed());  TEST_EQUAL(s, "3 1/3");
+    TRY((r = {-100_Z, 30_Z}));  TRY(s = r.to_string());  TEST_EQUAL(s, "-10/3");  TRY(s = r.mixed());  TEST_EQUAL(s, "-3 1/3");
 
     TRY((r = {}));              TRY(s = std::format("{}", r));  TEST_EQUAL(s, "0");      TRY(s = std::format("{:m}", r));  TEST_EQUAL(s, "0");
     TRY((r = {42_Z}));          TRY(s = std::format("{}", r));  TEST_EQUAL(s, "42");     TRY(s = std::format("{:m}", r));  TEST_EQUAL(s, "42");

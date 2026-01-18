@@ -83,7 +83,7 @@ namespace RS {
         template <std::integral T> T unchecked_cast() const noexcept; // UB if out of range
         template <std::integral T> explicit operator T() const noexcept { return checked_cast<T>().value_or(0); }
         std::size_t hash() const noexcept;
-        std::string str(unsigned base = 10, std::size_t digits = 1) const;
+        std::string to_string(unsigned base = 10, std::size_t digits = 1) const;
 
         static std::optional<Natural> parse(std::string_view str, unsigned base = 10);
 
@@ -544,7 +544,7 @@ namespace RS {
         return hash_mix(words_ | std::views::transform(std::hash<word>()));
     }
 
-    inline std::string Natural::str(unsigned base, std::size_t digits) const {
+    inline std::string Natural::to_string(unsigned base, std::size_t digits) const {
 
         if (base < 2 || base > 36) {
             throw std::out_of_range(std::format("Invalid number base: {}", base));
@@ -686,7 +686,7 @@ namespace RS {
         Natural abs() const { return mag_; }
         std::size_t hash() const noexcept;
         int sign() const noexcept { return sign_ ? -1 : mag_ ? 1 : 0; }
-        std::string str(unsigned base = 10, std::size_t digits = 1) const;
+        std::string to_string(unsigned base = 10, std::size_t digits = 1) const;
 
         static std::optional<Integer> parse(std::string_view str, unsigned base = 10);
 
@@ -851,8 +851,8 @@ namespace RS {
         return hash_mix(x, y);
     }
 
-    inline std::string Integer::str(unsigned base, std::size_t digits) const {
-        auto out = mag_.str(base, digits);
+    inline std::string Integer::to_string(unsigned base, std::size_t digits) const {
+        auto out = mag_.to_string(base, digits);
         if (sign_) {
             out.insert(0, 1, '-');
         }
@@ -983,8 +983,7 @@ RS::CommonFormatter {
 
     template <typename FormatContext>
     auto format(const M& m, FormatContext& ctx) const {
-        auto s = m.str(base, digits);
-        return write_out(s, ctx.out());
+        return write_out(m.to_string(base, digits), ctx.out());
     }
 
 };

@@ -48,5 +48,5 @@ CommonFormatter {
 
 CRTP base class that requires the argument type to have its own string
 formatting function, and simply copies the output of that function to the
-formatted output. `T` mus support either a `T::str()` member function or a
-`to_string(T)` free function that returns a string.
+formatted output. `T` mus support either a `to_string()` function, which can
+be either a member function or a free function.
