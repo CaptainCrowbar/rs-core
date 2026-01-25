@@ -32,25 +32,23 @@ namespace RS {
         template <std::output_iterator<char> Out>
         static Out write_out(char32_t c, Out out) {
 
-            auto n = c <= 0x7f    ? 1
-                : c <= 0x7ff      ? 2
-                : c <= 0xd7ff     ? 3
-                : c <= 0xdfff     ? 0
-                : c <= 0xffff     ? 3
-                : c <= 0x10'ffff  ? 4 : 0;
-
-            if (n == 0) {
-                return write_out("\ufffd", out);
-            } else if (n == 1) {
+            if (c <= 0x7f) {
                 return *out++ = static_cast<char>(c);
+            } else if ((c >= 0xd800 && c <= 0xdfff) || c >= 0x11'0000) {
+                return write_out("\ufffd", out);
             }
 
+            auto len = c <= 0x7ff ? 2 : c <= 0xffff ? 3 : 4;
+            auto shift = 6 * (len - 1);
             unsigned char and_mask = 0xff;
-            unsigned char or_mask = ~ (0xff >> n);
+            unsigned char or_mask = ~ (0xff >> len);
 
-            for (auto shift = 6 * (n - 1); shift >= 0; shift -= 6, and_mask = 0x3f, or_mask = 0x80) {
-                auto masked = ((c >> shift) & and_mask) | or_mask;
-                *out++ = static_cast<char>(masked);
+            while (shift >= 0) {
+                auto unit = ((c >> shift) & and_mask) | or_mask;
+                *out++ = static_cast<char>(unit);
+                shift -= 6;
+                and_mask = 0x3f;
+                or_mask = 0x80;
             }
 
             return out;
