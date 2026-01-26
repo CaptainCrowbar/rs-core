@@ -40,6 +40,7 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/alias.hpp` -- Hard type alias](alias.html)
     * [`rs-core/enum.hpp` -- Enumeration helpers](enum.html)
     * [`rs-core/iterator.hpp` -- Iterator base classes](iterator.html)
+    * [`rs-core/typelist.hpp` -- Type list metaprogramming](typelist.html)
     * [`rs-core/typename.hpp` -- Type names](typename.html)
 
 ## Using the library

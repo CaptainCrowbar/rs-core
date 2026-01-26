@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.139
+    VERSION 0.1.140
     LANGUAGES CXX
 )
 
@@ -77,6 +77,7 @@ add_executable(${unittest}
     test/rational-mp-integer-string-conversion-test.cpp
     test/scope-test.cpp
     test/terminal-test.cpp
+    test/typelist-test.cpp
     test/typename-test.cpp
     test/uint128-test.cpp
     test/uuid-test.cpp
