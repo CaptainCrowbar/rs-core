@@ -15,8 +15,9 @@ Requires C++23. Not yet tested on all compilers.
 ## Index of headers
 
 * General utilities
-    * [`rs-core/global.hpp` -- Global utilities](global.html)
+    * [`rs-core/global.hpp` -- Global definitions](global.html)
     * [`rs-core/hash.hpp` -- Hash functions](hash.html)
+    * [`rs-core/range.hpp` -- Range utilities](range.html)
     * [`rs-core/scope.hpp` -- Scope guards](scope.html)
     * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
     * [`rs-core/version.hpp` -- Version information](version.html)

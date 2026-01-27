@@ -8,9 +8,6 @@
 using namespace RS::UnitTest;
 
 void test_rs_core_global_arithmetic_concepts();
-void test_rs_core_global_range_concepts();
-void test_rs_core_global_as_range();
-void test_rs_core_global_sorted_range();
 void test_rs_core_alias_constructors();
 void test_rs_core_alias_conversions();
 void test_rs_core_alias_arithmetic_operators();
@@ -117,6 +114,9 @@ void test_rs_core_random_bernoulli_distribution();
 void test_rs_core_random_uniform_integer();
 void test_rs_core_random_uniform_mp_integer();
 void test_rs_core_random_dice();
+void test_rs_core_range_concepts();
+void test_rs_core_range_as_range();
+void test_rs_core_range_sorted();
 void test_rs_core_rational_int_concepts();
 void test_rs_core_rational_int_construction();
 void test_rs_core_rational_int_properties();
@@ -194,9 +194,6 @@ int main(int argc, char** argv) {
     std::println("{}{}{}", xrule, rule, xreset);
 
     call_me_maybe(test_rs_core_global_arithmetic_concepts, "test_rs_core_global_arithmetic_concepts");
-    call_me_maybe(test_rs_core_global_range_concepts, "test_rs_core_global_range_concepts");
-    call_me_maybe(test_rs_core_global_as_range, "test_rs_core_global_as_range");
-    call_me_maybe(test_rs_core_global_sorted_range, "test_rs_core_global_sorted_range");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
     call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");
     call_me_maybe(test_rs_core_alias_arithmetic_operators, "test_rs_core_alias_arithmetic_operators");
@@ -303,6 +300,9 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_uniform_integer, "test_rs_core_random_uniform_integer");
     call_me_maybe(test_rs_core_random_uniform_mp_integer, "test_rs_core_random_uniform_mp_integer");
     call_me_maybe(test_rs_core_random_dice, "test_rs_core_random_dice");
+    call_me_maybe(test_rs_core_range_concepts, "test_rs_core_range_concepts");
+    call_me_maybe(test_rs_core_range_as_range, "test_rs_core_range_as_range");
+    call_me_maybe(test_rs_core_range_sorted, "test_rs_core_range_sorted");
     call_me_maybe(test_rs_core_rational_int_concepts, "test_rs_core_rational_int_concepts");
     call_me_maybe(test_rs_core_rational_int_construction, "test_rs_core_rational_int_construction");
     call_me_maybe(test_rs_core_rational_int_properties, "test_rs_core_rational_int_properties");
