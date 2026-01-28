@@ -31,7 +31,7 @@ this conditionality, individual functions are not labelled as `constexpr`
 here.
 
 ```c++
-using integer_type = T;
+using Rational::integer_type = T;
 ```
 
 The underlying integer type.
@@ -127,7 +127,7 @@ Rational Rational::abs() const;
 Returns the absolute value of the rational number.
 
 ```c++
-int sign() const noexcept;
+int Rational::sign() const noexcept;
 ```
 
 Returns the sign of the rational number (-1 if negative, 0 if zero, +1 if
@@ -158,20 +158,29 @@ std::size_t Rational::hash() const noexcept;
 Hash function.
 
 ```c++
-std::string mixed() const;
-std::string to_string() const;
+std::string Rational::mixed() const;
+std::string Rational::to_string() const;
 ```
 
 Format a rational number as a string, either as a simple fraction or a mixed
 fraction (both will return a single number if the value is an integer).
 
 ```c++
-static std::optional<Rational> parse(std::string_view str);
+static std::optional<Rational> Rational::parse(std::string_view str);
 ```
 
 Parses a string into a rational number. This works the same way as the
 constructor that takes a string argument, except that an invalid argument
 will result in a null optional instead of an exception.
+
+## Associated types
+
+```c++
+using IntRational = Rational<int>;
+using MPRational = Rational<Integer>;
+```
+
+Commonly used instantiations.
 
 ## Specializations
 
