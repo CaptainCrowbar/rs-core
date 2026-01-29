@@ -132,8 +132,8 @@ true result would be negative. For the signed type, the division operators
 perform Euclidean division, where the remainder is always positive if the
 division is not exact.
 
-All of these are duplicated for mixed mode arithmetic between `Natural` and
-any unsigned primitive integer type.
+All of these are duplicated for mixed mode arithmetic between MPI and
+primitive integer types of the same signedness.
 
 ```c++
 Natural& Natural::operator&=(const Natural& y);
