@@ -81,7 +81,7 @@ void test_rs_core_markup_xml();
 void test_rs_core_markup_html();
 void test_rs_core_mp_integer_concepts();
 void test_rs_core_mp_integer_literals();
-void test_rs_core_mp_integer_core_functions();
+void test_rs_core_mp_integer_comparison();
 void test_rs_core_mp_integer_hash_set();
 void test_rs_core_mp_integer_signed_arithmetic();
 void test_rs_core_mp_integer_signed_division();
@@ -267,7 +267,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_markup_html, "test_rs_core_markup_html");
     call_me_maybe(test_rs_core_mp_integer_concepts, "test_rs_core_mp_integer_concepts");
     call_me_maybe(test_rs_core_mp_integer_literals, "test_rs_core_mp_integer_literals");
-    call_me_maybe(test_rs_core_mp_integer_core_functions, "test_rs_core_mp_integer_core_functions");
+    call_me_maybe(test_rs_core_mp_integer_comparison, "test_rs_core_mp_integer_comparison");
     call_me_maybe(test_rs_core_mp_integer_hash_set, "test_rs_core_mp_integer_hash_set");
     call_me_maybe(test_rs_core_mp_integer_signed_arithmetic, "test_rs_core_mp_integer_signed_arithmetic");
     call_me_maybe(test_rs_core_mp_integer_signed_division, "test_rs_core_mp_integer_signed_division");

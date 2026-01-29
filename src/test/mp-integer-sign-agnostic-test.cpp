@@ -1,7 +1,6 @@
 #include "rs-core/mp-integer.hpp"
 #include "rs-core/unit-test.hpp"
-#include <algorithm>
-#include <tuple>
+#include <compare>
 #include <unordered_set>
 
 using namespace RS;
@@ -71,25 +70,179 @@ void test_rs_core_mp_integer_literals() {
 
 }
 
-void test_rs_core_mp_integer_core_functions() {
+void test_rs_core_mp_integer_comparison() {
 
-    Natural a = 42u;
-    Natural b = 99u;
-    Natural c;
-    Natural d;
-    Integer w = 42;
-    Integer x = -99;
-    Integer y;
-    Integer z;
+    TEST(Natural{0} == Natural{0});      TEST(Natural{0} <= Natural{0});      TEST(Natural{0} >= Natural{0});
+    TEST(Natural{42} == Natural{42});    TEST(Natural{42} <= Natural{42});    TEST(Natural{42} >= Natural{42});
+    TEST(Natural{86} != Natural{99});    TEST(Natural{86} < Natural{99});     TEST(Natural{86} <= Natural{99});
+    TEST(Natural{99} != Natural{86});    TEST(Natural{99} > Natural{86});     TEST(Natural{99} >= Natural{86});
+    TEST(Natural{0} == 0);               TEST(Natural{0} <= 0);               TEST(Natural{0} >= 0);
+    TEST(Natural{42} == 42);             TEST(Natural{42} <= 42);             TEST(Natural{42} >= 42);
+    TEST(Natural{86} != 99);             TEST(Natural{86} < 99);              TEST(Natural{86} <= 99);
+    TEST(Natural{99} != 86);             TEST(Natural{99} > 86);              TEST(Natural{99} >= 86);
+    TEST(Natural{0} != -42);             TEST(Natural{0} > -42);              TEST(Natural{0} >= -42);
+    TEST(Natural{0} == 0u);              TEST(Natural{0} <= 0u);              TEST(Natural{0} >= 0u);
+    TEST(Natural{42} == 42u);            TEST(Natural{42} <= 42u);            TEST(Natural{42} >= 42u);
+    TEST(Natural{86} != 99u);            TEST(Natural{86} < 99u);             TEST(Natural{86} <= 99u);
+    TEST(Natural{99} != 86u);            TEST(Natural{99} > 86u);             TEST(Natural{99} >= 86u);
+    TEST(0 == Natural{0});               TEST(0 <= Natural{0});               TEST(0 >= Natural{0});
+    TEST(42 == Natural{42});             TEST(42 <= Natural{42});             TEST(42 >= Natural{42});
+    TEST(86 != Natural{99});             TEST(86 < Natural{99});              TEST(86 <= Natural{99});
+    TEST(99 != Natural{86});             TEST(99 > Natural{86});              TEST(99 >= Natural{86});
+    TEST(-42 != Natural{0});             TEST(-42 < Natural{0});              TEST(-42 <= Natural{0});
+    TEST(0u == Natural{0});              TEST(0u <= Natural{0});              TEST(0u >= Natural{0});
+    TEST(42u == Natural{42});            TEST(42u <= Natural{42});            TEST(42u >= Natural{42});
+    TEST(86u != Natural{99});            TEST(86u < Natural{99});             TEST(86u <= Natural{99});
+    TEST(99u != Natural{86});            TEST(99u > Natural{86});             TEST(99u >= Natural{86});
+    TEST(Integer{0} == Integer{0});      TEST(Integer{0} <= Integer{0});      TEST(Integer{0} >= Integer{0});
+    TEST(Integer{42} == Integer{42});    TEST(Integer{42} <= Integer{42});    TEST(Integer{42} >= Integer{42});
+    TEST(Integer{86} != Integer{99});    TEST(Integer{86} < Integer{99});     TEST(Integer{86} <= Integer{99});
+    TEST(Integer{99} != Integer{86});    TEST(Integer{99} > Integer{86});     TEST(Integer{99} >= Integer{86});
+    TEST(Integer{-42} == Integer{-42});  TEST(Integer{-42} <= Integer{-42});  TEST(Integer{-42} >= Integer{-42});
+    TEST(Integer{-86} != Integer{-99});  TEST(Integer{-86} > Integer{-99});   TEST(Integer{-86} >= Integer{-99});
+    TEST(Integer{-99} != Integer{-86});  TEST(Integer{-99} < Integer{-86});   TEST(Integer{-99} <= Integer{-86});
+    TEST(Integer{0} != Integer{42});     TEST(Integer{0} < Integer{42});      TEST(Integer{0} <= Integer{42});
+    TEST(Integer{0} != Integer{-42});    TEST(Integer{0} > Integer{-42});     TEST(Integer{0} >= Integer{-42});
+    TEST(Integer{42} != Integer{0});     TEST(Integer{42} > Integer{0});      TEST(Integer{42} >= Integer{0});
+    TEST(Integer{-42} != Integer{0});    TEST(Integer{-42} < Integer{0});     TEST(Integer{-42} <= Integer{0});
+    TEST(Integer{-42} != Integer{42});   TEST(Integer{-42} < Integer{42});    TEST(Integer{-42} <= Integer{42});
+    TEST(Integer{42} != Integer{-42});   TEST(Integer{42} > Integer{-42});    TEST(Integer{42} >= Integer{-42});
+    TEST(Integer{0} == 0);               TEST(Integer{0} <= 0);               TEST(Integer{0} >= 0);
+    TEST(Integer{42} == 42);             TEST(Integer{42} <= 42);             TEST(Integer{42} >= 42);
+    TEST(Integer{86} != 99);             TEST(Integer{86} < 99);              TEST(Integer{86} <= 99);
+    TEST(Integer{99} != 86);             TEST(Integer{99} > 86);              TEST(Integer{99} >= 86);
+    TEST(Integer{-42} == -42);           TEST(Integer{-42} <= -42);           TEST(Integer{-42} >= -42);
+    TEST(Integer{-86} != -99);           TEST(Integer{-86} > -99);            TEST(Integer{-86} >= -99);
+    TEST(Integer{-99} != -86);           TEST(Integer{-99} < -86);            TEST(Integer{-99} <= -86);
+    TEST(Integer{0} != 42);              TEST(Integer{0} < 42);               TEST(Integer{0} <= 42);
+    TEST(Integer{0} != -42);             TEST(Integer{0} > -42);              TEST(Integer{0} >= -42);
+    TEST(Integer{42} != 0);              TEST(Integer{42} > 0);               TEST(Integer{42} >= 0);
+    TEST(Integer{-42} != 0);             TEST(Integer{-42} < 0);              TEST(Integer{-42} <= 0);
+    TEST(Integer{-42} != 42);            TEST(Integer{-42} < 42);             TEST(Integer{-42} <= 42);
+    TEST(Integer{42} != -42);            TEST(Integer{42} > -42);             TEST(Integer{42} >= -42);
+    TEST(0 == Integer{0});               TEST(0 <= Integer{0});               TEST(0 >= Integer{0});
+    TEST(42 == Integer{42});             TEST(42 <= Integer{42});             TEST(42 >= Integer{42});
+    TEST(86 != Integer{99});             TEST(86 < Integer{99});              TEST(86 <= Integer{99});
+    TEST(99 != Integer{86});             TEST(99 > Integer{86});              TEST(99 >= Integer{86});
+    TEST(-42 == Integer{-42});           TEST(-42 <= Integer{-42});           TEST(-42 >= Integer{-42});
+    TEST(-86 != Integer{-99});           TEST(-86 > Integer{-99});            TEST(-86 >= Integer{-99});
+    TEST(-99 != Integer{-86});           TEST(-99 < Integer{-86});            TEST(-99 <= Integer{-86});
+    TEST(0 != Integer{42});              TEST(0 < Integer{42});               TEST(0 <= Integer{42});
+    TEST(0 != Integer{-42});             TEST(0 > Integer{-42});              TEST(0 >= Integer{-42});
+    TEST(42 != Integer{0});              TEST(42 > Integer{0});               TEST(42 >= Integer{0});
+    TEST(-42 != Integer{0});             TEST(-42 < Integer{0});              TEST(-42 <= Integer{0});
+    TEST(-42 != Integer{42});            TEST(-42 < Integer{42});             TEST(-42 <= Integer{42});
+    TEST(42 != Integer{-42});            TEST(42 > Integer{-42});             TEST(42 >= Integer{-42});
+    TEST(Integer{0} == 0u);              TEST(Integer{0} <= 0u);              TEST(Integer{0} >= 0u);
+    TEST(Integer{42} == 42u);            TEST(Integer{42} <= 42u);            TEST(Integer{42} >= 42u);
+    TEST(Integer{86} != 99u);            TEST(Integer{86} < 99u);             TEST(Integer{86} <= 99u);
+    TEST(Integer{99} != 86u);            TEST(Integer{99} > 86u);             TEST(Integer{99} >= 86u);
+    TEST(Integer{0} != 42u);             TEST(Integer{0} < 42u);              TEST(Integer{0} <= 42u);
+    TEST(Integer{42} != 0u);             TEST(Integer{42} > 0u);              TEST(Integer{42} >= 0u);
+    TEST(0u == Integer{0});              TEST(0u <= Integer{0});              TEST(0u >= Integer{0});
+    TEST(42u == Integer{42});            TEST(42u <= Integer{42});            TEST(42u >= Integer{42});
+    TEST(86u != Integer{99});            TEST(86u < Integer{99});             TEST(86u <= Integer{99});
+    TEST(99u != Integer{86});            TEST(99u > Integer{86});             TEST(99u >= Integer{86});
+    TEST(0u != Integer{42});             TEST(0u < Integer{42});              TEST(0u <= Integer{42});
+    TEST(42u != Integer{0});             TEST(42u > Integer{0});              TEST(42u >= Integer{0});
+    TEST(Integer{0} == Natural{0});      TEST(Integer{0} <= Natural{0});      TEST(Integer{0} >= Natural{0});
+    TEST(Integer{42} == Natural{42});    TEST(Integer{42} <= Natural{42});    TEST(Integer{42} >= Natural{42});
+    TEST(Integer{86} != Natural{99});    TEST(Integer{86} < Natural{99});     TEST(Integer{86} <= Natural{99});
+    TEST(Integer{99} != Natural{86});    TEST(Integer{99} > Natural{86});     TEST(Integer{99} >= Natural{86});
+    TEST(Integer{0} != Natural{42});     TEST(Integer{0} < Natural{42});      TEST(Integer{0} <= Natural{42});
+    TEST(Integer{42} != Natural{0});     TEST(Integer{42} > Natural{0});      TEST(Integer{42} >= Natural{0});
+    TEST(Natural{0} == Integer{0});      TEST(Natural{0} <= Integer{0});      TEST(Natural{0} >= Integer{0});
+    TEST(Natural{42} == Integer{42});    TEST(Natural{42} <= Integer{42});    TEST(Natural{42} >= Integer{42});
+    TEST(Natural{86} != Integer{99});    TEST(Natural{86} < Integer{99});     TEST(Natural{86} <= Integer{99});
+    TEST(Natural{99} != Integer{86});    TEST(Natural{99} > Integer{86});     TEST(Natural{99} >= Integer{86});
+    TEST(Natural{0} != Integer{42});     TEST(Natural{0} < Integer{42});      TEST(Natural{0} <= Integer{42});
+    TEST(Natural{42} != Integer{0});     TEST(Natural{42} > Integer{0});      TEST(Natural{42} >= Integer{0});
 
-    TRY(c = std::clamp(a, Natural(0), Natural(10)));  TEST_EQUAL(c, 10u);
-    TRY(y = std::clamp(w, Integer(0), Integer(10)));  TEST_EQUAL(y, 10);
-
-    TRY(c = b / a);  TEST_EQUAL(c, 2u);  TRY(c = b % a);  TEST_EQUAL(c, 15u);
-    TRY(y = x / w);  TEST_EQUAL(y, -3);  TRY(y = x % w);  TEST_EQUAL(y, 27);
-
-    TRY(std::tie(c, d) = b.divide(a));  TEST_EQUAL(c, 2u);  TEST_EQUAL(d, 15u);
-    TRY(std::tie(y, z) = x.divide(w));  TEST_EQUAL(y, -3);  TEST_EQUAL(z, 27);
+    TEST((Natural{0} <=> Natural{0})      == std::strong_ordering::equal);
+    TEST((Natural{42} <=> Natural{42})    == std::strong_ordering::equal);
+    TEST((Natural{86} <=> Natural{99})    == std::strong_ordering::less);
+    TEST((Natural{99} <=> Natural{86})    == std::strong_ordering::greater);
+    TEST((Natural{0} <=> 0)               == std::strong_ordering::equal);
+    TEST((Natural{42} <=> 42)             == std::strong_ordering::equal);
+    TEST((Natural{86} <=> 99)             == std::strong_ordering::less);
+    TEST((Natural{99} <=> 86)             == std::strong_ordering::greater);
+    TEST((Natural{0} <=> -42)             == std::strong_ordering::greater);
+    TEST((Natural{0} <=> 0u)              == std::strong_ordering::equal);
+    TEST((Natural{42} <=> 42u)            == std::strong_ordering::equal);
+    TEST((Natural{86} <=> 99u)            == std::strong_ordering::less);
+    TEST((Natural{99} <=> 86u)            == std::strong_ordering::greater);
+    TEST((0 <=> Natural{0})               == std::strong_ordering::equal);
+    TEST((42 <=> Natural{42})             == std::strong_ordering::equal);
+    TEST((86 <=> Natural{99})             == std::strong_ordering::less);
+    TEST((99 <=> Natural{86})             == std::strong_ordering::greater);
+    TEST((-42 <=> Natural{0})             == std::strong_ordering::less);
+    TEST((0u <=> Natural{0})              == std::strong_ordering::equal);
+    TEST((42u <=> Natural{42})            == std::strong_ordering::equal);
+    TEST((86u <=> Natural{99})            == std::strong_ordering::less);
+    TEST((99u <=> Natural{86})            == std::strong_ordering::greater);
+    TEST((Integer{0} <=> Integer{0})      == std::strong_ordering::equal);
+    TEST((Integer{42} <=> Integer{42})    == std::strong_ordering::equal);
+    TEST((Integer{86} <=> Integer{99})    == std::strong_ordering::less);
+    TEST((Integer{99} <=> Integer{86})    == std::strong_ordering::greater);
+    TEST((Integer{-42} <=> Integer{-42})  == std::strong_ordering::equal);
+    TEST((Integer{-86} <=> Integer{-99})  == std::strong_ordering::greater);
+    TEST((Integer{-99} <=> Integer{-86})  == std::strong_ordering::less);
+    TEST((Integer{0} <=> Integer{42})     == std::strong_ordering::less);
+    TEST((Integer{0} <=> Integer{-42})    == std::strong_ordering::greater);
+    TEST((Integer{42} <=> Integer{0})     == std::strong_ordering::greater);
+    TEST((Integer{-42} <=> Integer{0})    == std::strong_ordering::less);
+    TEST((Integer{-42} <=> Integer{42})   == std::strong_ordering::less);
+    TEST((Integer{42} <=> Integer{-42})   == std::strong_ordering::greater);
+    TEST((Integer{0} <=> 0)               == std::strong_ordering::equal);
+    TEST((Integer{42} <=> 42)             == std::strong_ordering::equal);
+    TEST((Integer{86} <=> 99)             == std::strong_ordering::less);
+    TEST((Integer{99} <=> 86)             == std::strong_ordering::greater);
+    TEST((Integer{-42} <=> -42)           == std::strong_ordering::equal);
+    TEST((Integer{-86} <=> -99)           == std::strong_ordering::greater);
+    TEST((Integer{-99} <=> -86)           == std::strong_ordering::less);
+    TEST((Integer{0} <=> 42)              == std::strong_ordering::less);
+    TEST((Integer{0} <=> -42)             == std::strong_ordering::greater);
+    TEST((Integer{42} <=> 0)              == std::strong_ordering::greater);
+    TEST((Integer{-42} <=> 0)             == std::strong_ordering::less);
+    TEST((Integer{-42} <=> 42)            == std::strong_ordering::less);
+    TEST((Integer{42} <=> -42)            == std::strong_ordering::greater);
+    TEST((0 <=> Integer{0})               == std::strong_ordering::equal);
+    TEST((42 <=> Integer{42})             == std::strong_ordering::equal);
+    TEST((86 <=> Integer{99})             == std::strong_ordering::less);
+    TEST((99 <=> Integer{86})             == std::strong_ordering::greater);
+    TEST((-42 <=> Integer{-42})           == std::strong_ordering::equal);
+    TEST((-86 <=> Integer{-99})           == std::strong_ordering::greater);
+    TEST((-99 <=> Integer{-86})           == std::strong_ordering::less);
+    TEST((0 <=> Integer{42})              == std::strong_ordering::less);
+    TEST((0 <=> Integer{-42})             == std::strong_ordering::greater);
+    TEST((42 <=> Integer{0})              == std::strong_ordering::greater);
+    TEST((-42 <=> Integer{0})             == std::strong_ordering::less);
+    TEST((-42 <=> Integer{42})            == std::strong_ordering::less);
+    TEST((42 <=> Integer{-42})            == std::strong_ordering::greater);
+    TEST((Integer{0} <=> 0u)              == std::strong_ordering::equal);
+    TEST((Integer{42} <=> 42u)            == std::strong_ordering::equal);
+    TEST((Integer{86} <=> 99u)            == std::strong_ordering::less);
+    TEST((Integer{99} <=> 86u)            == std::strong_ordering::greater);
+    TEST((Integer{0} <=> 42u)             == std::strong_ordering::less);
+    TEST((Integer{42} <=> 0u)             == std::strong_ordering::greater);
+    TEST((0u <=> Integer{0})              == std::strong_ordering::equal);
+    TEST((42u <=> Integer{42})            == std::strong_ordering::equal);
+    TEST((86u <=> Integer{99})            == std::strong_ordering::less);
+    TEST((99u <=> Integer{86})            == std::strong_ordering::greater);
+    TEST((0u <=> Integer{42})             == std::strong_ordering::less);
+    TEST((42u <=> Integer{0})             == std::strong_ordering::greater);
+    TEST((Integer{0} <=> Natural{0})      == std::strong_ordering::equal);
+    TEST((Integer{42} <=> Natural{42})    == std::strong_ordering::equal);
+    TEST((Integer{86} <=> Natural{99})    == std::strong_ordering::less);
+    TEST((Integer{99} <=> Natural{86})    == std::strong_ordering::greater);
+    TEST((Integer{0} <=> Natural{42})     == std::strong_ordering::less);
+    TEST((Integer{42} <=> Natural{0})     == std::strong_ordering::greater);
+    TEST((Natural{0} <=> Integer{0})      == std::strong_ordering::equal);
+    TEST((Natural{42} <=> Integer{42})    == std::strong_ordering::equal);
+    TEST((Natural{86} <=> Integer{99})    == std::strong_ordering::less);
+    TEST((Natural{99} <=> Integer{86})    == std::strong_ordering::greater);
+    TEST((Natural{0} <=> Integer{42})     == std::strong_ordering::less);
+    TEST((Natural{42} <=> Integer{0})     == std::strong_ordering::greater);
 
 }
 

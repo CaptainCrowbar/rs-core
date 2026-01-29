@@ -132,6 +132,9 @@ true result would be negative. For the signed type, the division operators
 perform Euclidean division, where the remainder is always positive if the
 division is not exact.
 
+All of these are duplicated for mixed mode arithmetic between `Natural` and
+any unsigned primitive integer type.
+
 ```c++
 Natural& Natural::operator&=(const Natural& y);
 Natural& Natural::operator|=(const Natural& y);
@@ -146,7 +149,9 @@ Natural operator>>(const Natural& x, int y);
 ```
 
 Bitwise arithmetic operators. These are defined only for the unsigned type.
-For the shift operators, behaviour is undefined if the RHS is negative.
+For the shift operators, behaviour is undefined if the RHS is negative. The
+bitwise and, or, and exclusive or operators are duplicated for mixed mode
+arithmetic between `Natural` and any unsigned primitive integer type.
 
 ```c++
 std::pair<Mpitype, Mpitype> Mpitype::divide(const Mpitype& y) const;
@@ -189,15 +194,12 @@ bool operator<(const Mpitype& x, const Mpitype& y) noexcept;
 bool operator>(const Mpitype& x, const Mpitype& y) noexcept;
 bool operator<=(const Mpitype& x, const Mpitype& y) noexcept;
 bool operator>=(const Mpitype& x, const Mpitype& y) noexcept;
-```
-
-Conventional comparison operators.
-
-```c++
 std::strong_ordering operator<=>(const Mpitype& x, const Mpitype& y) noexcept;
 ```
 
-Three-way comparison operator.
+Comparison operators. These are also defined between `Natural` and `Integer,`
+and between either MPI type and any primitive integer type. Comparisons
+between signed and unsigned types will be handled correctly.
 
 ### Conversion functions
 

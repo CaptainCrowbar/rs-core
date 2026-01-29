@@ -57,6 +57,15 @@ namespace RS {
         Natural& operator<<=(int y); // UB if y<0
         Natural& operator>>=(int y); // UB if y<0
 
+        template <std::unsigned_integral T> Natural& operator+=(T y) { return *this += static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator-=(T y) { return *this -= static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator*=(T y) { return *this *= static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator/=(T y) { return *this /= static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator%=(T y) { return *this %= static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator&=(T y) { return *this &= static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator|=(T y) { return *this |= static_cast<Natural>(y); }
+        template <std::unsigned_integral T> Natural& operator^=(T y) { return *this ^= static_cast<Natural>(y); }
+
         friend Natural operator+(const Natural& x, const Natural& y) { auto z = x; z += y; return z; }
         friend Natural operator-(const Natural& x, const Natural& y) { auto z = x; z -= y; return z; }
         friend Natural operator*(const Natural& x, const Natural& y);
@@ -353,6 +362,86 @@ namespace RS {
 
     }
 
+    template <std::unsigned_integral T>
+    Natural operator+(const Natural& x, T y) {
+        return x + static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator-(const Natural& x, T y) {
+        return x - static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator*(const Natural& x, T y) {
+        return x * static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator/(const Natural& x, T y) {
+        return x / static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator%(const Natural& x, T y) {
+        return x % static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator&(const Natural& x, T y) {
+        return x & static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator|(const Natural& x, T y) {
+        return x | static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator^(const Natural& x, T y) {
+        return x ^ static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator+(T x, const Natural& y) {
+        return static_cast<Natural>(x) + y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator-(T x, const Natural& y) {
+        return static_cast<Natural>(x) - y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator*(T x, const Natural& y) {
+        return static_cast<Natural>(x) * y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator/(T x, const Natural& y) {
+        return static_cast<Natural>(x) / y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator%(T x, const Natural& y) {
+        return static_cast<Natural>(x) % y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator&(T x, const Natural& y) {
+        return static_cast<Natural>(x) & y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator|(T x, const Natural& y) {
+        return static_cast<Natural>(x) | y;
+    }
+
+    template <std::unsigned_integral T>
+    Natural operator^(T x, const Natural& y) {
+        return static_cast<Natural>(x) ^ y;
+    }
+
     inline bool operator==(const Natural& x, const Natural& y) noexcept {
         if (x.words_.size() != y.words_.size()) {
             return false;
@@ -382,6 +471,32 @@ namespace RS {
 
         return std::strong_ordering::equal;
 
+    }
+
+    template <std::signed_integral T>
+    bool operator==(const Natural& x, T y) noexcept {
+        using U = std::make_unsigned_t<T>;
+        return y >= 0 && x == static_cast<Natural>(static_cast<U>(y));
+    }
+
+    template <std::signed_integral T>
+    std::strong_ordering operator<=>(const Natural& x, T y) noexcept {
+        using U = std::make_unsigned_t<T>;
+        if (y < 0) {
+            return std::strong_ordering::greater;
+        } else {
+            return x <=> static_cast<Natural>(static_cast<U>(y));
+        }
+    }
+
+    template <std::unsigned_integral T>
+    bool operator==(const Natural& x, T y) noexcept {
+        return x == static_cast<Natural>(y);
+    }
+
+    template <std::unsigned_integral T>
+    std::strong_ordering operator<=>(const Natural& x, T y) noexcept {
+        return x <=> static_cast<Natural>(y);
     }
 
     inline std::pair<Natural, Natural> Natural::divide(const Natural& y) const {
@@ -667,6 +782,12 @@ namespace RS {
         Integer& operator/=(const Integer& y) { return *this = divide(y).first; }
         Integer& operator%=(const Integer& y) { return *this = divide(y).second; }
 
+        template <std::signed_integral T> Integer& operator+=(T y) { return *this += static_cast<Integer>(y); }
+        template <std::signed_integral T> Integer& operator-=(T y) { return *this -= static_cast<Integer>(y); }
+        template <std::signed_integral T> Integer& operator*=(T y) { return *this *= static_cast<Integer>(y); }
+        template <std::signed_integral T> Integer& operator/=(T y) { return *this /= static_cast<Integer>(y); }
+        template <std::signed_integral T> Integer& operator%=(T y) { return *this %= static_cast<Integer>(y); }
+
         friend Integer operator+(const Integer& x, const Integer& y) { auto z = x; z += y; return z; }
         friend Integer operator-(const Integer& x, const Integer& y) { auto z = x; z -= y; return z; }
         friend Integer operator*(const Integer& x, const Integer& y);
@@ -772,6 +893,56 @@ namespace RS {
         return z;
     }
 
+    template <std::signed_integral T>
+    Integer operator+(const Integer& x, T y) {
+        return x + static_cast<Integer>(y);
+    }
+
+    template <std::signed_integral T>
+    Integer operator-(const Integer& x, T y) {
+        return x - static_cast<Integer>(y);
+    }
+
+    template <std::signed_integral T>
+    Integer operator*(const Integer& x, T y) {
+        return x * static_cast<Integer>(y);
+    }
+
+    template <std::signed_integral T>
+    Integer operator/(const Integer& x, T y) {
+        return x / static_cast<Integer>(y);
+    }
+
+    template <std::signed_integral T>
+    Integer operator%(const Integer& x, T y) {
+        return x % static_cast<Integer>(y);
+    }
+
+    template <std::signed_integral T>
+    Integer operator+(T x, const Integer& y) {
+        return static_cast<Integer>(x) + y;
+    }
+
+    template <std::signed_integral T>
+    Integer operator-(T x, const Integer& y) {
+        return static_cast<Integer>(x) - y;
+    }
+
+    template <std::signed_integral T>
+    Integer operator*(T x, const Integer& y) {
+        return static_cast<Integer>(x) * y;
+    }
+
+    template <std::signed_integral T>
+    Integer operator/(T x, const Integer& y) {
+        return static_cast<Integer>(x) / y;
+    }
+
+    template <std::signed_integral T>
+    Integer operator%(T x, const Integer& y) {
+        return static_cast<Integer>(x) % y;
+    }
+
     inline std::strong_ordering operator<=>(const Integer& x, const Integer& y) noexcept {
         auto c = y.sign_ <=> x.sign_;
         if (c != 0) {
@@ -781,6 +952,24 @@ namespace RS {
         } else {
             return x.mag_ <=> y.mag_;
         }
+    }
+
+    inline bool operator==(const Integer& x, const Natural& y) noexcept {
+        return x == Integer{y};
+    }
+
+    inline std::strong_ordering operator<=>(const Integer& x, const Natural& y) noexcept {
+        return x <=> Integer{y};
+    }
+
+    template <std::integral T>
+    bool operator==(const Integer& x, T y) noexcept {
+        return x == Integer{y};
+    }
+
+    template <std::integral T>
+    std::strong_ordering operator<=>(const Integer& x, T y) noexcept {
+        return x <=> Integer{y};
     }
 
     inline std::pair<Integer, Integer> Integer::divide(const Integer& y) const {
