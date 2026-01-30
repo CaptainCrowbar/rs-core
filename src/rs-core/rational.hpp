@@ -31,6 +31,7 @@ namespace RS {
         constexpr Rational(const T& t): num_(t), den_(1) {}
         constexpr Rational(const T& n, const T& d): num_(n), den_(d) { reduce(); }
         constexpr Rational(const T& i, const T& n, const T& d);
+        template <std::signed_integral U> constexpr Rational(U u): Rational{T{u}} {}
         explicit Rational(std::string_view str);
 
         constexpr T num() const { return num_; }
@@ -175,6 +176,46 @@ namespace RS {
     }
 
     template <SignedIntegral T>
+    constexpr Rational<T>& operator+=(const Rational<T>& x, const T& y) {
+        return x += Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
+    constexpr Rational<T>& operator-=(const Rational<T>& x, const T& y) {
+        return x -= Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
+    constexpr Rational<T>& operator*=(const Rational<T>& x, const T& y) {
+        return x *= Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
+    constexpr Rational<T>& operator/=(const Rational<T>& x, const T& y) {
+        return x /= Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T>& operator+=(const Rational<T>& x, U y) {
+        return x += Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T>& operator-=(const Rational<T>& x, U y) {
+        return x -= Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T>& operator*=(const Rational<T>& x, U y) {
+        return x *= Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T>& operator/=(const Rational<T>& x, U y) {
+        return x /= Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
     constexpr Rational<T> operator+(const Rational<T>& x, const Rational<T>& y) {
         auto multiple = lcm(x.den(), y.den());
         auto lhs = x.num() * (multiple / x.den());
@@ -202,6 +243,46 @@ namespace RS {
     }
 
     template <SignedIntegral T>
+    constexpr Rational<T> operator+(const Rational<T>& x, const T& y) {
+        return x + Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
+    constexpr Rational<T> operator-(const Rational<T>& x, const T& y) {
+        return x - Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
+    constexpr Rational<T> operator*(const Rational<T>& x, const T& y) {
+        return x * Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
+    constexpr Rational<T> operator/(const Rational<T>& x, const T& y) {
+        return x / Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T> operator+(const Rational<T>& x, U y) {
+        return x + Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T> operator-(const Rational<T>& x, U y) {
+        return x - Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T> operator*(const Rational<T>& x, U y) {
+        return x * Rational<T>{y};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr Rational<T> operator/(const Rational<T>& x, U y) {
+        return x / Rational<T>{y};
+    }
+
+    template <SignedIntegral T>
     constexpr bool operator==(const Rational<T>& x, const Rational<T>& y) noexcept {
         return x.num() == y.num() && x.den() == y.den();
     }
@@ -212,6 +293,26 @@ namespace RS {
         auto lhs = x.num() * (multiple / x.den());
         auto rhs = y.num() * (multiple / y.den());
         return lhs <=> rhs;
+    }
+
+    template <SignedIntegral T>
+    constexpr bool operator==(const Rational<T>& x, const T& y) noexcept {
+        return x.num() == y && x.den() == T{1};
+    }
+
+    template <SignedIntegral T>
+    constexpr std::strong_ordering operator<=>(const Rational<T>& x, const T& y) noexcept {
+        return x.num() <=> y * x.den();
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr bool operator==(const Rational<T>& x, U y) noexcept {
+        return x.num() == T{y} && x.den() == T{1};
+    }
+
+    template <SignedIntegral T, std::signed_integral U>
+    constexpr std::strong_ordering operator<=>(const Rational<T>& x, U y) noexcept {
+        return x.num() <=> T{y} * x.den();
     }
 
     template <SignedIntegral T>

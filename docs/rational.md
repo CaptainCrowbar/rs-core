@@ -66,6 +66,12 @@ negative (e.g. `Rational(-1,2,3)` is interpreted as -1 2/3 or -5/3).
 Behaviour is undefined if the denominator is zero.
 
 ```c++
+template <std::signed_integral U> constexpr Rational(U u);
+```
+
+Constructor from a signed primitive integral type that is convertible to `T.`
+
+```c++
 explicit Rational::Rational(std::string_view str);
 ```
 
@@ -106,7 +112,10 @@ Rational operator/(const Rational& x, const Rational& y);
 
 Arithmetic operators. These all have their usual meanings. Behaviour is
 undefined on division by zero, or if the result of an arithmetic operation
-would be out of range for the underlying integer type.
+would be out of range for the underlying integer type. For the binary
+operators, corresponding operators are also defined for mixed mode arithmetic
+between `Rational` and `T,` and between `Rational` and any primitive signed
+integer type convertible to `T.`
 
 ```c++
 bool operator==(const Rational& x, const Rational& y) noexcept;
@@ -118,7 +127,9 @@ bool operator>=(const Rational& x, const Rational& y) noexcept;
 std::strong_ordering operator<=>(const Rational& x, const Rational& y) noexcept;
 ```
 
-Comparison operators.
+Comparison operators. Corresponding operators are also defined for comparisons
+between `Rational` and `T,` and between `Rational` and any primitive signed
+integer type convertible to `T.`
 
 ```c++
 Rational Rational::abs() const;
