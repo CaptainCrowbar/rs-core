@@ -265,9 +265,13 @@ RS::CommonFormatter {
     RS::Detail::EnumCase mode = RS::Detail::EnumCase::none;
     char delimiter = '_';
 
-    constexpr auto parse(std::format_parse_context& ctx) {
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+
         using namespace RS::Detail;
+
         auto it = ctx.begin();
+
         for (; it != ctx.end() && *it != '}'; ++it) {
             if (*it == 'i' && mode == EnumCase::none && delimiter == '_') {
                 mode = EnumCase::integer;
@@ -278,24 +282,31 @@ RS::CommonFormatter {
             } else if (is_enum_delimiter_char(*it) && mode != EnumCase::integer && delimiter == '_') {
                 delimiter = *it;
             } else {
-                throw std::format_error{std::format("Invalid format: {:?}", *it)};
+                throw std::format_error{"Invalid format"};
             }
         }
+
         return it;
+
     }
 
     template <typename FormatContext>
     auto format(const T& t, FormatContext& ctx) const {
+
         using namespace RS::Detail;
         using U = std::underlying_type_t<T>;
+
         std::string str;
+
         if (mode == EnumCase::integer) {
             str = std::to_string(static_cast<U>(t));
         } else {
             str = to_string(t);
             reformat_enum(str, mode, delimiter);
         }
+
         return write_out(str, ctx.out());
+
     }
 
 };

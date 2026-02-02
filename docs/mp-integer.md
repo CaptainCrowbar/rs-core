@@ -328,9 +328,9 @@ Common type. This follows these rules:
 struct std::formatter<Mpitype>;
 ```
 
-Standard formatter. The only flags recognized are `"b"` (binary) and `"x"`
-(hexadecimal); if neither flag is present the value will be returned in
-decimal; the result is unspecified if both are present.
+Standard formatter. A minimum width can be supplied. The only other flags
+recognized are `"b"` (binary) and `"x"`(hexadecimal); if neither flag is
+present the value will be returned in decimal.
 
 ```c++
 struct std::hash<Mpitype>;

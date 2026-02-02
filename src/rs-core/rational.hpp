@@ -445,28 +445,16 @@ template <RS::SignedIntegral T>
 struct std::formatter<RS::Rational<T>>:
 RS::CommonFormatter {
 
-    bool mixed = false;
+    std::string flags;
 
     template <typename ParseContext>
     constexpr auto parse(ParseContext& ctx) {
-
-        auto it = ctx.begin();
-
-        for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 'm') {
-                mixed = true;
-            } else {
-                throw std::format_error{std::format("Invalid format: {:?}", *it)};
-            }
-        }
-
-        return it;
-
+        return parse_helper(ctx, "m", &flags);
     }
 
     template <typename FormatContext>
     auto format(const RS::Rational<T>& r, FormatContext& ctx) const {
-        return write_out(mixed ? r.mixed() : r.to_string(), ctx.out());
+        return write_out(flags == "m" ? r.mixed() : r.to_string(), ctx.out());
     }
 
 };

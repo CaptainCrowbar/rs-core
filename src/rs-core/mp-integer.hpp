@@ -1152,15 +1152,14 @@ RS::CommonFormatter {
         auto it = ctx.begin();
 
         for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 'b') {
+            if (*it == 'b' && base == 10) {
                 base = 2;
-            } else if (*it == 'x') {
+            } else if (*it == 'x' && base == 10) {
                 base = 16;
             } else if (*it >= '0' && *it <= '9') {
-                digits *= 10;
-                digits += static_cast<std::size_t>(*it - '0');
+                digits = 10 * digits + static_cast<std::size_t>(*it - '0');
             } else {
-                throw std::format_error{std::format("Invalid format: {:?}", *it)};
+                throw std::format_error{"Invalid format"};
             }
         }
 
