@@ -15,6 +15,13 @@ if [[ "${PWD##*/}" =~ build ]]; then
     cd ..
 fi
 
+project="${PWD##*/}"
+
+if [[ "$project" == rs-unicode ]]; then
+    echo "Use the local bump-version in this project"
+    exit 1
+fi
+
 if ! [ -d src ]; then
     echo "*** Source directory not found"
     exit 1
