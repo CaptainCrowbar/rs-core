@@ -52,7 +52,7 @@ template parameters:
 | `T`     | Arbitrary type          |                 |
 | `TS`    | Sequence of types       |                 |
 | `TL`    | Instance of `Typelist`  |                 |
-| `SL`    | Sorted typelist         |                 |
+| `STL`   | Sorted typelist         |                 |
 | `UF`    | Unary function          | `T → T`         |
 | `UP`    | Unary predicate         | `T → bool`      |
 | `BF`    | Binary function         | `T × T → T`     |
