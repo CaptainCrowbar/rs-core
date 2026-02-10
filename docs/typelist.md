@@ -4,7 +4,7 @@ _[Core utility library by Ross Smith](index.html)_
 
 ```c++
 #include "rs-core/typelist.hpp"
-namespace RS;
+namespace RS::Meta;
 ```
 
 ## Contents
@@ -13,6 +13,9 @@ namespace RS;
 {:toc}
 
 ## Introduction
+
+All of the definitions here are in the sub-namespace `RS::Meta,` because many
+of them have simple, common names that could easily collide with other code.
 
 Metafunctions are templates that operate on types; usually they take one or
 more types as arguments and "return" another type via a member type, but

@@ -4,7 +4,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace RS {
+namespace RS::Meta {
 
     // Typelist primitives
 

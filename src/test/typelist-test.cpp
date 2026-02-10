@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-using namespace RS;
+using namespace RS::Meta;
 
 namespace {
 
