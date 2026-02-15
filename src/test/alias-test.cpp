@@ -6,6 +6,7 @@
 #include <format>
 #include <functional>
 #include <ranges>
+#include <stdexcept>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -392,6 +393,17 @@ void test_rs_core_alias_range_access() {
     TEST_EQUAL(as[3], 'l');   TEST_EQUAL(cas[3], 'l');
     TEST_EQUAL(as[4], 'o');   TEST_EQUAL(cas[4], 'o');
     TEST_EQUAL(as[5], '\0');  TEST_EQUAL(cas[5], '\0');
+
+    TEST_EQUAL(as.at(0), 'H');   TEST_EQUAL(cas.at(0), 'H');
+    TEST_EQUAL(as.at(1), 'e');   TEST_EQUAL(cas.at(1), 'e');
+    TEST_EQUAL(as.at(2), 'l');   TEST_EQUAL(cas.at(2), 'l');
+    TEST_EQUAL(as.at(3), 'l');   TEST_EQUAL(cas.at(3), 'l');
+    TEST_EQUAL(as.at(4), 'o');   TEST_EQUAL(cas.at(4), 'o');
+
+    TEST_THROW(as.at(5), std::out_of_range, "string");
+    TEST_THROW(cas.at(5), std::out_of_range, "string");
+    TEST_THROW(as.at(6), std::out_of_range, "string");
+    TEST_THROW(cas.at(6), std::out_of_range, "string");
 
     TRY(as[4] = '!');
     TEST_EQUAL(*as, "Hell!");

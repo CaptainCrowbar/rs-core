@@ -4,6 +4,7 @@
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
+#include <cmath>
 #include <compare>
 #include <concepts>
 #include <cstddef>
@@ -141,7 +142,12 @@ namespace RS {
             requires requires (const T& t) { { t[0] } -> Reference; } { return value_[i]; }
         auto operator[](std::size_t i) const
             requires requires (const T& t) { { t[0] } -> NonReference; } { return value_[i]; }
-
+        auto& at(std::size_t i)
+            requires requires (T& t) { { t[0] } -> MutableReference; } { return value_.at(i); }
+        const auto& at(std::size_t i) const
+            requires requires (const T& t) { { t[0] } -> Reference; } { return value_.at(i); }
+        auto at(std::size_t i) const
+            requires requires (const T& t) { { t[0] } -> NonReference; } { return value_.at(i); }
         auto begin() requires requires (T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
         auto begin() const requires requires (const T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
         auto end() requires requires (T& t) { { std::ranges::end(t) }; } { return std::ranges::end(value_); }
