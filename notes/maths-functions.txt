@@ -1,0 +1,97 @@
+acos(T x) -> T
+acosh(T x) -> T
+asin(T x) -> T
+asinh(T x) -> T
+assoc_laguerre(unsigned n, unsigned m, T x) -> T
+assoc_legendre(unsigned l, unsigned m, T x) -> T
+atan(T x) -> T
+atan2(T y, T x) -> T
+atanh(T x) -> T
+beta(T x, T y) -> T
+cbrt(T x) -> T
+ceil(T x) -> T
+comp_ellint_1(T k) -> T
+comp_ellint_2(T k) -> T
+comp_ellint_3(T k, T nu) -> T
+copysign(T x, T y) -> T
+cos(T x) -> T
+cosh(T x) -> T
+cyl_bessel_i(T nu,T x) -> T
+cyl_bessel_j(T nu,T x) -> T
+cyl_bessel_k(T nu,T x) -> T
+cyl_neumann(T nu,T x) -> T
+ellint_1(T k, T phi) -> T
+ellint_2(T k, T phi) -> T
+ellint_3(T k, T nu, T phi) -> T
+erf(T x) -> T
+erfc(T x) -> T
+exp(T x) -> T
+exp2(T x) -> T
+expint(T x) -> T
+expm1(T x) -> T
+fabs(T x) -> T
+fdim(T x, T y) -> T
+floor(T x) -> T
+fma(T x, T y, T z) -> T
+fmax(T x, T y) -> T
+fmaximum(T x, T y) -> T
+fmaximum_num(T x, T y) -> T
+fmin(T x, T y) -> T
+fminimum(T x, T y) -> T
+fminimum_num(T x, T y) -> T
+fmod(T x, T y) -> T
+fpclassify(T x) -> int
+frexp(T value, int* exp) -> T
+hermite(unsigned n, T x) -> T
+hypot(T x, T y) -> T
+hypot(T x, T y, T z) -> T
+ilogb(T x) -> int
+isfinite(T x) -> bool
+isgreater(T x, T y) -> bool
+isgreaterequal(T x, T y) -> bool
+isinf(T x) -> bool
+isless(T x, T y) -> bool
+islessequal(T x, T y) -> bool
+islessgreater(T x, T y) -> bool
+isnan(T x) -> bool
+isnormal(T x) -> bool
+isunordered(T x, T y) -> bool
+laguerre(unsigned n, T x) -> T
+ldexp(T x, int exp) -> T
+legendre(unsigned l, T x) -> T
+lerp(T a, T b, T t) -> T
+lgamma(T x) -> T
+llrint(T x) -> long long int
+llround(T x) -> long long int
+log(T x) -> T
+log10(T x) -> T
+log1p(T x) -> T
+log2(T x) -> T
+logb(T x) -> T
+lrint(T x) -> long int
+lround(T x) -> long int
+modf(T value, T* iptr) -> T
+nearbyint(T x) -> T
+nextafter(T x, T y) -> T
+nextdown(T x) -> T
+nexttoward(T x, long double y) -> T
+nextup(T x) -> T
+pow(T x, T y) -> T
+remainder(T x, T y) -> T
+remquo(T x, T y, int* quo) -> T
+riemann_zeta(T x) -> T
+rint(T x) -> T
+round(T x) -> T
+scalbln(T x, long int n) -> T
+scalbn(T x, int n) -> T
+signbit(T x) -> bool
+sin(T x) -> T
+sinh(T x) -> T
+sph_bessel(unsigned n, T x) -> T
+sph_legendre(unsigned l, unsigned m, T theta) -> T
+sph_neumann(unsigned n, T x) -> T
+sqrt(T x) -> T
+tan(T x) -> T
+tanh(T x) -> T
+tgamma(T x) -> T
+trunc(T x) -> T

@@ -8,11 +8,11 @@
 namespace RS {
 
     inline std::array<int, 3> version() noexcept {
-        return {{ 0, 1, 149 }};
+        return {{ 0, 1, 150 }};
     }
 
     inline std::string version_string() {
-        return "0.1.149";
+        return "0.1.150";
     }
 
 }

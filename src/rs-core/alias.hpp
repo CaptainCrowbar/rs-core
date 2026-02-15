@@ -13,6 +13,7 @@
 #include <functional>
 #include <iterator>
 #include <limits>
+#include <numbers>
 #include <ranges>
 #include <utility>
 
@@ -82,9 +83,9 @@ namespace RS {
 
         // Arithmetic operators
 
-        Alias operator+() const requires requires (T t) { { + t } -> std::convertible_to<T>; } { return Alias(+ value_); }
-        Alias operator-() const requires requires (T t) { { - t } -> std::convertible_to<T>; } { return Alias(- value_); }
-        Alias operator~() const requires requires (T t) { { ~ t } -> std::convertible_to<T>; } { return Alias(~ value_); }
+        Alias operator+() const requires requires (T t) { { + t } -> std::convertible_to<T>; } { return Alias{+ value_}; }
+        Alias operator-() const requires requires (T t) { { - t } -> std::convertible_to<T>; } { return Alias{- value_}; }
+        Alias operator~() const requires requires (T t) { { ~ t } -> std::convertible_to<T>; } { return Alias{~ value_}; }
 
         Alias& operator++() requires requires (T& t) { { ++ t }; } { ++ value_; return *this; }
         Alias operator++(int) requires requires (T& t) { { t ++ }; } { auto old = *this; value_ ++; return old; }
@@ -103,25 +104,25 @@ namespace RS {
         Alias& operator>>=(int j) requires requires (T& t, int i) { { t >>= i }; } { value_ >>= j; return *this; }
 
         friend Alias operator+(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t + u } -> std::convertible_to<T>; } { return Alias(a.value_ + b.value_); }
+            requires requires (T t, T u) { { t + u } -> std::convertible_to<T>; } { return Alias{a.value_ + b.value_}; }
         friend Alias operator-(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t - u } -> std::convertible_to<T>; } { return Alias(a.value_ - b.value_); }
+            requires requires (T t, T u) { { t - u } -> std::convertible_to<T>; } { return Alias{a.value_ - b.value_}; }
         friend Alias operator*(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t * u } -> std::convertible_to<T>; } { return Alias(a.value_ * b.value_); }
+            requires requires (T t, T u) { { t * u } -> std::convertible_to<T>; } { return Alias{a.value_ * b.value_}; }
         friend Alias operator/(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t / u } -> std::convertible_to<T>; } { return Alias(a.value_ / b.value_); }
+            requires requires (T t, T u) { { t / u } -> std::convertible_to<T>; } { return Alias{a.value_ / b.value_}; }
         friend Alias operator%(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t % u } -> std::convertible_to<T>; } { return Alias(a.value_ % b.value_); }
+            requires requires (T t, T u) { { t % u } -> std::convertible_to<T>; } { return Alias{a.value_ % b.value_}; }
         friend Alias operator&(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t & u } -> std::convertible_to<T>; } { return Alias(a.value_ & b.value_); }
+            requires requires (T t, T u) { { t & u } -> std::convertible_to<T>; } { return Alias{a.value_ & b.value_}; }
         friend Alias operator|(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t | u } -> std::convertible_to<T>; } { return Alias(a.value_ | b.value_); }
+            requires requires (T t, T u) { { t | u } -> std::convertible_to<T>; } { return Alias{a.value_ | b.value_}; }
         friend Alias operator^(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t ^ u } -> std::convertible_to<T>; } { return Alias(a.value_ ^ b.value_); }
+            requires requires (T t, T u) { { t ^ u } -> std::convertible_to<T>; } { return Alias{a.value_ ^ b.value_}; }
         friend Alias operator<<(const Alias& a, int j)
-            requires requires (T t, int i) { { t << i } -> std::convertible_to<T>; } { return Alias(a.value_ << j); }
+            requires requires (T t, int i) { { t << i } -> std::convertible_to<T>; } { return Alias{a.value_ << j}; }
         friend Alias operator>>(const Alias& a, int j)
-            requires requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; } { return Alias(a.value_ >> j); }
+            requires requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; } { return Alias{a.value_ >> j}; }
 
         // Comparison operators
 
@@ -162,7 +163,208 @@ namespace RS {
 
         Alias substr(std::size_t pos, std::size_t len = npos) const
             requires requires (const T& t) { { t.substr(0, 1) } -> std::convertible_to<T>; }
-            { return Alias(value_.substr(pos, len)); }
+            { return Alias{value_.substr(pos, len)}; }
+
+        // Maths functions
+
+        // (T) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(function) \
+            friend auto function(Alias a) \
+            requires requires (T x) { { std::function(x) } -> std::convertible_to<T>; } \
+                    || requires (T x) { { function(x) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(*a)}; \
+            }
+
+        // (T) -> RT
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(function, RT) \
+            friend auto function(Alias a) \
+            requires requires (T x) { { std::function(x) } -> std::convertible_to<RT>; } \
+                    || requires (T x) { { function(x) } -> std::convertible_to<RT>; } { \
+                using std::function; \
+                return Alias{function(*a)}; \
+            }
+
+        // (T, T) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(function) \
+            friend auto function(Alias a, Alias b) \
+            requires requires (T x, T y) { { std::function(x, y) } -> std::convertible_to<T>; } \
+                    || requires (T x, T y) { { function(x, y) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(*a, *b)}; \
+            }
+
+        // (T, T) -> RT
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(function, RT) \
+            friend auto function(Alias a, Alias b) \
+            requires requires (T x, T y) { { std::function(x, y) } -> std::convertible_to<RT>; } \
+                    || requires (T x, T y) { { function(x, y) } -> std::convertible_to<RT>; } { \
+                using std::function; \
+                return Alias{function(*a, *b)}; \
+            }
+
+        // (T, T*) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_TPTR_YIELDS_T(function) \
+            friend auto function(Alias a, Alias* b) \
+            requires requires (T x, T* y) { { std::function(x, y) } -> std::convertible_to<T>; } \
+                    || requires (T x, T* y) { { function(x, y) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                T t{}; \
+                Alias r{function(*a, &t)}; \
+                *b = Alias{t}; \
+                return r; \
+            }
+
+        // (T, U) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_U_YIELDS_T(function, U) \
+            friend auto function(Alias a, U b) \
+            requires requires (T x, U y) { { std::function(x, y) } -> std::convertible_to<T>; } \
+                    || requires (T x, U y) { { function(x, y) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(*a, b)}; \
+            }
+
+        // (T, U*) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_UPTR_YIELDS_T(function, U) \
+            friend auto function(Alias a, U* b) \
+            requires requires (T x, U* y) { { std::function(x, y) } -> std::convertible_to<T>; } \
+                    || requires (T x, U* y) { { function(x, y) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(*a, b)}; \
+            }
+
+        // (U, T) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_T_YIELDS_T(function, U) \
+            friend auto function(U a, Alias b) \
+            requires requires (U x, T y) { { std::function(x, y) } -> std::convertible_to<T>; } \
+                    || requires (U x, T y) { { function(x, y) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(a, *b)}; \
+            }
+
+        // (T, T, T) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_T_YIELDS_T(function) \
+            friend auto function(Alias a, Alias b, Alias c) \
+            requires requires (T x, T y, T z) { { std::function(x, y, z) } -> std::convertible_to<T>; } \
+                    || requires (T x, T y, T z) { { function(x, y, z) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(*a, *b, *c)}; \
+            }
+
+        // (T, T, U*) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_UPTR_YIELDS_T(function, U) \
+            friend auto function(Alias a, Alias b, U* c) \
+            requires requires (T x, T y, U* z) { { std::function(x, y, z) } -> std::convertible_to<T>; } \
+                    || requires (T x, T y, U* z) { { function(x, y, z) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(*a, *b, c)}; \
+            }
+
+        // (U, U, T) -> T
+        #define RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T(function, U) \
+            friend auto function(U a, U b, Alias c) \
+            requires requires (U x, U y, T z) { { std::function(x, y, z) } -> std::convertible_to<T>; } \
+                    || requires (U x, U y, T z) { { function(x, y, z) } -> std::convertible_to<T>; } { \
+                using std::function; \
+                return Alias{function(a, b, *c)}; \
+            }
+
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(acos)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(acosh)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(asin)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(asinh)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(atan)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(atanh)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(cbrt)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(ceil)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(cos)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(cosh)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(erf)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(erfc)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(exp)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(exp2)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(expm1)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(fabs)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(floor)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(lgamma)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(log)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(log10)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(log1p)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(log2)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(logb)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(nearbyint)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(rint)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(round)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(sin)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(sinh)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(sqrt)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(tan)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(tanh)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(tgamma)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(trunc)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(fpclassify, int)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(ilogb, int)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(isfinite, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(isinf, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(isnan, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(isnormal, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(llrint, long long)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(llround, long long)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(lrint, long)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(lround, long)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_RT(signbit, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(atan2)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(copysign)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(fdim)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(fmax)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(fmin)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(fmod)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(hypot)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(nextafter)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(pow)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(remainder)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(isgreater, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(isgreaterequal, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(isless, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(islessequal, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(islessgreater, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_RT(isunordered, bool)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_TPTR_YIELDS_T(modf)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_U_YIELDS_T(ldexp, int)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_U_YIELDS_T(nexttoward, long double)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_U_YIELDS_T(scalbln, long)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_U_YIELDS_T(scalbn, int)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_UPTR_YIELDS_T(frexp, int)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_T_YIELDS_T(fma)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_T_YIELDS_T(hypot)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_T_YIELDS_T(lerp)
+        RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_UPTR_YIELDS_T(remquo, int)
+
+        #if __cpp_lib_math_special_functions >= 201603L
+
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(comp_ellint_1)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(comp_ellint_2)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(expint)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T(riemann_zeta)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(beta)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(comp_ellint_3)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(cyl_bessel_i)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(cyl_bessel_j)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(cyl_bessel_k)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(cyl_neumann)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(ellint_1)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_YIELDS_T(ellint_2)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_T_YIELDS_T(hermite, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_T_YIELDS_T(laguerre, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_T_YIELDS_T(legendre, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_T_YIELDS_T(sph_bessel, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_T_YIELDS_T(sph_neumann, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_T_T_YIELDS_T(ellint_3)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T(assoc_laguerre, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T(assoc_legendre, unsigned)
+            RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T(sph_legendre, unsigned)
+
+        #endif
 
     };
 
@@ -185,6 +387,29 @@ struct std::hash<RS::Alias<T, Tag, Flags>> {
         return std::hash<T>()(*a);
     }
 };
+
+#define RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(constant) \
+    template <typename T, typename Tag, RS::AliasFlags Flags> \
+    requires requires { { std::numbers::constant ## _v<T> } -> std::convertible_to<T>; } \
+    RS::Alias<T, Tag, Flags> constant ## _v <RS::Alias<T, Tag, Flags>>{constant ## _v<T>};
+
+namespace std::numbers {
+
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(e)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(egamma)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(inv_pi)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(inv_sqrt3)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(inv_sqrtpi)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(ln10)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(ln2)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(log10e)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(log2e)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(phi)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(pi)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(sqrt2)
+    RS_CORE_DEFINE_ALIAS_STD_NUMBERS_CONSTANT(sqrt3)
+
+}
 
 template <typename T, typename Tag, RS::AliasFlags Flags>
 requires std::numeric_limits<T>::is_specialized

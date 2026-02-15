@@ -280,6 +280,11 @@ std::size_t Alias::size() const;
 
 Range property functions. Defined if `std::ranges::empty/size(T)` are valid.
 
+### Mathematical functions
+
+All functions in `<cmath>` are defined for `Alias<T,...>` if they are defined
+for `T` (as of C++23).
+
 ### String functions
 
 ```c++
@@ -306,8 +311,15 @@ struct std::hash<Alias>;
 Defined if `std::hash<T>` is defined, and returns the same value.
 
 ```c++
+namespace std::numbers { ... }
+```
+
+The constants in this namespace are duplicated for `Alias<T,...>` if they are
+defined for `T.`
+
+```c++
 class std::numeric_limits<Alias>;
 ```
 
-Defined if `std::numeric_limits<T>` is specialized, and contains the same
-values, converted where necessary to `Alias<T>.`
+Defined if `numeric_limits<T>` is specialized, and contains the same values,
+converted where necessary to `Alias<T>.`
