@@ -42,11 +42,11 @@ which are used to access the underlying `T` value.
 Most of the member functions of `T` can be called using the arrow operator. A
 few are explicitly implemented as special cases, providing direct member
 functions of `Alias` (for example, if `T` has a `substr()` function, we
-expect `Alias::substr()` to return another `Alias` instead of the plain `T`
+expect `Alias.substr()` to return another `Alias` instead of the plain `T`
 that `Alias->substr()` would return).
 
 Explicit conversion operators always exist in both directions between `T` and
-`Alias<T>`, and between different instantiations of `Alias` for the same
+`Alias<T,...>`, and between different instantiations of `Alias` for the same
 `T`.
 
 The second template argument, `Tag`, can be used to distinguish different
@@ -71,6 +71,9 @@ alias:
 
 Combining `implicit_to_alias` and `implicit_from_alias` is legal but likely to
 lead to ambiguous overload resolution issues.
+
+Behaviour is undefined if instantiations of `Alias` exist with the same
+underlying type and tag type but different flags.
 
 ### Parameter visibility
 

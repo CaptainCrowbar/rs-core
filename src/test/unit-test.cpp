@@ -7,6 +7,7 @@
 
 using namespace RS::UnitTest;
 
+void test_rs_core_global_primitive_concepts();
 void test_rs_core_global_arithmetic_concepts();
 void test_rs_core_alias_constructors();
 void test_rs_core_alias_conversions();
@@ -193,6 +194,7 @@ int main(int argc, char** argv) {
     std::println("{}Running unit tests{}", xhead, xreset);
     std::println("{}{}{}", xrule, rule, xreset);
 
+    call_me_maybe(test_rs_core_global_primitive_concepts, "test_rs_core_global_primitive_concepts");
     call_me_maybe(test_rs_core_global_arithmetic_concepts, "test_rs_core_global_arithmetic_concepts");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
     call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");

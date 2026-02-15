@@ -18,6 +18,23 @@ namespace {
 
 }
 
+void test_rs_core_global_primitive_concepts() {
+
+    TEST(! Reference<int>);
+    TEST(Reference<int&>);
+    TEST(Reference<const int&>);
+    TEST(! MutableReference<int>);
+    TEST(MutableReference<int&>);
+    TEST(! MutableReference<const int&>);
+    TEST(! ConstReference<int>);
+    TEST(! ConstReference<int&>);
+    TEST(ConstReference<const int&>);
+    TEST(NonReference<int>);
+    TEST(! NonReference<int&>);
+    TEST(! NonReference<const int&>);
+
+}
+
 void test_rs_core_global_arithmetic_concepts() {
 
     TEST(SignedIntegral<int>);

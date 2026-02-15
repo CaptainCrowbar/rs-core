@@ -13,21 +13,9 @@
 #include <iterator>
 #include <limits>
 #include <ranges>
-#include <type_traits>
 #include <utility>
 
 namespace RS {
-
-    namespace Detail {
-
-        template <typename T> struct MutableReferenceType: std::false_type {};
-        template <typename T> struct MutableReferenceType<T&>: std::true_type {};
-        template <typename T> struct MutableReferenceType<const T&>: std::false_type {};
-        template <typename T> concept MutableReference = MutableReferenceType<T>::value;
-        template <typename T> concept Reference = std::is_reference_v<T>;
-        template <typename T> concept NonReference = ! std::is_reference_v<T>;
-
-    }
 
     RS_BITMASK(AliasFlags, std::uint8_t,
         none                 = 0,
@@ -148,11 +136,11 @@ namespace RS {
         // Range access
 
         auto& operator[](std::size_t i)
-            requires requires (T& t) { { t[0] } -> Detail::MutableReference; } { return value_[i]; }
+            requires requires (T& t) { { t[0] } -> MutableReference; } { return value_[i]; }
         const auto& operator[](std::size_t i) const
-            requires requires (const T& t) { { t[0] } -> Detail::Reference; } { return value_[i]; }
+            requires requires (const T& t) { { t[0] } -> Reference; } { return value_[i]; }
         auto operator[](std::size_t i) const
-            requires requires (const T& t) { { t[0] } -> Detail::NonReference; } { return value_[i]; }
+            requires requires (const T& t) { { t[0] } -> NonReference; } { return value_[i]; }
 
         auto begin() requires requires (T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
         auto begin() const requires requires (const T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }

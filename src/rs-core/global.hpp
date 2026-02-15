@@ -5,6 +5,7 @@
 #include <limits>
 #include <print>
 #include <string_view>
+#include <type_traits>
 
 namespace RS {
 
@@ -12,7 +13,17 @@ namespace RS {
 
     static_assert(std::numeric_limits<unsigned char>::digits == 8);
 
-    // Concepts
+    // Primitive concepts
+
+    template <typename T> struct MetaMutableReference: std::false_type {};
+    template <typename T> struct MetaMutableReference<T&>: std::true_type {};
+    template <typename T> struct MetaMutableReference<const T&>: std::false_type {};
+    template <typename T> concept Reference = std::is_reference_v<T>;
+    template <typename T> concept MutableReference = MetaMutableReference<T>::value;
+    template <typename T> concept ConstReference = Reference<T> && ! MutableReference<T>;
+    template <typename T> concept NonReference = ! std::is_reference_v<T>;
+
+    // Arithmetic concepts
 
     template <typename T>
     concept Arithmetic = std::numeric_limits<T>::is_specialized

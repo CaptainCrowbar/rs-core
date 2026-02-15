@@ -94,7 +94,7 @@ namespace {
 
     template <typename T>
     concept MutableIndexed = requires (T& t, std::size_t i) {
-        { t[i] } -> Detail::MutableReference;
+        { t[i] } -> MutableReference;
     };
 
 }
