@@ -255,12 +255,10 @@ Heterogeneous comparison operators. Each of these is defined if the
 ```c++
 [value type]& Alias::operator[](std::size_t i);
 [see below] Alias::operator[](std::size_t i) const;
-[value type]& Alias::at(std::size_t i);
-[see below] Alias::at(std::size_t i) const;
 ```
 
-Indexing functions. Defined if the corresponding function for `T` is defined.
-The `const` versions can return either a `const` reference or a value object,
+Indexing operators. Defined if the corresponding operator for `T` is defined.
+The `const` version can return either a `const` reference or a value object,
 whichever is returned by the underlying call.
 
 ```c++
