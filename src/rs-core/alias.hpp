@@ -176,7 +176,7 @@ namespace RS {
             requires requires (T x) { { std::function(x) } -> std::convertible_to<RT>; } \
                     || requires (T x) { { function(x) } -> std::convertible_to<RT>; } { \
                 using std::function; \
-                return Alias{function(*a)}; \
+                return function(*a); \
             }
 
         // (T, T) -> T
@@ -194,7 +194,7 @@ namespace RS {
             requires requires (T x, T y) { { std::function(x, y) } -> std::convertible_to<RT>; } \
                     || requires (T x, T y) { { function(x, y) } -> std::convertible_to<RT>; } { \
                 using std::function; \
-                return Alias{function(*a, *b)}; \
+                return function(*a, *b); \
             }
 
         // (T, T*) -> T
