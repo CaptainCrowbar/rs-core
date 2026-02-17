@@ -65,14 +65,11 @@ Sources:
 
 * [CODATA recommended values](https://physics.nist.gov/cuu/Constants/)
 
-Values related to quantity of substance are given in kilomoles to avoid
-intrusive factors of 1000 in expressions.
-
 | Constant                     | Symbol       | Value                                                                |
 | --------                     | ------       | -----                                                                |
 | `alpha_particle_mass`        | `m_alpha`    | 6.645×10<sup>-27</sup> kg                                            |
 | `atomic_mass_constant`       | `m_u`        | 1.661×10<sup>-27</sup> kg                                            |
-| `avogadro_constant`          | `N_A`        | 6.022×10<sup>26</sup> kmol<sup>-1</sup>                              |
+| `avogadro_constant`          | `N_A`        | 6.022×10<sup>23</sup> mol<sup>-1</sup>                               |
 | `boltzmann_constant`         | `k`          | 1.381×10<sup>-23</sup> J/K                                           |
 | `electron_mass`              | `m_e`        | 9.109×10<sup>-31</sup> kg                                            |
 | `elementary_charge`          | `ec`         | 1.602×10<sup>-19</sup> C                                             |
@@ -80,7 +77,7 @@ intrusive factors of 1000 in expressions.
 | `first_radiation_constant`   | `c_1`        | 3.742×10<sup>-16</sup> W m<sup>2</sup>                               |
 | `gravitational_constant`     | `G`          | 6.674×10<sup>-11</sup> m<sup>3</sup> kg<sup>-1</sup> s<sup>-2</sup>  |
 | `josephson_constant`         | `K_J`        | 4.836×10<sup>14</sup> Hz V<sup>-1</sup>                              |
-| `molar_gas_constant`         | `R`          | 8314 J kmol<sup>-1</sup> K<sup>-1</sup>                              |
+| `molar_gas_constant`         | `R`          | 8.314 J mol<sup>-1</sup> K<sup>-1</sup>                              |
 | `neutron_mass`               | `m_n`        | 1.675×10<sup>-27</sup> kg                                            |
 | `planck_constant`            | `h`          | 6.626×10<sup>-34</sup> J s                                           |
 | `proton_mass`                | `m_p`        | 1.673×10<sup>-27</sup> kg                                            |

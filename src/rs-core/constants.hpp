@@ -45,12 +45,9 @@ namespace RS {
     // Physical constants
     // CODATA recommended values: https://physics.nist.gov/cuu/Constants/
 
-    // Values related to quantity of substance are given in kilomoles to avoid
-    // intrusive factors of 1000 in expressions.
-
     RS_DEFINE_CONSTANT_2(alpha_particle_mass,        m_alpha,    6.644'657'3357e-27);    // kg
     RS_DEFINE_CONSTANT_2(atomic_mass_constant,       m_u,        1.660'539'066'60e-27);  // kg
-    RS_DEFINE_CONSTANT_2(avogadro_constant,          N_A,        6.022'140'76e26);       // kmol^-1
+    RS_DEFINE_CONSTANT_2(avogadro_constant,          N_A,        6.022'140'76e23);       // mol^-1
     RS_DEFINE_CONSTANT_2(boltzmann_constant,         k,          1.380'649e-23);         // J/K
     RS_DEFINE_CONSTANT_2(electron_mass,              m_e,        9.109'383'7015e-31);    // kg
     RS_DEFINE_CONSTANT_2(elementary_charge,          ec,         1.602'176'634e-19);     // C
@@ -58,7 +55,7 @@ namespace RS {
     RS_DEFINE_CONSTANT_2(first_radiation_constant,   c_1,        3.741'771'852e-16);     // W m^2 (c_1 = 2π h c^2)
     RS_DEFINE_CONSTANT_2(gravitational_constant,     G,          6.674'28e-11);          // m^3 kg^-1 s^-2
     RS_DEFINE_CONSTANT_2(josephson_constant,         K_J,        4.835'978'484e14);      // Hz V^-1 (K_J = 2e/h)
-    RS_DEFINE_CONSTANT_2(molar_gas_constant,         R,          8'314.462'618);         // J kmol^-1 K^-1 (R = N_A k)
+    RS_DEFINE_CONSTANT_2(molar_gas_constant,         R,          8.314'462'618);         // J mol^-1 K^-1 (R = N_A k)
     RS_DEFINE_CONSTANT_2(neutron_mass,               m_n,        1.674'927'498'04e-27);  // kg
     RS_DEFINE_CONSTANT_2(planck_constant,            h,          6.626'070'15e-34);      // J s
     RS_DEFINE_CONSTANT_2(proton_mass,                m_p,        1.672'621'923'69e-27);  // kg
