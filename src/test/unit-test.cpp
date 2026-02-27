@@ -140,6 +140,8 @@ void test_rs_core_rational_mp_integer_formatting();
 void test_rs_core_rational_mp_integer_parsing();
 void test_rs_core_scope_guard();
 void test_rs_core_terminal_escape_codes();
+void test_rs_core_topological_sorting();
+void test_rs_core_topological_sorting_reverse();
 void test_rs_core_typelist_size();
 void test_rs_core_typelist_conversion();
 void test_rs_core_typelist_append();
@@ -330,6 +332,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_rational_mp_integer_parsing, "test_rs_core_rational_mp_integer_parsing");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
     call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
+    call_me_maybe(test_rs_core_topological_sorting, "test_rs_core_topological_sorting");
+    call_me_maybe(test_rs_core_topological_sorting_reverse, "test_rs_core_topological_sorting_reverse");
     call_me_maybe(test_rs_core_typelist_size, "test_rs_core_typelist_size");
     call_me_maybe(test_rs_core_typelist_conversion, "test_rs_core_typelist_conversion");
     call_me_maybe(test_rs_core_typelist_append, "test_rs_core_typelist_append");
