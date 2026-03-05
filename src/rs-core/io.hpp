@@ -58,14 +58,15 @@ namespace RS {
         public Iterator<iterator, const std::string, std::input_iterator_tag> {
         public:
             iterator() {}
-            explicit iterator(IO& io);
+            explicit iterator(IO& io, bool trim);
             const std::string& operator*() const noexcept { return line_; }
             iterator& operator++();
             bool operator==(const iterator& i) const noexcept { return io_ == i.io_; }
             bool operator==(std::nullptr_t) const noexcept { return io_ == nullptr; }
         private:
-            IO* io_{};
+            IO* io_ = nullptr;
             std::string line_;
+            bool trim_ = false;
         };
 
         using line_range = std::ranges::subrange<iterator, std::nullptr_t>;
@@ -86,14 +87,15 @@ namespace RS {
         virtual std::size_t read(void* ptr, std::size_t len) = 0;
         virtual std::string read_all();
         virtual std::size_t read_into(std::string& buf, std::size_t pos = 0);
-        virtual std::string read_line();
+        virtual std::string read_full_line();
         virtual std::string read_str(std::size_t len);
         virtual void seek(std::ptrdiff_t offset = 0, IOSeek from = current) = 0;
         virtual std::ptrdiff_t tell() const = 0;
         virtual std::size_t write(const void* ptr, std::size_t len) = 0;
         virtual std::size_t write_str(std::string_view str) { return write(str.data(), str.size()); }
 
-        line_range lines() { return {iterator{*this}, {}}; }
+        line_range lines(bool trim = false) { return {iterator{*this, trim}, {}}; }
+        std::string read_line(bool trim = false);
 
         template <typename... Args>
             std::size_t print(std::format_string<const Args&...> fmt, const Args&... args) {
@@ -109,30 +111,27 @@ namespace RS {
 
     protected:
 
+        static void trim_line(std::string& line) noexcept;
+
         #ifdef _WIN32
-
-            static std::wstring quick_wstring(const char* cptr) {
-                std::wstring wstr;
-                for (;*cptr != 0; ++cptr) {
-                    wstr += static_cast<wchar_t>(*cptr);
-                }
-                return wstr;
-            }
-
+            static std::wstring quick_wstring(const char* cptr);
         #endif
 
     };
 
-        inline IO::iterator::iterator(IO& io):
-        io_(&io),
-        line_() {
+        inline IO::iterator::iterator(IO& io, bool trim):
+        io_{&io},
+        line_{},
+        trim_{trim} {
             ++*this;
         }
 
         inline IO::iterator& IO::iterator::operator++() {
-            line_ = io_->read_line();
+            line_ = io_->read_full_line();
             if (line_.empty()) {
                 io_ = nullptr;
+            } else if (trim_) {
+                trim_line(line_);
             }
             return *this;
         }
@@ -182,7 +181,7 @@ namespace RS {
             }
         }
 
-        inline std::string IO::read_line() {
+        inline std::string IO::read_full_line() {
             std::string buf;
             char c{};
             while (get(c)) {
@@ -194,12 +193,41 @@ namespace RS {
             return buf;
         }
 
+        inline std::string IO::read_line(bool trim) {
+            auto line = read_full_line();
+            if (trim) {
+                trim_line(line);
+            }
+            return line;
+        }
+
         inline std::string IO::read_str(std::size_t len) {
             std::string str(len, '\0');
             auto n = read_into(str);
             str.resize(n);
             return str;
         }
+
+        inline void IO::trim_line(std::string& line) noexcept {
+            if (! line.empty() && line.back() == '\n') {
+                line.pop_back();
+                if (! line.empty() && line.back() == '\r') {
+                    line.pop_back();
+                }
+            }
+        }
+
+        #ifdef _WIN32
+
+            inline std::wstring IO::quick_wstring(const char* cptr) {
+                std::wstring wstr;
+                for (;*cptr != 0; ++cptr) {
+                    wstr += static_cast<wchar_t>(*cptr);
+                }
+                return wstr;
+            }
+
+        #endif
 
     class Cstdio:
     public IO {
@@ -224,7 +252,7 @@ namespace RS {
         bool is_tty() const noexcept override { return file_is_tty(stream_); }
         void put(char c) override;
         std::size_t read(void* ptr, std::size_t len) override;
-        std::string read_line() override;
+        std::string read_full_line() override;
         void seek(std::ptrdiff_t offset = 0, IOSeek from = current) override;
         std::ptrdiff_t tell() const override;
         std::size_t write(const void* ptr, std::size_t len) override;
@@ -325,7 +353,7 @@ namespace RS {
             return n;
         }
 
-        inline std::string Cstdio::read_line() {
+        inline std::string Cstdio::read_full_line() {
 
             static constexpr auto block_size = 256uz;
 
@@ -464,7 +492,7 @@ namespace RS {
         bool is_tty() const noexcept override { return false; }
         std::size_t read(void* ptr, std::size_t len) override;
         std::string read_all() override;
-        std::string read_line() override;
+        std::string read_full_line() override;
         std::string read_str(std::size_t len) override;
         void seek(std::ptrdiff_t offset, IOSeek from = current) override;
         std::ptrdiff_t tell() const override { return static_cast<std::ptrdiff_t>(pos_); }
@@ -521,7 +549,7 @@ namespace RS {
             return result;
         }
 
-        inline std::string StringBuffer::read_line() {
+        inline std::string StringBuffer::read_full_line() {
             auto next = buf_ptr_->find('\n', pos_);
             if (next == npos) {
                 next = buf_ptr_->size();

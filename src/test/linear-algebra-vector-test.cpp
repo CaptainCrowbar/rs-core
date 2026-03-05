@@ -9,7 +9,7 @@
 using namespace RS;
 using std::numbers::pi;
 
-void test_rs_linear_algebra_concepts() {
+void test_rs_core_linear_algebra_concepts() {
 
     static_assert(Scalar<signed char>);
     static_assert(Scalar<unsigned char>);
@@ -25,7 +25,7 @@ void test_rs_linear_algebra_concepts() {
 
 }
 
-void test_rs_linear_algebra_vector_integer_construction() {
+void test_rs_core_linear_algebra_vector_integer_construction() {
 
     Int3 v1, v2, v3;
     const Int3& cv1 = v1;
@@ -80,7 +80,7 @@ void test_rs_linear_algebra_vector_integer_construction() {
 
 }
 
-void test_rs_linear_algebra_vector_integer_arithmetic() {
+void test_rs_core_linear_algebra_vector_integer_arithmetic() {
 
     int x = 0;
     Int3 v1, v2, v3, v4;
@@ -126,7 +126,7 @@ void test_rs_linear_algebra_vector_integer_arithmetic() {
 
 }
 
-void test_rs_linear_algebra_vector_integer_hash() {
+void test_rs_core_linear_algebra_vector_integer_hash() {
 
     std::unordered_set<Int3> set;
     Int3 v1, v2, v3;
@@ -144,7 +144,7 @@ void test_rs_linear_algebra_vector_integer_hash() {
 
 }
 
-void test_rs_linear_algebra_vector_integer_total_order() {
+void test_rs_core_linear_algebra_vector_integer_total_order() {
 
     std::set<Int3> set;
     Int3 v1, v2, v3;
@@ -163,7 +163,7 @@ void test_rs_linear_algebra_vector_integer_total_order() {
 
 }
 
-void test_rs_linear_algebra_vector_floating_construction() {
+void test_rs_core_linear_algebra_vector_floating_construction() {
 
     Double3 v1, v2, v3;
     const Double3& cv1(v1);
@@ -218,7 +218,7 @@ void test_rs_linear_algebra_vector_floating_construction() {
 
 }
 
-void test_rs_linear_algebra_vector_floating_arithmetic() {
+void test_rs_core_linear_algebra_vector_floating_arithmetic() {
 
     double x = 0;
     Double3 v1, v2, v3, v4, v5;
@@ -293,7 +293,7 @@ void test_rs_linear_algebra_vector_floating_arithmetic() {
 
 }
 
-void test_rs_linear_algebra_vector_floating_interpolation() {
+void test_rs_core_linear_algebra_vector_floating_interpolation() {
 
     Double3 u = {10,20,30};
     Double3 v = {12,34,56};

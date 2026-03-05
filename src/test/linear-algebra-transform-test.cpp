@@ -58,7 +58,7 @@ namespace {
 
 }
 
-void test_rs_linear_algebra_transform_2d() {
+void test_rs_core_linear_algebra_transform_2d() {
 
     check_2d_helper(0,          0,          0,  0);
     check_2d_helper(1,          0,          1,  0);
@@ -76,7 +76,7 @@ void test_rs_linear_algebra_transform_2d() {
 
 }
 
-void test_rs_linear_algebra_transform_3d() {
+void test_rs_core_linear_algebra_transform_3d() {
 
     check_3d_helper(0,          0,          0,          0,  0,         0,        0);
     check_3d_helper(1,          0,          0,          1,  0,         90_deg,   1);
@@ -120,7 +120,7 @@ void test_rs_linear_algebra_transform_3d() {
 
 }
 
-void test_rs_linear_algebra_transform_projective_geometry() {
+void test_rs_core_linear_algebra_transform_projective_geometry() {
 
     Double3 v3;
     Double4 v4;
@@ -166,7 +166,7 @@ void test_rs_linear_algebra_transform_projective_geometry() {
 
 }
 
-void test_rs_linear_algebra_transform_primitives() {
+void test_rs_core_linear_algebra_transform_primitives() {
 
     static const auto u = Double3::unit(0);
     static const auto v = Double3::unit(1);
@@ -349,7 +349,7 @@ void test_rs_linear_algebra_transform_primitives() {
 
 }
 
-void test_rs_linear_algebra_transform_quaternions() {
+void test_rs_core_linear_algebra_transform_quaternions() {
 
     static const auto z = Double3::null();
     static const auto u = Double3::unit(0);

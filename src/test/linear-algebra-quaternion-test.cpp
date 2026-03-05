@@ -18,7 +18,7 @@ namespace {
 
 }
 
-void test_rs_linear_algebra_quaternion() {
+void test_rs_core_linear_algebra_quaternion() {
 
     Qdouble q, r, s;
 

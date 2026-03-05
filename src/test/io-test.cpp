@@ -189,6 +189,22 @@ void test_rs_core_io_cstdio_line_iterator() {
         TEST(i == lines.end());
     }
 
+    {
+        Cstdio io(test_file);
+        TRY(lines = io.lines(true));
+        TRY(i = lines.begin());
+        TRY(s = *i);
+        TEST_EQUAL(s, "Hello world");
+        TRY(++i);
+        TRY(s = *i);
+        TEST_EQUAL(s, "Goodnight moon");
+        TRY(++i);
+        TRY(s = *i);
+        TEST_EQUAL(s, "Here comes the sun");
+        TRY(++i);
+        TEST(i == lines.end());
+    }
+
     TRY(fs::remove(test_file));
     TEST(! fs::exists(test_file));
     TEST_THROW(Cstdio(test_file), std::system_error, test_file.string());
@@ -383,19 +399,41 @@ void test_rs_core_io_string_buffer_line_iterator() {
     TRY(buf.write_str("Hello world\n"));
     TRY(buf.write_str("Goodnight moon\n"));
     TRY(buf.write_str("Here comes the sun\n"));
-    TRY(buf.seek(0, IO::set));
 
-    TRY(lines = buf.lines());
-    TRY(i = lines.begin());
-    TRY(s = *i);
-    TEST_EQUAL(s, "Hello world\n");
-    TRY(++i);
-    TRY(s = *i);
-    TEST_EQUAL(s, "Goodnight moon\n");
-    TRY(++i);
-    TRY(s = *i);
-    TEST_EQUAL(s, "Here comes the sun\n");
-    TRY(++i);
-    TEST(i == lines.end());
+    {
+
+        TRY(buf.seek(0, IO::set));
+        TRY(lines = buf.lines());
+        TRY(i = lines.begin());
+        TRY(s = *i);
+        TEST_EQUAL(s, "Hello world\n");
+        TRY(++i);
+        TRY(s = *i);
+        TEST_EQUAL(s, "Goodnight moon\n");
+        TRY(++i);
+        TRY(s = *i);
+        TEST_EQUAL(s, "Here comes the sun\n");
+        TRY(++i);
+        TEST(i == lines.end());
+
+    }
+
+    {
+
+        TRY(buf.seek(0, IO::set));
+        TRY(lines = buf.lines(true));
+        TRY(i = lines.begin());
+        TRY(s = *i);
+        TEST_EQUAL(s, "Hello world");
+        TRY(++i);
+        TRY(s = *i);
+        TEST_EQUAL(s, "Goodnight moon");
+        TRY(++i);
+        TRY(s = *i);
+        TEST_EQUAL(s, "Here comes the sun");
+        TRY(++i);
+        TEST(i == lines.end());
+
+    }
 
 }

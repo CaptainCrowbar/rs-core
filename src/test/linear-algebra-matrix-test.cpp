@@ -21,7 +21,7 @@ namespace {
 
 }
 
-void test_rs_linear_algebra_matrix_basics() {
+void test_rs_core_linear_algebra_matrix_basics() {
 
     Double3 v1, v2;
     Double3x3r rm1(2, 1), rm2, rm3;
@@ -418,7 +418,7 @@ void test_rs_linear_algebra_matrix_basics() {
 
 }
 
-void test_rs_linear_algebra_matrix_inversion() {
+void test_rs_core_linear_algebra_matrix_inversion() {
 
     double x = 0;
 

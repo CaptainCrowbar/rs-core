@@ -117,7 +117,7 @@ virtual bool IO::is_tty() const noexcept;
 Query whether the I/O stream is connected to a terminal.
 
 ```c++
-IO::line_range IO::lines();
+IO::line_range IO::lines(bool trim = false);
 ```
 
 Returns an iterator range over the lines in an input stream, starting at the
@@ -164,13 +164,15 @@ into the string starting at the given position. This will do nothing and
 return zero if `pos>=buf.size().`
 
 ```c++
-virtual std::string IO::read_line();
+virtual std::string IO::read_full_line();
+std::string IO::read_line(bool trim = false);
 ```
 
-Reads one line from the stream, starting at the current read position and
+Read one line from the stream, starting at the current read position and
 ending after the next line feed or at the end of the stream, whichever comes
-first. If the stream actually contains binary data, not text, this may read a
-large amount of data looking for a line feed.
+first. The `read_line()` calls `read_full_line()` and trims trailing LF or
+CR+LF if requested. If the stream actually contains binary data, not text,
+this may read a large amount of data looking for a line feed.
 
 ```c++
 std::string IO::read_str(std::size_t len);
