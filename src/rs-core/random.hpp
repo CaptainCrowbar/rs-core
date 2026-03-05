@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <bit>
 #include <cmath>
+#include <compare>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
@@ -40,9 +41,8 @@ namespace RS {
         constexpr Pcg() noexcept { seed(default_seed); }
         constexpr explicit Pcg(std::uint64_t s) noexcept { seed(s); }
         constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1) noexcept { seed(s0, s1); }
-        constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept {
-            seed(s0, s1, s2, s3);
-        }
+        constexpr explicit Pcg(std::uint64_t s0, std::uint64_t s1, std::uint64_t s2, std::uint64_t s3) noexcept
+            { seed(s0, s1, s2, s3); }
 
         constexpr std::uint64_t operator()() noexcept;
 
@@ -52,6 +52,9 @@ namespace RS {
 
         constexpr static std::uint64_t min() noexcept { return 0; }
         constexpr static std::uint64_t max() noexcept { return max64; }
+
+        constexpr friend bool operator==(const Pcg& a, const Pcg& b) noexcept
+            { return a.state_ == b.state_ && a.delta_ == b.delta_; }
 
     private:
 

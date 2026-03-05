@@ -82,6 +82,13 @@ constexpr static std::uint64_t Pcg::max() noexcept;
 
 Minimum and maximum values.
 
+```c++
+constexpr bool operator==(const Pcg& a, const Pcg& b) noexcept;
+constexpr bool operator!=(const Pcg& a, const Pcg& b) noexcept;
+```
+
+These compare the generators' current internal states.
+
 ### RandomDevice64 engine
 
 ```c++
