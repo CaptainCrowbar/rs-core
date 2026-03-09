@@ -76,6 +76,8 @@ namespace RS {
             using uint128_t = Uint128;
         #endif
 
+        constexpr auto max128 = ~ uint128_t{0};
+
         template <std::integral T>
         constexpr Uint128::Uint128(T t) noexcept {
 

@@ -20,6 +20,21 @@ is defined as a convenience alias for the native 128-bit type if one exists,
 otherwise for the `Uint128` class.
 
 ```c++
+constexpr auto max128 = ~ uint128_t{0};
+```
+
+Defined for convenience.
+
+## Uint128 class
+
+```c++
+class Uint128;
+```
+
+The `Uint128` class implements 128-bit arithmetic using a pair of 64-bit
+integers internally.
+
+```c++
 using Uint128::word = std::uint64_t;
 ```
 

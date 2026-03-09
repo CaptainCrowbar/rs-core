@@ -60,6 +60,8 @@ namespace RS {
     // Constants
 
     constexpr std::string_view ascii_whitespace = "\t\n\r ";
+    constexpr auto max8 = ~ std::uint8_t{0};
+    constexpr auto max16 = ~ std::uint16_t{0};
     constexpr auto max32 = ~ std::uint32_t{0};
     constexpr auto max64 = ~ std::uint64_t{0};
     constexpr auto npos = ~ 0uz;
