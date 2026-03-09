@@ -1,5 +1,7 @@
 #include "rs-core/global.hpp"
 #include "rs-core/unit-test.hpp"
+#include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <string_view>
@@ -97,5 +99,20 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST_EQUAL(select(86),     "SignedIntegral");
     TEST_EQUAL(select(99u),    "UnsignedIntegral");
     TEST_EQUAL(select(12.34),  "FloatingPoint");
+
+}
+
+void test_rs_core_global_constants() {
+
+    static_assert(std::same_as<decltype(max8), const std::uint8_t>);
+    static_assert(std::same_as<decltype(max16), const std::uint16_t>);
+    static_assert(std::same_as<decltype(max32), const std::uint32_t>);
+    static_assert(std::same_as<decltype(max64), const std::uint64_t>);
+    static_assert(std::same_as<decltype(npos), const std::size_t>);
+
+    TEST_EQUAL(max8, 0xffu);
+    TEST_EQUAL(max16, 0xffffu);
+    TEST_EQUAL(max32, 0xffff'fffful);
+    TEST_EQUAL(max64, 0xffff'ffff'ffff'ffffull);
 
 }

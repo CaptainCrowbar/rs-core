@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <print>
@@ -60,11 +61,11 @@ namespace RS {
     // Constants
 
     constexpr std::string_view ascii_whitespace = "\t\n\r ";
-    constexpr auto max8 = ~ std::uint8_t{0};
-    constexpr auto max16 = ~ std::uint16_t{0};
-    constexpr auto max32 = ~ std::uint32_t{0};
-    constexpr auto max64 = ~ std::uint64_t{0};
-    constexpr auto npos = ~ 0uz;
+    constexpr std::uint8_t max8 = static_cast<std::uint8_t>(~ std::uint8_t{0});
+    constexpr std::uint16_t max16 = static_cast<std::uint16_t>(~ std::uint16_t{0});
+    constexpr std::uint32_t max32 = ~ std::uint32_t{0};
+    constexpr std::uint64_t max64 = ~ std::uint64_t{0};
+    constexpr std::size_t npos = ~ 0uz;
 
     // Metaprogramming utilities
 
