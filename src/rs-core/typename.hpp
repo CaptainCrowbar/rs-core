@@ -14,18 +14,18 @@ namespace RS {
 
     namespace Detail {
 
-        inline std::string demangle_typename(std::string name) {
+        inline std::string demangle_typename(const std::string& name) {
 
             #ifdef __GNUC__
 
                 // https://gcc.gnu.org/onlinedocs/libstdc++/libstdc++-html-USERS-4.3/a01696.html
 
                 auto status = 0;
-                auto demangle_ptr = abi::__cxa_demangle(name.data(), nullptr, nullptr, &status);
-                std::unique_ptr<char, decltype(&std::free)> name_ptr(demangle_ptr, &std::free);
+                auto raw_name_ptr = abi::__cxa_demangle(name.data(), nullptr, nullptr, &status);
+                std::unique_ptr<char, decltype(&std::free)> unique_name_ptr(raw_name_ptr, &std::free);
 
-                if (demangle_ptr != nullptr) {
-                    return demangle_ptr;
+                if (unique_name_ptr) {
+                    return raw_name_ptr;
                 }
 
             #endif
