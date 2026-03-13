@@ -579,6 +579,19 @@ void test_rs_core_arithmetic_angle_conversions() {
 
 }
 
+void test_rs_core_arithmetic_geometry_functions() {
+
+    double r = 10;
+    double a = 1256.6371;
+    double v = 4188.7902;
+
+    TEST_NEAR(sphere_area_from_radius(r), a, 0.0001);
+    TEST_NEAR(sphere_radius_from_area(a), r, 0.0001);
+    TEST_NEAR(sphere_volume_from_radius(r), v, 0.0001);
+    TEST_NEAR(sphere_radius_from_volume(v), r, 0.0001);
+
+}
+
 void test_rs_core_arithmetic_interpolation() {
 
     TEST_EQUAL(interpolate(10.0, 50.0, 30.0, 10.0, 0.0),   70.0);

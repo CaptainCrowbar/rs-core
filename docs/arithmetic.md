@@ -97,6 +97,8 @@ namespace Literals {
 
 Degree/radian conversions.
 
+## Geometry functions
+
 ## Integer literals
 
 ```c++

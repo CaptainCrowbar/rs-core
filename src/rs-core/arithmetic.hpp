@@ -286,6 +286,32 @@ namespace RS {
 
     }
 
+    // Geometry functions
+
+    // Surface area and volume of a sphere
+    // S = 4 π r^2
+    // V = (4/3) π r^3
+
+    template <std::floating_point T>
+    constexpr T sphere_area_from_radius(T r) noexcept {
+        return T{4} * std::numbers::pi_v<T> * r * r;
+    }
+
+    template <std::floating_point T>
+    constexpr T sphere_volume_from_radius(T r) noexcept {
+        return (T{4} * std::numbers::pi_v<T> / T{3}) * (r * r * r);
+    }
+
+    template <std::floating_point T>
+    T sphere_radius_from_area(T s) noexcept {
+        return std::sqrt(s / (T{4} * std::numbers::pi_v<T>));
+    }
+
+    template <std::floating_point T>
+    T sphere_radius_from_volume(T v) noexcept {
+        return std::cbrt(v * T{3} / (T{4} * std::numbers::pi_v<T>));
+    }
+
     // Integer literals
 
     namespace Detail {

@@ -29,6 +29,7 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
 * Mathematical utilities
     * [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
+    * [`rs-core/astronomy.hpp` -- Astronomical constants and functions](astronomy.html)
     * [`rs-core/constants.hpp` -- Physical constants](constants.html)
     * [`rs-core/linear-algebra.hpp` -- Linear algebra](linear-algebra.html)
     * [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
