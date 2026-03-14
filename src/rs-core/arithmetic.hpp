@@ -340,42 +340,6 @@ namespace RS {
 
     }
 
-    // Interpolation functions
-
-    RS_BITMASK(Lerp, std::uint8_t,
-        none    = 0,
-        log_x   = 1,
-        log_y   = 2,
-        log_xy  = 3,
-    )
-
-    template <Lerp Mode = Lerp::none, std::floating_point X, typename Y>
-    requires requires (X x, Y y, Y yy) {
-        { y + yy } -> std::convertible_to<Y>;
-        { y - yy } -> std::convertible_to<Y>;
-        { x * y } -> std::convertible_to<Y>;
-    } && (
-        ! has_bit(Mode, Lerp::log_y)
-        || std::floating_point<Y>
-    )
-    Y interpolate(X x1, Y y1, X x2, Y y2, X x3) noexcept {
-        if constexpr (has_bit(Mode, Lerp::log_x)) {
-            x1 = std::log(x1);
-            x2 = std::log(x2);
-            x3 = std::log(x3);
-        }
-        if constexpr (has_bit(Mode, Lerp::log_y)) {
-            y1 = std::log(y1);
-            y2 = std::log(y2);
-        }
-        auto fraction = (x3 - x1) / (x2 - x1);
-        auto y3 = y1 + fraction * (y2 - y1);
-        if constexpr (has_bit(Mode, Lerp::log_y)) {
-            y3 = std::exp(y3);
-        }
-        return y3;
-    }
-
     // Number parsing
 
     RS_ENUM(ParseNumber, int,
