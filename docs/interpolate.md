@@ -75,8 +75,8 @@ of them have the following behaviour in common:
       (XY pairs).
     * An explicit constructor from a range or container of control points.
 * The function call operator performs interpolation.
-* The `size()` function returns the number of control points; `empty
-  ()` returns `size()==0.`
+* The `size()` function returns the number of control points.
+* The `empty()` function returns `size()==0.`
 * The constructors will throw `std::domain_error` if there are two points with
   the same X coordinate, or if the `log_x` or `log_y` flag is used and any X
   or Y coordinate, respectively, is less than or equal to zero.
