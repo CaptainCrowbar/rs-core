@@ -99,6 +99,19 @@ Degree/radian conversions.
 
 ## Geometry functions
 
+```c++
+template <std::floating_point T>
+    constexpr T sphere_area_from_radius(T r) noexcept;
+template <std::floating_point T>
+    constexpr T sphere_volume_from_radius(T r) noexcept;
+template <std::floating_point T>
+    T sphere_radius_from_area(T s) noexcept;
+template <std::floating_point T>
+    T sphere_radius_from_volume(T v) noexcept;
+```
+
+Surface area and volume of a sphere.
+
 ## Integer literals
 
 ```c++
