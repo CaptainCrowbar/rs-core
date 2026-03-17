@@ -10,6 +10,7 @@ using namespace RS::UnitTest;
 void test_rs_core_global_primitive_concepts();
 void test_rs_core_global_arithmetic_concepts();
 void test_rs_core_global_constants();
+void test_rs_core_global_metaprogramming();
 void test_rs_core_alias_constructors();
 void test_rs_core_alias_conversions();
 void test_rs_core_alias_arithmetic_operators();
@@ -219,6 +220,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_global_primitive_concepts, "test_rs_core_global_primitive_concepts");
     call_me_maybe(test_rs_core_global_arithmetic_concepts, "test_rs_core_global_arithmetic_concepts");
     call_me_maybe(test_rs_core_global_constants, "test_rs_core_global_constants");
+    call_me_maybe(test_rs_core_global_metaprogramming, "test_rs_core_global_metaprogramming");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
     call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");
     call_me_maybe(test_rs_core_alias_arithmetic_operators, "test_rs_core_alias_arithmetic_operators");

@@ -116,3 +116,12 @@ void test_rs_core_global_constants() {
     TEST_EQUAL(max64, 0xffff'ffff'ffff'ffffull);
 
 }
+
+void test_rs_core_global_metaprogramming() {
+
+    static_assert(MaybeNontypeParameter<int>);
+    static_assert(MaybeNontypeParameter<void*>);
+    static_assert(! MaybeNontypeParameter<std::string>);
+    static_assert(! MaybeNontypeParameter<std::string_view>);
+
+}

@@ -75,3 +75,9 @@ template <typename> constexpr bool dependent_false = false;
 
 Used when the equivalent of `static_assert(false)` is needed in a dependent
 context.
+
+```c++
+template <typename T> concept MaybeNontypeParameter;
+```
+
+Checks whether a type can be used as a non-type template parameter.

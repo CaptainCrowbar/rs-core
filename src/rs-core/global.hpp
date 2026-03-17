@@ -71,4 +71,15 @@ namespace RS {
 
     template <typename> constexpr bool dependent_false = false;
 
+    namespace Detail {
+
+        template <auto...> class UseNontypeParameter {};
+
+    }
+
+    template <typename T>
+    concept MaybeNontypeParameter = requires {
+        Detail::UseNontypeParameter<T{}>{};
+    };
+
 }
