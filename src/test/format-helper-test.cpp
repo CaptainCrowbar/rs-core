@@ -57,7 +57,7 @@ CommonFormatter {
 
 };
 
-void test_rs_core_format() {
+void test_rs_core_format_helpers() {
 
     Alpha f{86};
     Bravo b{99};
