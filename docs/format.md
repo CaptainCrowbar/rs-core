@@ -64,6 +64,24 @@ These perform the same functions as `parse_number_maybe(),` but a failed
 conversion will throw `std::invalid_argument` or `std::out_of_range` instead
 of returning a null optional.
 
+## Roman numerals
+
+```c++
+std::string roman(int n);
+```
+
+Format a number as a Roman numeral. This will return an empty string if the
+argument is less than 1.
+
+```c++
+int parse_roman(std::string_view str);
+```
+
+Parse a Roman numeral. This will return -1 if the string is empty, contains an
+invalid Roman numeral, or the value does not fit in an `int.` This will
+accept some strings that are technically incorrect but follow the conventions
+of Roman numerals, such as an arbitrary length string of `'I'`.
+
 ## Standard formatter helpers
 
 ### Type agnostic formatter base class

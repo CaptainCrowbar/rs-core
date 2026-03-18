@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <concepts>
+#include <cstddef>
 #include <cstdlib>
 #include <format>
 #include <iterator>
@@ -14,6 +15,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 namespace RS {
 
@@ -214,6 +216,106 @@ namespace RS {
         T t {};
         Detail::check_parse_result(parse_number(str, t), str);
         return t;
+    }
+
+    // Roman numerals
+
+    inline std::string roman(int n) {
+
+        if (n < 1) {
+            return {};
+        }
+
+        static constexpr std::pair<int, const char*> table[] = {
+            { 900, "CM" }, { 500, "D" }, { 400, "CD" }, { 100, "C" },
+            { 90, "XC" }, { 50, "L" }, { 40, "XL" }, { 10, "X" },
+            { 9, "IX" }, { 5, "V" }, { 4, "IV" }, { 1, "I" },
+        };
+
+        std::string r(static_cast<std::size_t>(n / 1000), 'M');
+        n %= 1000;
+
+        for (auto [div,str]: table) {
+            for (auto q = n / div; q > 0; --q) {
+                r += str;
+            }
+            n %= div;
+        }
+
+        return r;
+
+    }
+
+    inline int parse_roman(std::string_view str) {
+
+        static constexpr auto max_value = static_cast<unsigned long long>(std::numeric_limits<int>::max());
+
+        struct group_info {
+            int factor;
+            char one;
+            char five;
+            char ten;
+        };
+
+        struct group_result {
+            int value = 0;
+            std::size_t length = 0;
+        };
+
+        static const group_info groups[] = {
+            { 100,  'C', 'D', 'M' },
+            { 10,   'X', 'L', 'C' },
+            { 1,    'I', 'V', 'X' },
+        };
+
+        static const auto read_group = [] (std::string_view str, const group_info& group) -> group_result {
+
+            auto count = std::min(str.find_first_not_of(group.one), str.size());
+            auto next = count == str.size() ? 0 :
+                str[count] == group.five ? 5 :
+                str[count] == group.ten ? 10 : 0;
+
+            if (next == 0) {
+                return {static_cast<int>(count) * group.factor, count};
+            } else if (next > 0 && count > 1) {
+                return {-1, 0};
+            } else if (next > 0 && count == 1) {
+                return {(next - 1) * group.factor, 2};
+            } else if (next > 0 && str.size() == 1) {
+                return {next * group.factor, 1};
+            }
+
+            count = std::min(str.find_first_not_of(group.one, 1), str.size());
+            auto value = next + static_cast<int>(count - 1);
+
+            return {value * group.factor, count};
+
+        };
+
+        if (str.empty()) {
+            return -1;
+        }
+
+        auto pos = std::min(str.find_first_not_of('M'), str.size());
+        auto result = 1000ull * static_cast<unsigned long long>(pos);
+        auto tail = str.substr(pos);
+
+        for (const auto& group: groups) {
+            auto rc = read_group(tail, group);
+            if (rc.value == -1) {
+                return -1;
+            } else if (rc.value > 0) {
+                result += static_cast<unsigned long long>(rc.value);
+                tail = tail.substr(rc.length);
+            }
+        }
+
+        if (tail.empty() && result <= max_value) {
+            return static_cast<int>(result);
+        } else {
+            return -1;
+        }
+
     }
 
     // Standard formatter helpers

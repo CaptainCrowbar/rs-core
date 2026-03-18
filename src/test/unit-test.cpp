@@ -55,6 +55,8 @@ void test_rs_core_arithmetic_try_parse_integers();
 void test_rs_core_format_parse_floating_point();
 void test_rs_core_format_parse_floating_point_maybe();
 void test_rs_core_arithmetic_try_parse_floating_point();
+void test_rs_core_format_roman();
+void test_rs_core_format_parse_roman();
 void test_rs_core_hash_concepts();
 void test_rs_core_hash_kernighan();
 void test_rs_core_hash_mix();
@@ -265,6 +267,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_format_parse_floating_point, "test_rs_core_format_parse_floating_point");
     call_me_maybe(test_rs_core_format_parse_floating_point_maybe, "test_rs_core_format_parse_floating_point_maybe");
     call_me_maybe(test_rs_core_arithmetic_try_parse_floating_point, "test_rs_core_arithmetic_try_parse_floating_point");
+    call_me_maybe(test_rs_core_format_roman, "test_rs_core_format_roman");
+    call_me_maybe(test_rs_core_format_parse_roman, "test_rs_core_format_parse_roman");
     call_me_maybe(test_rs_core_hash_concepts, "test_rs_core_hash_concepts");
     call_me_maybe(test_rs_core_hash_kernighan, "test_rs_core_hash_kernighan");
     call_me_maybe(test_rs_core_hash_mix, "test_rs_core_hash_mix");
