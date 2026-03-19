@@ -4,13 +4,16 @@
 #include "rs-core/global.hpp"
 #include <algorithm>
 #include <cerrno>
+#include <cmath>
 #include <concepts>
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <format>
 #include <iterator>
 #include <limits>
 #include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -216,6 +219,237 @@ namespace RS {
         T t {};
         Detail::check_parse_result(parse_number(str, t), str);
         return t;
+    }
+
+    // Integer formatting
+
+    template <std::integral T>
+    void append_integer(std::string& str, T t, int base = 10, std::size_t digits = 1) {
+
+        using limits = std::numeric_limits<T>;
+        using U = std::make_unsigned_t<T>;
+
+        auto u_base = static_cast<U>(base);
+        U u;
+
+        if constexpr (std::signed_integral<T>) {
+            if (t < 0) {
+                str += '-';
+                if (t == limits::lowest()) {
+                    u = static_cast<U>(limits::max()) + 1;
+                } else {
+                    u = static_cast<U>(- t);
+                }
+            } else {
+                u = static_cast<U>(t);
+            }
+        } else {
+            u = t;
+        }
+
+        auto start_pos = str.size();
+        auto min_size = start_pos + digits;
+
+        while (u != 0) {
+            auto digit = u % u_base;
+            u /= u_base;
+            if (digit < 10) {
+                str += static_cast<char>(digit + '0');
+            } else {
+                str += static_cast<char>(digit - 10 + 'a');
+            }
+        }
+
+        if (str.size() < min_size) {
+            str.append(min_size - str.size(), '0');
+        }
+
+        std::reverse(str.begin() + static_cast<std::ptrdiff_t>(start_pos), str.end());
+
+    }
+
+    // Floating point formatting
+
+    namespace Detail {
+
+        constexpr auto null_exponent = std::numeric_limits<int>::lowest();
+
+        // Significand has an implicit decimal point after the first digit
+
+        template <std::floating_point T>
+        void format_float_exponent_breakdown(T t, std::size_t prec, std::string& sig, int& exp) {
+
+            using limits = std::numeric_limits<T>;
+
+            static constexpr auto exp_bits = 8 * sizeof(T) - static_cast<std::size_t>(limits::digits) - 1;
+            static constexpr auto exp_digits10 = (exp_bits + 2) / 3;
+
+            auto print_size = exp_digits10 + prec + 6;
+            sig.resize(print_size, '\0');
+            auto print_prec = std::max(static_cast<int>(prec) - 1, 0);
+            int rc;
+
+            if constexpr (sizeof(T) <= sizeof(double)) {
+                rc = std::snprintf(sig.data(), sig.size(), "%.*e", print_prec, static_cast<double>(t));
+            } else {
+                rc = std::snprintf(sig.data(), sig.size(), "%.*Le", print_prec, static_cast<long double>(t));
+            }
+
+            sig.resize(static_cast<std::size_t>(rc));
+            auto e_pos = sig.find('e');
+            exp = *parse_number_maybe<int>(sig.substr(e_pos + 1));
+            sig.resize(e_pos);
+
+            if (sig.size() > 1) {
+                sig.erase(1, 1);
+            }
+
+        }
+
+        inline void format_float_digits_compose(std::string& sig, int& exp) {
+
+            auto prec = static_cast<int>(sig.size());
+
+            if (exp < 0) {
+                auto zeros = static_cast<std::size_t>(- exp - 1);
+                sig.insert(0, "0.");
+                sig.insert(2, zeros, '0');
+            } else if (exp < prec - 1) {
+                auto pos = static_cast<std::size_t>(exp + 1);
+                sig.insert(pos, 1, '.');
+            } else {
+                auto zeros = static_cast<std::size_t>(exp - prec + 1);
+                sig.append(zeros, '0');
+            }
+
+            exp = null_exponent;
+
+        }
+
+        inline void format_float_exponent_compose(std::string& sig) {
+            if (sig.size() >= 2) {
+                sig.insert(1, 1, '.');
+            }
+        }
+
+        template <std::floating_point T>
+        void format_float_fixed(T t, std::size_t prec, std::string& sig) {
+
+            auto print_size = prec + 4;
+
+            if (t > T{1}) {
+                print_size += static_cast<std::size_t>(std::ceil(std::log10(t)));
+            }
+
+            sig.resize(print_size, '\0');
+            int rc;
+
+            if constexpr (sizeof(T) <= sizeof(double)) {
+                rc = std::snprintf(sig.data(), sig.size(), "%.*f", static_cast<int>(prec), static_cast<double>(t));
+            } else {
+                rc = std::snprintf(sig.data(), sig.size(), "%.*Lf", static_cast<int>(prec), static_cast<long double>(t));
+            }
+
+            sig.resize(static_cast<std::size_t>(rc));
+
+        }
+
+        template <std::floating_point T>
+        void format_float_general(T t, std::size_t prec, std::string& sig, int& exp) {
+
+            format_float_exponent_breakdown(t, prec, sig, exp);
+            auto threshold = std::max(static_cast<int>(prec), 1);
+
+            if (exp >= -4 && exp < threshold) {
+                format_float_digits_compose(sig, exp);
+            } else {
+                format_float_exponent_compose(sig);
+            }
+
+        }
+
+    }
+
+    template <std::floating_point T>
+    std::string format_float(T t, std::string_view fmt = {}) {
+
+        static constexpr std::string_view base_formats{"DdEeFfGg"};
+
+        auto base = 'g';
+        auto mods = fmt;
+
+        if (! mods.empty() && base_formats.contains(mods[0])) {
+            base = mods[0];
+            mods = mods.substr(1);
+        }
+
+        auto first_digit = std::ranges::find_if(mods, ascii_isdigit);
+        std::size_t prec;
+
+        if (first_digit == mods.end()) {
+            prec = 6;
+        } else {
+            prec = 0;
+            for (auto it = first_digit; it != mods.end() && ascii_isdigit(*it); ++it) {
+                prec = 10uz * prec + static_cast<std::size_t>(*it - '0');
+            }
+        }
+
+        mods = {mods.begin(), first_digit};
+        auto upper = ascii_isupper(base);
+        auto abs_t = std::abs(t);
+        std::string sig;
+        auto exp = Detail::null_exponent;
+
+        if (std::isinf(t)) {
+
+            sig = upper ? "INF" : "inf";
+
+        } else if (std::isnan(t)) {
+
+            sig = upper ? "NAN" : "nan";
+
+        } else {
+
+            switch (base) {
+                case 'D': case 'd':
+                    Detail::format_float_exponent_breakdown(abs_t, prec, sig, exp);
+                    Detail::format_float_digits_compose(sig, exp);
+                    break;
+                case 'E': case 'e':
+                    Detail::format_float_exponent_breakdown(abs_t, prec, sig, exp);
+                    Detail::format_float_exponent_compose(sig);
+                    break;
+                case 'F': case 'f':
+                    Detail::format_float_fixed(abs_t, prec, sig);
+                    break;
+                default:
+                    Detail::format_float_general(abs_t, prec, sig, exp);
+                    break;
+            }
+
+        }
+
+        std::string str;
+
+        if (std::signbit(t)) {
+            str = "-";
+        } else if (mods.contains('s')) {
+            str = "+";
+        }
+
+        str += sig;
+
+        if (exp != Detail::null_exponent) {
+            str += upper ? 'E' : 'e';
+            if (exp >= 0 && mods.contains('S')) {
+                str += '+';
+            }
+            append_integer(str, exp);
+        }
+
+        return str;
+
     }
 
     // Roman numerals

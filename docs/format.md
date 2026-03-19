@@ -64,6 +64,47 @@ These perform the same functions as `parse_number_maybe(),` but a failed
 conversion will throw `std::invalid_argument` or `std::out_of_range` instead
 of returning a null optional.
 
+## Integer formatting
+
+```c++
+template <std::integral T>
+    void append_integer(std::string& str, T t, int base = 10,
+        std::size_t digits = 1);
+```
+
+Quick convenience function to append an integer to a string, writing at least
+the specified number of digits. Behaviour is undefined if `base<2` or
+`base>36`.
+
+## Floating point formatting
+
+```c++
+template <std::floating_point T>
+    std::string format_float(T t, std::string_view fmt = {});
+```
+
+Formats a floating point number in my preferred formats. The format string may
+contain the following parts:
+
+1. A letter indicating the basic format. If this is not present, format `g` is used. This can be:
+    * `D` or `d` -- Significant digits format. The number is displayed in decimal form with no exponent.
+    * `E` or `e` -- Exponential (scientific) format.
+    * `F` or `f` -- Fixed point format.
+    * `G` or `g` -- General format. This uses either `D/d` or `E/e` format, using the same rules as `std::printf()`.
+2. Any number of modifier letters. Unrecognised modifiers are ignored. These can be:
+    * `s` -- Always show a sign.
+    * `S` -- Always show a sign on the exponent.
+3. An unsigned integer indicating the precision, defaulting to 6 if not present. Anything after this is ignored.
+
+For `E/e` and `G/g` formats, the case of the base format code indicates
+whether the exponent delimiter is an upper or lower case `E`. For the other
+formats, the case has no effect.
+
+For `F/f` format, the precision indicates how many decimal places to display.
+For the other formats, the precision indicates how many significant digits to
+display, with a minimum of 1 (note that, for `E/e` format, this behaviour
+differs from `std::printf()`).
+
 ## Roman numerals
 
 ```c++
