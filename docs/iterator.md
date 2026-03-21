@@ -48,7 +48,7 @@ Example:
 
 ```c++
 class MyIterator:
-public RS::Iterator<MyIterator, const int, std::forward_iterator_category> {
+public RS::Iterator<MyIterator, const int, std::forward_iterator_tag> {
 public:
     const int& operator*() const;
     MyIterator& operator++();

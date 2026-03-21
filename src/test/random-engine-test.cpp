@@ -3,12 +3,14 @@
 #include <cmath>
 #include <cstdint>
 #include <random>
+#include <string>
 #include <vector>
 
 using namespace RS;
-using namespace RS::Detail;
 
 void test_rs_core_random_engine_concepts() {
+
+    using namespace RS::Detail;
 
     // Engine         Bits  Min  Max                    Category
     // ranlux24       24    0    0xff'ffff              <32
@@ -62,6 +64,37 @@ void test_rs_core_random_engine_concepts() {
     TEST(Exact64Engine<Pcg>);
     TEST(! LessThan32Engine<Pcg>);
     TEST(! LessThan64Engine<Pcg>);
+
+}
+
+void test_rs_core_random_distribution_concepts() {
+
+    TEST((RandomDistributionWithEngine<std::uniform_int_distribution<int>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<std::uniform_real_distribution<double>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<std::normal_distribution<double>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<UniformInteger<int>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<UniformReal<double>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<NormalDistribution<double>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<RandomChoice<std::string>, std::minstd_rand>));
+    TEST((RandomDistributionWithEngine<WeightedChoice<std::string>, std::minstd_rand>));
+
+    TEST((RandomDistributionWithEngine<std::uniform_int_distribution<int>, Pcg>));
+    TEST((RandomDistributionWithEngine<std::uniform_real_distribution<double>, Pcg>));
+    TEST((RandomDistributionWithEngine<std::normal_distribution<double>, Pcg>));
+    TEST((RandomDistributionWithEngine<UniformInteger<int>, Pcg>));
+    TEST((RandomDistributionWithEngine<UniformReal<double>, Pcg>));
+    TEST((RandomDistributionWithEngine<NormalDistribution<double>, Pcg>));
+    TEST((RandomDistributionWithEngine<RandomChoice<std::string>, Pcg>));
+    TEST((RandomDistributionWithEngine<WeightedChoice<std::string>, Pcg>));
+
+    TEST((RandomDistribution<std::uniform_int_distribution<int>>));
+    TEST((RandomDistribution<std::uniform_real_distribution<double>>));
+    TEST((RandomDistribution<std::normal_distribution<double>>));
+    TEST((RandomDistribution<UniformInteger<int>>));
+    TEST((RandomDistribution<UniformReal<double>>));
+    TEST((RandomDistribution<NormalDistribution<double>>));
+    TEST((RandomDistribution<RandomChoice<std::string>>));
+    TEST((RandomDistribution<WeightedChoice<std::string>>));
 
 }
 

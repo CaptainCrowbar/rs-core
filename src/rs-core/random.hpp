@@ -4,6 +4,7 @@
 #include "rs-core/enum.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
+#include "rs-core/iterator.hpp"
 #include "rs-core/mp-integer.hpp"
 #include "rs-core/uint128.hpp"
 #include <algorithm>
@@ -89,6 +90,24 @@ namespace RS {
     // 64-bit random device
 
     using RandomDevice64 = std::independent_bits_engine<std::random_device, 64, std::uint64_t>;
+
+    // Concepts
+
+    template <typename D, typename E>
+    concept RandomDistributionWithEngine =
+        std::uniform_random_bit_generator<E>
+        && std::copyable<D>
+        && std::copyable<typename D::result_type>
+        && requires (D dst, E rng) {
+            { dst(rng) } -> std::convertible_to<typename D::result_type>;
+        };
+
+    template <typename D>
+    concept RandomDistribution =
+        RandomDistributionWithEngine<D, std::minstd_rand>
+        && RandomDistributionWithEngine<D, std::mt19937>
+        && RandomDistributionWithEngine<D, std::mt19937_64>
+        && RandomDistributionWithEngine<D, Pcg>;
 
     // Uniform integer distribution
 
@@ -830,6 +849,73 @@ namespace RS {
         }
 
     }
+
+    // Random iterators
+
+    template <RandomDistribution D, std::uniform_random_bit_generator E>
+    class RandomIterator:
+    public Iterator<RandomIterator<D, E>, const typename D::result_type, std::forward_iterator_tag> {
+    public:
+        RandomIterator() = default;
+        explicit RandomIterator(const D& d, const E& e): dist_{d}, engine_{e} {}
+        const D::result_type& operator*() const;
+        RandomIterator& operator++() { ready_ = false; return *this; }
+        bool operator==(const RandomIterator& j) const noexcept { return engine_ == j.engine_; }
+        bool operator==(std::nullptr_t) const noexcept { return false; }
+    private:
+        mutable D dist_;
+        mutable E engine_;
+        mutable D::result_type value_;
+        mutable bool ready_ = false;
+    };
+
+        template <RandomDistribution D, std::uniform_random_bit_generator E>
+        const D::result_type& RandomIterator<D, E>::operator*() const {
+            if (! ready_) {
+                value_ = dist_(engine_);
+                ready_ = true;
+            }
+            return value_;
+        }
+
+    template <RandomDistribution D, std::uniform_random_bit_generator E>
+    auto random_range(const D& d, const E& e) {
+        RandomIterator<D, E> i{d, e};
+        return std::ranges::subrange{i, nullptr};
+    }
+
+    template <RandomDistribution D, std::uniform_random_bit_generator E>
+    class IndirectRandomIterator:
+    public Iterator<IndirectRandomIterator<D, E>, const typename D::result_type, std::forward_iterator_tag> {
+    public:
+        IndirectRandomIterator() = default;
+        explicit IndirectRandomIterator(const D& d, E& e): dist_{d}, engine_{&e} {}
+        const D::result_type& operator*() const;
+        IndirectRandomIterator& operator++() { ready_ = false; return *this; }
+        bool operator==(const IndirectRandomIterator& j) const noexcept { return engine_ == j.engine_; }
+        bool operator==(std::nullptr_t) const noexcept { return false; }
+    private:
+        mutable D dist_;
+        E* engine_;
+        mutable D::result_type value_;
+        mutable bool ready_ = false;
+    };
+
+        template <RandomDistribution D, std::uniform_random_bit_generator E>
+        const D::result_type& IndirectRandomIterator<D, E>::operator*() const {
+            if (! ready_) {
+                value_ = dist_(*engine_);
+                ready_ = true;
+            }
+            return value_;
+        }
+
+    template <RandomDistribution D, std::uniform_random_bit_generator E>
+    auto indirect_random_range(const D& d, E& e) {
+        IndirectRandomIterator<D, E> i{d, e};
+        return std::ranges::subrange{i, nullptr};
+    }
+
 
 }
 
