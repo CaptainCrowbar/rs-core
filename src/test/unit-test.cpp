@@ -127,6 +127,7 @@ void test_rs_core_mp_integer_unsigned_conversion_from_integer();
 void test_rs_core_mp_integer_unsigned_conversion_to_floating_point();
 void test_rs_core_mp_integer_unsigned_conversion_to_string();
 void test_rs_core_mp_integer_unsigned_conversion_from_string();
+void test_rs_core_random_bit();
 void test_rs_core_random_enum();
 void test_rs_core_random_shuffle();
 void test_rs_core_random_choice();
@@ -350,6 +351,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_to_floating_point, "test_rs_core_mp_integer_unsigned_conversion_to_floating_point");
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_to_string, "test_rs_core_mp_integer_unsigned_conversion_to_string");
     call_me_maybe(test_rs_core_mp_integer_unsigned_conversion_from_string, "test_rs_core_mp_integer_unsigned_conversion_from_string");
+    call_me_maybe(test_rs_core_random_bit, "test_rs_core_random_bit");
     call_me_maybe(test_rs_core_random_enum, "test_rs_core_random_enum");
     call_me_maybe(test_rs_core_random_shuffle, "test_rs_core_random_shuffle");
     call_me_maybe(test_rs_core_random_choice, "test_rs_core_random_choice");

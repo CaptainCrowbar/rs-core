@@ -800,6 +800,45 @@ namespace RS {
 
     // Random algorithms
 
+    template <typename T, std::uniform_random_bit_generator RNG>
+    requires (std::integral<T> || std::is_enum_v<T>)
+    T random_bit(T mask, RNG& rng) {
+
+        unsigned long long umask;
+
+        if constexpr (std::is_enum_v<T>) {
+            using UT = std::underlying_type_t<T>;
+            auto utmask = static_cast<UT>(mask);
+            if constexpr (std::signed_integral<UT>) {
+                umask = static_cast<std::make_unsigned_t<UT>>(utmask);
+            } else {
+                umask = utmask;
+            }
+        } else if constexpr (std::signed_integral<T>) {
+            umask = static_cast<std::make_unsigned_t<T>>(mask);
+        } else {
+            umask = mask;
+        }
+
+        auto n_bits = std::popcount(umask);
+
+        if (n_bits <= 1) {
+            return mask;
+        }
+
+        auto index = UniformInteger<int>{n_bits}(rng) + 1;
+        auto count = 0;
+        unsigned long long rc = 1;
+
+        for (;;) {
+            if (has_bit(rc, mask) && ++count == index) {
+                return static_cast<T>(rc);
+            }
+            rc <<= 1;
+        }
+
+    }
+
     namespace Detail {
 
         template <AutoEnum E>

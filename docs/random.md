@@ -379,6 +379,18 @@ list.
 ## Random algorithms
 
 ```c++
+template <typename T>
+    requires (std::integral<T> || std::is_enum_v<T>)
+    T random_bit(T mask, RNG& rng);
+```
+
+Returns a random value containing one of the bits in the `mask` argument. If
+`mask` is zero or contains only one bit, this will return `mask` immediately
+without calling the RNG. Behaviour is undefined if `T` is a signed integer,
+or an enumeration type whose underlying type is a signed integer, and `mask`
+is negative.
+
+```c++
 template <AutoEnum E, [E or int] Min, std::uniform_random_bit_generator RNG>
     E random_enum(RNG& rng);
 ```

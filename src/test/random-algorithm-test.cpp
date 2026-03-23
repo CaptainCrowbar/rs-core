@@ -11,6 +11,117 @@ using namespace RS;
 
 namespace {
 
+    RS_BITMASK(Mask, unsigned,
+        alpha    = 1,
+        bravo    = 2,
+        charlie  = 4,
+    )
+
+}
+
+void test_rs_core_random_bit() {
+
+    static constexpr auto iterations = 10'000;
+    static constexpr auto total = static_cast<double>(iterations);
+
+    {
+
+        std::minstd_rand rng(42);
+        int n;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(n = random_bit(4, rng));
+            TEST_EQUAL(n, 4);
+        }
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<int, int> census;
+        int n;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY((n = random_bit(3, rng)));
+            TEST(n == 1 || n == 2);
+            ++census[n];
+        }
+
+        TEST_NEAR(census[1] / total, 0.5, 0.01);
+        TEST_NEAR(census[2] / total, 0.5, 0.01);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<int, int> census;
+        int n;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY((n = random_bit(7, rng)));
+            TEST(n == 1 || n == 2 || n == 4);
+            ++census[n];
+        }
+
+        TEST_NEAR(census[1] / total, 0.33, 0.01);
+        TEST_NEAR(census[2] / total, 0.33, 0.01);
+        TEST_NEAR(census[4] / total, 0.33, 0.01);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        Mask m;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY(m = random_bit(Mask::charlie, rng));
+            TEST_EQUAL(m, Mask::charlie);
+        }
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<Mask, int> census;
+        Mask m;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY((m = random_bit(Mask::alpha | Mask::bravo, rng)));
+            TEST(m == Mask::alpha || m == Mask::bravo);
+            ++census[m];
+        }
+
+        TEST_NEAR(census[Mask::alpha] / total, 0.5, 0.01);
+        TEST_NEAR(census[Mask::bravo] / total, 0.5, 0.01);
+
+    }
+
+    {
+
+        std::minstd_rand rng(42);
+        std::map<Mask, int> census;
+        Mask m;
+
+        for (auto i = 0; i < iterations; ++i) {
+            TRY((m = random_bit(Mask::alpha | Mask::bravo | Mask::charlie, rng)));
+            TEST(m == Mask::alpha || m == Mask::bravo || m == Mask::charlie);
+            ++census[m];
+        }
+
+        TEST_NEAR(census[Mask::alpha] / total,    0.33, 0.01);
+        TEST_NEAR(census[Mask::bravo] / total,    0.33, 0.01);
+        TEST_NEAR(census[Mask::charlie] / total,  0.33, 0.01);
+
+    }
+
+}
+
+namespace {
+
     RS_ENUM(Foo, unsigned,
         alpha,
         bravo,
