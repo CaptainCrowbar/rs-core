@@ -639,8 +639,8 @@ namespace RS {
 
             auto len = c <= 0x7ff ? 2 : c <= 0xffff ? 3 : 4;
             auto shift = 6 * (len - 1);
-            unsigned char and_mask = 0xff;
-            unsigned char or_mask = ~ (0xff >> len);
+            auto and_mask = static_cast<unsigned char>(0xff);
+            auto or_mask = static_cast<unsigned char>(~ (0xff >> len));
 
             while (shift >= 0) {
                 auto unit = ((c >> shift) & and_mask) | or_mask;

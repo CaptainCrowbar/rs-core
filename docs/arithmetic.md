@@ -100,17 +100,25 @@ Degree/radian conversions.
 ## Geometry functions
 
 ```c++
-template <std::floating_point T>
-    constexpr T sphere_area_from_radius(T r) noexcept;
-template <std::floating_point T>
-    constexpr T sphere_volume_from_radius(T r) noexcept;
-template <std::floating_point T>
+template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 1)
+    T sphere_area_from_radius(T r) noexcept;
+template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 1)
+    T sphere_volume_from_radius(T r) noexcept;
+template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 2)
     T sphere_radius_from_area(T s) noexcept;
-template <std::floating_point T>
+template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 1)
     T sphere_radius_from_volume(T v) noexcept;
 ```
 
-Surface area and volume of a sphere.
+Surface area and volume of a sphere in `N` dimensions.
+
+The `sphere_radius_from_area()` function is restricted to `N>=2` because
+the "surface" of a 1-sphere is always two points, so no radius can be
+deduced.
 
 ## Integer literals
 

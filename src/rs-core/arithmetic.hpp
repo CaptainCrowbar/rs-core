@@ -7,6 +7,7 @@
 #include <bit>
 #include <cmath>
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
@@ -283,28 +284,66 @@ namespace RS {
 
     // Geometry functions
 
-    // Surface area and volume of a sphere
-    // S = 4 π r^2
-    // V = (4/3) π r^3
+    // Surface area and volume of a sphere in N dimensions
 
-    template <std::floating_point T>
-    constexpr T sphere_area_from_radius(T r) noexcept {
-        return T{4} * std::numbers::pi_v<T> * r * r;
+    namespace Detail {
+
+        template <std::size_t N, std::floating_point T>
+        inline const T sphere_surface_coeff
+            = T{2} * std::exp((T{N} / T{2}) * std::log(std::numbers::pi_v<T>) - std::lgamma(T{N} / T{2}));
+
+        template <std::floating_point T>
+        inline const T sphere_surface_coeff<0, T> = T{1};
+
+        template <std::floating_point T>
+        inline const T sphere_surface_coeff<1, T> = T{2};
+
+        template <std::floating_point T>
+        inline const T sphere_surface_coeff<2, T> = T{2} * std::numbers::pi_v<T>;
+
+        template <std::floating_point T>
+        inline const T sphere_surface_coeff<3, T> = T{4} * std::numbers::pi_v<T>;
+
+        template <std::size_t N, std::floating_point T>
+        inline const T sphere_volume_coeff
+            = std::exp((T{N} / T{2}) * std::log(std::numbers::pi_v<T>) - std::lgamma(T{N} / T{2} + T{1}));
+
+        template <std::floating_point T>
+        inline const T sphere_volume_coeff<0, T> = T{1};
+
+        template <std::floating_point T>
+        inline const T sphere_volume_coeff<1, T> = T{2};
+
+        template <std::floating_point T>
+        inline const T sphere_volume_coeff<2, T> = std::numbers::pi_v<T>;
+
+        template <std::floating_point T>
+        inline const T sphere_volume_coeff<3, T> = (T{4} / T{3}) * std::numbers::pi_v<T>;
+
     }
 
-    template <std::floating_point T>
-    constexpr T sphere_volume_from_radius(T r) noexcept {
-        return (T{4} * std::numbers::pi_v<T> / T{3}) * (r * r * r);
+    template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 1)
+    T sphere_area_from_radius(T r) noexcept {
+        return Detail::sphere_surface_coeff<N, T> * std::pow(r, T{N - 1});
     }
 
-    template <std::floating_point T>
+    template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 1)
+    T sphere_volume_from_radius(T r) noexcept {
+        return Detail::sphere_volume_coeff<N, T> * std::pow(r, T{N});
+    }
+
+    template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 2)
     T sphere_radius_from_area(T s) noexcept {
-        return std::sqrt(s / (T{4} * std::numbers::pi_v<T>));
+        return std::pow(s / Detail::sphere_surface_coeff<N, T>, T{1} / T{N - 1});
     }
 
-    template <std::floating_point T>
+    template <std::size_t N = 3, std::floating_point T>
+    requires (N >= 1)
     T sphere_radius_from_volume(T v) noexcept {
-        return std::cbrt(v * T{3} / (T{4} * std::numbers::pi_v<T>));
+        return std::pow(v / Detail::sphere_volume_coeff<N, T>, T{1} / T{N});
     }
 
     // Integer literals

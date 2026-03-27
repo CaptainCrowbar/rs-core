@@ -9,7 +9,6 @@
 
 using namespace RS;
 using namespace RS::Literals;
-using std::numbers::pi;
 
 void test_rs_core_arithmetic_binomial_coefficient() {
 
@@ -560,6 +559,8 @@ void test_rs_core_arithmetic_checked_cast() {
 
 void test_rs_core_arithmetic_angle_conversions() {
 
+    using std::numbers::pi;
+
     TEST_NEAR(degrees(0.0),     0,       1e-10);
     TEST_NEAR(degrees(pi / 2),  90,      1e-10);
     TEST_NEAR(degrees(pi),      180,     1e-10);
@@ -581,13 +582,49 @@ void test_rs_core_arithmetic_angle_conversions() {
 
 void test_rs_core_arithmetic_geometry_functions() {
 
-    double r = 10;
-    double a = 1256.6371;
-    double v = 4188.7902;
+    double r, s, v;
 
-    TEST_NEAR(sphere_area_from_radius(r), a, 0.0001);
-    TEST_NEAR(sphere_radius_from_area(a), r, 0.0001);
-    TEST_NEAR(sphere_volume_from_radius(r), v, 0.0001);
-    TEST_NEAR(sphere_radius_from_volume(v), r, 0.0001);
+    TRY(s = sphere_area_from_radius<1>(10.0));   TEST_NEAR(s, 2.0,               1e-6);
+    TRY(s = sphere_area_from_radius<2>(10.0));   TEST_NEAR(s, 62.83185,          1e-5);
+    TRY(s = sphere_area_from_radius(10.0));      TEST_NEAR(s, 1'256.6371,        1e-4);
+    TRY(s = sphere_area_from_radius<4>(10.0));   TEST_NEAR(s, 19'739.209,        1e-3);
+    TRY(s = sphere_area_from_radius<5>(10.0));   TEST_NEAR(s, 263'189.45,        1e-2);
+    TRY(s = sphere_area_from_radius<6>(10.0));   TEST_NEAR(s, 3'100'627.7,       1e-1);
+    TRY(s = sphere_area_from_radius<7>(10.0));   TEST_NEAR(s, 33'073'362.0,      1);
+    TRY(s = sphere_area_from_radius<8>(10.0));   TEST_NEAR(s, 324'696'970.0,     1e1);
+    TRY(s = sphere_area_from_radius<9>(10.0));   TEST_NEAR(s, 2'968'658'000.0,   1e2);
+    TRY(s = sphere_area_from_radius<10>(10.0));  TEST_NEAR(s, 25'501'640'000.0,  1e3);
+
+    TRY(v = sphere_volume_from_radius<1>(10.0));   TEST_NEAR(v, 20.0,              1e-5);
+    TRY(v = sphere_volume_from_radius<2>(10.0));   TEST_NEAR(v, 314.1593,          1e-4);
+    TRY(v = sphere_volume_from_radius(10.0));      TEST_NEAR(v, 4'188.790,         1e-3);
+    TRY(v = sphere_volume_from_radius<4>(10.0));   TEST_NEAR(v, 49'348.02,         1e-2);
+    TRY(v = sphere_volume_from_radius<5>(10.0));   TEST_NEAR(v, 526'378.9,         1e-1);
+    TRY(v = sphere_volume_from_radius<6>(10.0));   TEST_NEAR(v, 5'167'713.0,       1);
+    TRY(v = sphere_volume_from_radius<7>(10.0));   TEST_NEAR(v, 47'247'660.0,      1e1);
+    TRY(v = sphere_volume_from_radius<8>(10.0));   TEST_NEAR(v, 405'871'200.0,     1e2);
+    TRY(v = sphere_volume_from_radius<9>(10.0));   TEST_NEAR(v, 3'298'509'000.0,   1e3);
+    TRY(v = sphere_volume_from_radius<10>(10.0));  TEST_NEAR(v, 25'501'640'000.0,  1e4);
+
+    TRY(r = sphere_radius_from_area<2>(62.83185));           TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area(1'256.6371));            TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<4>(19'739.209));         TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<5>(263'189.45));         TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<6>(3'100'627.7));        TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<7>(33'073'362.0));       TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<8>(324'696'970.0));      TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<9>(2'968'658'000.0));    TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_area<10>(25'501'640'000.0));  TEST_NEAR(r, 10.0, 1e-5);
+
+    TRY(r = sphere_radius_from_volume<1>(20.0));               TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<2>(314.1593));           TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume(4'188.790));             TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<4>(49'348.02));          TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<5>(526'378.9));          TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<6>(5'167'713.0));        TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<7>(47'247'660.0));       TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<8>(405'871'200.0));      TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<9>(3'298'509'000.0));    TEST_NEAR(r, 10.0, 1e-5);
+    TRY(r = sphere_radius_from_volume<10>(25'501'640'000.0));  TEST_NEAR(r, 10.0, 1e-5);
 
 }
