@@ -167,6 +167,8 @@ class UniformInteger {
         constexpr T operator()(RNG& rng) const;
     constexpr T min() const noexcept;
     constexpr T max() const noexcept;
+    constexpr double mean() const noexcept;
+    double sd() const noexcept;
 };
 ```
 
@@ -201,6 +203,8 @@ class Dice {
     constexpr T max() const noexcept;
     constexpr T number() const noexcept;
     constexpr T faces() const noexcept;
+    constexpr double mean() const noexcept;
+    double sd() const noexcept;
     double pdf(T x) const;
     double cdf(T x) const;
     double ccdf(T x) const;
@@ -234,6 +238,8 @@ class UniformReal {
         constexpr T operator()(RNG& rng) const;
     constexpr T min() const noexcept;
     constexpr T max() const noexcept;
+    constexpr T mean() const noexcept;
+    T sd() const noexcept;
 };
 ```
 
@@ -271,6 +277,8 @@ class LogUniform {
         constexpr T operator()(RNG& rng) const;
     constexpr T min() const noexcept;
     constexpr T max() const noexcept;
+    T mean() const noexcept;
+    T sd() const noexcept;
 };
 ```
 

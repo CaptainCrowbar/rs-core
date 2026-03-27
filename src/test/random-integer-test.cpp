@@ -109,6 +109,8 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), 0);
         TEST_EQUAL(dist.max(), 9);
+        TEST_EQUAL(dist.mean(), 4.5);
+        TEST_NEAR(dist.sd(), 2.872281, 1e-6);
 
         std::unordered_map<int, int> census;
         int x{};
@@ -140,6 +142,8 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), -5);
         TEST_EQUAL(dist.max(), 5);
+        TEST_EQUAL(dist.mean(), 0);
+        TEST_NEAR(dist.sd(), 3.162278, 1e-6);
 
         std::unordered_map<int, int> census;
         int x{};
@@ -172,12 +176,10 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), 1);
         TEST_EQUAL(dist.max(), 100);
+        TEST_EQUAL(dist.mean(), 50.5);
+        TEST_NEAR(dist.sd(), 28.866070, 1e-6);
 
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto tolerance = static_cast<double>(dist.max() - dist.min()) / std::sqrt(nx);
         auto sum = 0.0;
         auto sum2 = 0.0;
         int x{};
@@ -194,8 +196,8 @@ void test_rs_core_random_uniform_integer() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
 
     }
 
@@ -206,12 +208,10 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), 0);
         TEST_EQUAL(dist.max(), 999);
+        TEST_EQUAL(dist.mean(), 499.5);
+        TEST_NEAR(dist.sd(), 288.674990, 1e-6);
 
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto tolerance = static_cast<double>(dist.max() - dist.min()) / std::sqrt(nx);
         auto sum = 0.0;
         auto sum2 = 0.0;
         int x{};
@@ -228,8 +228,8 @@ void test_rs_core_random_uniform_integer() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
 
     }
 
@@ -240,12 +240,10 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), 0);
         TEST_EQUAL(dist.max(), 32767);
+        TEST_EQUAL(dist.mean(), 16383.5);
+        TEST_NEAR(dist.sd(), 9459.306806, 1e-6);
 
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto tolerance = static_cast<double>(dist.max() - dist.min()) / std::sqrt(nx);
         auto sum = 0.0;
         auto sum2 = 0.0;
         std::int16_t x{};
@@ -262,8 +260,8 @@ void test_rs_core_random_uniform_integer() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
 
     }
 
@@ -274,12 +272,10 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), 0u);
         TEST_EQUAL(dist.max(), 65535u);
+        TEST_EQUAL(dist.mean(), 32767.5);
+        TEST_NEAR(dist.sd(), 18918.613619, 1e-6);
 
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto tolerance = static_cast<double>(dist.max() - dist.min()) / std::sqrt(nx);
         auto sum = 0.0;
         auto sum2 = 0.0;
         std::uint16_t x{};
@@ -296,8 +292,8 @@ void test_rs_core_random_uniform_integer() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
 
     }
 
@@ -308,12 +304,10 @@ void test_rs_core_random_uniform_integer() {
 
         TEST_EQUAL(dist.min(), 0u);
         TEST_EQUAL(dist.max(), 0xffff'ffff'ffff'ffffull);
+        TEST_NEAR(dist.mean(), 9.22337e18, 1e13);
+        TEST_NEAR(dist.sd(), 5.32512e18, 1e13);
 
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto tolerance = static_cast<double>(dist.max() - dist.min()) / std::sqrt(nx);
         auto sum = 0.0;
         auto sum2 = 0.0;
         std::uint64_t x{};
@@ -330,8 +324,8 @@ void test_rs_core_random_uniform_integer() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
 
     }
 
@@ -349,12 +343,10 @@ void test_rs_core_random_uniform_mp_integer() {
 
         TEST_EQUAL(dist.min(), 1);
         TEST_EQUAL(dist.max(), 100);
+        TEST_EQUAL(dist.mean(), 50.5);
+        TEST_NEAR(dist.sd(), 28.866070, 1e-6);
 
-        auto xmin = static_cast<double>(dist.min());
-        auto xmax = static_cast<double>(dist.max());
-        auto expect_mean = 0.5 * (xmin + xmax);
-        auto expect_sd = (xmax - xmin + 1.0) / std::sqrt(12.0);
-        auto tolerance = (xmax - xmin) / std::sqrt(nx);
+        auto tolerance = static_cast<double>(dist.max() - dist.min()) / std::sqrt(nx);
         auto sum = 0.0;
         auto sum2 = 0.0;
         Integer x{};
@@ -371,8 +363,8 @@ void test_rs_core_random_uniform_mp_integer() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, expect_mean, tolerance);
-        TEST_NEAR(sd, expect_sd, tolerance);
+        TEST_NEAR(mean, dist.mean(), tolerance);
+        TEST_NEAR(sd, dist.sd(), tolerance);
 
     }
 
@@ -392,6 +384,8 @@ void test_rs_core_random_dice() {
         TEST_EQUAL(dist.max(), 6);
         TEST_EQUAL(dist.number(), 1);
         TEST_EQUAL(dist.faces(), 6);
+        TEST_EQUAL(dist.mean(), 3.5);
+        TEST_NEAR(dist.sd(), 1.707825, 1e-6);
         TEST_EQUAL(std::format("{}", dist), "1d6");
 
         TEST_EQUAL(dist.pdf(0), 0);
@@ -449,6 +443,8 @@ void test_rs_core_random_dice() {
         TEST_EQUAL(dist.max(), 18);
         TEST_EQUAL(dist.number(), 3);
         TEST_EQUAL(dist.faces(), 6);
+        TEST_EQUAL(dist.mean(), 10.5);
+        TEST_NEAR(dist.sd(), 2.9580, 1e-4);
         TEST_EQUAL(std::format("{}", dist), "3d6");
 
         TEST_EQUAL(dist.pdf(2), 0);
@@ -525,8 +521,8 @@ void test_rs_core_random_dice() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, 10.5, 0.1);
-        TEST_NEAR(sd, 2.9580, 0.1);
+        TEST_NEAR(mean, dist.mean(), 0.05);
+        TEST_NEAR(sd, dist.sd(), 0.05);
 
     }
 
@@ -539,6 +535,8 @@ void test_rs_core_random_dice() {
         TEST_EQUAL(dist.max(), 200);
         TEST_EQUAL(dist.number(), 2);
         TEST_EQUAL(dist.faces(), 100);
+        TEST_EQUAL(dist.mean(), 101);
+        TEST_NEAR(dist.sd(), 40.8228, 1e-4);
         TEST_EQUAL(std::format("{}", dist), "2d100");
 
         int x{};
@@ -558,8 +556,8 @@ void test_rs_core_random_dice() {
         auto mean = sum / nx;
         auto sd = std::sqrt((nx / (nx - 1.0)) * (sum2 / nx - mean * mean));
 
-        TEST_NEAR(mean, 101, 1);
-        TEST_NEAR(sd, 40.8228, 1);
+        TEST_NEAR(mean, dist.mean(), 0.5);
+        TEST_NEAR(sd, dist.sd(), 0.5);
 
     }
 

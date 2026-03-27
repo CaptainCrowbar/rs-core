@@ -176,6 +176,8 @@ namespace RS {
 
         constexpr T min() const noexcept { return min_; }
         constexpr T max() const noexcept { return max_; }
+        constexpr double mean() const noexcept;
+        double sd() const noexcept;
 
     private:
 
@@ -239,6 +241,21 @@ namespace RS {
 
         }
 
+        template <Integral T>
+        constexpr double UniformInteger<T>::mean() const noexcept {
+            auto a = static_cast<double>(min_);
+            auto b = static_cast<double>(max_);
+            return 0.5 * (a + b);
+        }
+
+        template <Integral T>
+        double UniformInteger<T>::sd() const noexcept {
+            auto a = static_cast<double>(min_);
+            auto b = static_cast<double>(max_);
+            auto c = b - a + 1.0;
+            return std::sqrt((c * c - 1.0) / 12.0);
+        }
+
     // Bernoulli distribution
 
     class BernoulliDistribution {
@@ -294,6 +311,8 @@ namespace RS {
         constexpr T max() const noexcept { return number_ * single_.max(); }
         constexpr T number() const noexcept { return number_; }
         constexpr T faces() const noexcept { return single_.max(); }
+        constexpr double mean() const noexcept;
+        double sd() const noexcept;
 
         double pdf(T x) const;
         double cdf(T x) const;
@@ -314,6 +333,20 @@ namespace RS {
                 sum += single_(rng);
             }
             return sum;
+        }
+
+        template <Integral T>
+        constexpr double Dice<T>::mean() const noexcept {
+            auto n = static_cast<double>(number_);
+            auto f = static_cast<double>(single_.max());
+            return 0.5 * n * (f + 1.0);
+        }
+
+        template <Integral T>
+        double Dice<T>::sd() const noexcept {
+            auto n = static_cast<double>(number_);
+            auto f = static_cast<double>(single_.max());
+            return std::sqrt(n * (f * f - 1.0) / 12.0);
         }
 
         template <Integral T>
@@ -465,6 +498,8 @@ namespace RS {
 
         constexpr T min() const noexcept { return min_; }
         constexpr T max() const noexcept { return max_; }
+        constexpr T mean() const noexcept { return min_ / T{2} + max_ / T{2}; }
+        T sd() const noexcept { return (max_ - min_) / std::sqrt(T{12}); }
 
     private:
 
@@ -565,6 +600,8 @@ namespace RS {
 
         constexpr T min() const noexcept { return min_; }
         constexpr T max() const noexcept { return max_; }
+        T mean() const noexcept;
+        T sd() const noexcept;
 
     private:
 
@@ -586,6 +623,18 @@ namespace RS {
         template <std::uniform_random_bit_generator RNG>
         constexpr T LogUniform<T>::operator()(RNG& rng) const {
             return std::clamp(std::exp(dist_(rng)), min_, max_);
+        }
+
+        template <std::floating_point T>
+        T LogUniform<T>::mean() const noexcept {
+            return (max_ - min_) / std::log(max_ / min_);
+        }
+
+        template <std::floating_point T>
+        T LogUniform<T>::sd() const noexcept {
+            auto m = mean();
+            auto c = (max_ * max_ - min_ * min_) / (T{2} * std::log(max_ / min_));
+            return std::sqrt(c - m * m);
         }
 
     // Normal distribution
