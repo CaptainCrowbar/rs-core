@@ -13,7 +13,7 @@ void test_rs_core_random_uniform_real() {
 
     {
 
-        std::minstd_rand rng(42);
+        std::minstd_rand rng{42};
         UniformReal<double> dist;
 
         TEST_EQUAL(dist.min(), 0.0);
@@ -44,8 +44,8 @@ void test_rs_core_random_uniform_real() {
 
     {
 
-        Pcg rng(42);
-        UniformReal<double> dist(10.0);
+        Pcg rng{42};
+        UniformReal<double> dist{10.0};
 
         TEST_EQUAL(dist.min(), 0.0);
         TEST_EQUAL(dist.max(), 10.0);
@@ -75,8 +75,8 @@ void test_rs_core_random_uniform_real() {
 
     {
 
-        Pcg rng(42);
-        UniformReal<double> dist(100.0, -100.0);
+        Pcg rng{42};
+        UniformReal<double> dist{100.0, -100.0};
 
         TEST_EQUAL(dist.min(), -100.0);
         TEST_EQUAL(dist.max(), 100.0);
@@ -106,8 +106,8 @@ void test_rs_core_random_uniform_real() {
 
     {
 
-        Pcg rng(42);
-        UniformReal<float> dist(100.0f, -100.0f);
+        Pcg rng{42};
+        UniformReal<float> dist{100.0f, -100.0f};
 
         TEST_EQUAL(dist.min(), -100.0);
         TEST_EQUAL(dist.max(), 100.0);
@@ -137,6 +137,45 @@ void test_rs_core_random_uniform_real() {
 
 }
 
+void test_rs_core_random_log_uniform_real() {
+
+    static constexpr auto n = 10'000;
+    static constexpr auto nd = static_cast<double>(n);
+
+    {
+
+        std::minstd_rand rng{42};
+        LogUniform<double> dist{20.0, 2000.0};
+
+        TEST_EQUAL(dist.min(), 20.0);
+        TEST_EQUAL(dist.max(), 2000.0);
+
+        auto expect_mean = (dist.max() - dist.min()) / (std::log(dist.max()) - std::log(dist.min()));
+        auto variance = expect_mean * (0.5 * (dist.max() + dist.min()) - expect_mean);
+        auto expect_sd = std::sqrt(variance);
+        auto tolerance = (dist.max() - dist.min()) / std::sqrt(nd);
+        auto sum = 0.0;
+        auto sum2 = 0.0;
+        double x{};
+
+        for (auto i = 0; i < n; ++i) {
+            TRY(x = dist(rng));
+            TEST(x >= dist.min());
+            TEST(x <= dist.max());
+            sum += x;
+            sum2 += x * x;
+        }
+
+        auto mean = sum / nd;
+        auto sd = std::sqrt((nd / (nd - 1.0)) * (sum2 / nd - mean * mean));
+
+        TEST_NEAR(mean, expect_mean, tolerance);
+        TEST_NEAR(sd, expect_sd, tolerance);
+
+    }
+
+}
+
 void test_rs_core_random_normal_distribution() {
 
     static constexpr auto n = 1'000'000;
@@ -144,7 +183,7 @@ void test_rs_core_random_normal_distribution() {
 
     {
 
-        std::minstd_rand rng(42);
+        std::minstd_rand rng{42};
         NormalDistribution<double> dist;
 
         TEST_EQUAL(dist.mean(), 0.0);
@@ -173,8 +212,8 @@ void test_rs_core_random_normal_distribution() {
 
     {
 
-        std::minstd_rand rng(42);
-        NormalDistribution<double> dist(100, 50);
+        std::minstd_rand rng{42};
+        NormalDistribution<double> dist{100, 50};
 
         TEST_EQUAL(dist.mean(), 100.0);
         TEST_EQUAL(dist.sd(), 50.0);

@@ -229,7 +229,7 @@ class UniformReal {
     using result_type = T;
     constexpr UniformReal() noexcept;
     constexpr explicit UniformReal(T range) noexcept;
-    constexpr explicit UniformReal(T min, T max) noexcept;
+    constexpr explicit UniformReal(T a, T b) noexcept;
     template <std::uniform_random_bit_generator RNG>
         constexpr T operator()(RNG& rng) const;
     constexpr T min() const noexcept;
@@ -243,8 +243,8 @@ regardless of the standard C++ implementation, but cannot guarantee
 predictable results because of nondeterministic floating point arithmetic.
 
 The default constructor generates values from 0 to 1. The second generates
-values from zero to `range;` in this case `range` may be negative. The third
-generates numbers from `min` to `max.`
+values between zero and `range` (which may be negative). The third generates
+numbers between `a` and `b` (the order of the arguments is not important).
 
 If the range is degenerate (the bounds are equal), the call operator will
 always return a value equal to the bounds. If the bounds differ by only one
@@ -258,6 +258,31 @@ This uses
 _TODO: The current implementation does not fill all bits in floating point
 types larger than 64 bits; in these cases it simply generates a 64-bit
 result and casts to the result type._
+
+### Log uniform floating point distribution
+
+```c++
+template <std::floating_point T>
+class LogUniform {
+    using result_type = T;
+    constexpr LogUniform() noexcept;
+    constexpr explicit LogUniform(T a, T b) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        constexpr T operator()(RNG& rng) const;
+    constexpr T min() const noexcept;
+    constexpr T max() const noexcept;
+};
+```
+
+This generates a random variate that is distributed according to a log uniform
+distribution (also called a reciprocal distribution) between the two limits.
+
+The default constructor creates a degenerate distribution that always returns
+1. In the second, the order of the arguments is not important. Behaviour is
+undefined if either bound is less than or equal to zero.
+
+Unlike `UniformReal,` this class does not guarantee that the returned value
+will never be equal to either of the bounds.
 
 ### Normal distribution
 

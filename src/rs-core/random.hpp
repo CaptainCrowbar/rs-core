@@ -459,7 +459,7 @@ namespace RS {
 
         constexpr UniformReal() = default;
         constexpr explicit UniformReal(T range) noexcept: UniformReal(T{0}, range) {}
-        constexpr explicit UniformReal(T min, T max) noexcept;
+        constexpr explicit UniformReal(T a, T b) noexcept;
 
         template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
 
@@ -483,9 +483,13 @@ namespace RS {
     };
 
         template <std::floating_point T>
-        constexpr UniformReal<T>::UniformReal(T min, T max) noexcept:
-        min_(std::min(min, max)),
-        max_(std::max(min, max)) {
+        constexpr UniformReal<T>::UniformReal(T a, T b) noexcept:
+        min_(a),
+        max_(b) {
+
+            if (min_ > max_) {
+                std::swap(min_, max_);
+            }
 
             if (min_ == max_) {
                 mode_ = range_mode::empty;
@@ -545,6 +549,43 @@ namespace RS {
 
             }
 
+        }
+
+    template <std::floating_point T>
+    class LogUniform {
+
+    public:
+
+        using result_type = T;
+
+        constexpr LogUniform() = default;
+        constexpr explicit LogUniform(T a, T b) noexcept;
+
+        template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
+
+        constexpr T min() const noexcept { return min_; }
+        constexpr T max() const noexcept { return max_; }
+
+    private:
+
+        UniformReal<T> dist_{T{0}};
+        T min_{1};
+        T max_{1};
+
+    };
+
+        template <std::floating_point T>
+        constexpr LogUniform<T>::LogUniform(T a, T b) noexcept:
+        dist_{std::log(a), std::log(b)}, min_{a}, max_{b} {
+            if (min_ > max_) {
+                std::swap(min_, max_);
+            }
+        }
+
+        template <std::floating_point T>
+        template <std::uniform_random_bit_generator RNG>
+        constexpr T LogUniform<T>::operator()(RNG& rng) const {
+            return std::clamp(std::exp(dist_(rng)), min_, max_);
         }
 
     // Normal distribution

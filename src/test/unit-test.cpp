@@ -140,6 +140,7 @@ void test_rs_core_random_distribution_concepts();
 void test_rs_core_random_pcg_engine();
 void test_rs_core_random_device_64_engine();
 void test_rs_core_random_uniform_real();
+void test_rs_core_random_log_uniform_real();
 void test_rs_core_random_normal_distribution();
 void test_rs_core_random_normal_distribution_properties();
 void test_rs_core_random_bernoulli_distribution();
@@ -364,6 +365,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_pcg_engine, "test_rs_core_random_pcg_engine");
     call_me_maybe(test_rs_core_random_device_64_engine, "test_rs_core_random_device_64_engine");
     call_me_maybe(test_rs_core_random_uniform_real, "test_rs_core_random_uniform_real");
+    call_me_maybe(test_rs_core_random_log_uniform_real, "test_rs_core_random_log_uniform_real");
     call_me_maybe(test_rs_core_random_normal_distribution, "test_rs_core_random_normal_distribution");
     call_me_maybe(test_rs_core_random_normal_distribution_properties, "test_rs_core_random_normal_distribution_properties");
     call_me_maybe(test_rs_core_random_bernoulli_distribution, "test_rs_core_random_bernoulli_distribution");
