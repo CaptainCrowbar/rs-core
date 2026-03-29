@@ -10,6 +10,65 @@
 
 namespace RS {
 
+    // Iterator concepts
+
+    namespace Detail {
+
+        template <typename I, typename V>
+        concept CanReadIterator = std::assignable_from<V&, std::iter_reference_t<I>>;
+
+        template <typename I, typename V>
+        concept CanWriteIterator = std::assignable_from<std::iter_reference_t<I>&, V>;
+
+    }
+
+    template <typename I, typename V>
+    concept ReadableIterator = std::input_iterator<I> && Detail::CanReadIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadableForwardIterator = std::forward_iterator<I> && Detail::CanReadIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadableBidirectionalIterator = std::bidirectional_iterator<I> && Detail::CanReadIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadableRandomAccessIterator = std::random_access_iterator<I> && Detail::CanReadIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadableContiguousIterator = std::contiguous_iterator<I> && Detail::CanReadIterator<I, V>;
+
+    template <typename I, typename V>
+    concept WritableIterator = std::output_iterator<I, V>;
+
+    template <typename I, typename V>
+    concept WritableForwardIterator = std::forward_iterator<I> && Detail::CanWriteIterator<I, V>;
+
+    template <typename I, typename V>
+    concept WritableBidirectionalIterator = std::bidirectional_iterator<I> && Detail::CanWriteIterator<I, V>;
+
+    template <typename I, typename V>
+    concept WritableRandomAccessIterator = std::random_access_iterator<I> && Detail::CanWriteIterator<I, V>;
+
+    template <typename I, typename V>
+    concept WritableContiguousIterator = std::contiguous_iterator<I> && Detail::CanWriteIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadWriteIterator = ReadableIterator<I, V> && WritableIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadWriteForwardIterator = ReadableForwardIterator<I, V> && WritableForwardIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadWriteBidirectionalIterator = ReadableBidirectionalIterator<I, V> && WritableBidirectionalIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadWriteRandomAccessIterator = ReadableRandomAccessIterator<I, V> && WritableRandomAccessIterator<I, V>;
+
+    template <typename I, typename V>
+    concept ReadWriteContiguousIterator = ReadableContiguousIterator<I, V> && WritableContiguousIterator<I, V>;
+
+    // Iterator base class
+
     template <typename I, typename CV, typename Guide>
     class Iterator {
 
@@ -58,10 +117,10 @@ namespace RS {
 
     public:
 
-        using difference_type = std::conditional_t<is_exactly_output, void, std::ptrdiff_t>;
-        using pointer = std::conditional_t<is_exactly_output, void, CV*>;
-        using reference = std::conditional_t<is_exactly_output, void, CV&>;
-        using value_type = std::conditional_t<is_exactly_output, void, std::remove_const_t<CV>>;
+        using difference_type = std::ptrdiff_t;
+        using pointer = CV*;
+        using reference = CV&;
+        using value_type = std::remove_const_t<CV>;
 
         I& operator*()                  requires is_exactly_output  { return self(); }
         friend I& operator++(I& t)      requires is_exactly_output  { return t; }

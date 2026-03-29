@@ -81,9 +81,10 @@ void test_rs_core_io_string_buffer_external();
 void test_rs_core_io_string_buffer_byte_io();
 void test_rs_core_io_string_buffer_formatting();
 void test_rs_core_io_string_buffer_line_iterator();
+void test_rs_core_iterator_concepts();
 void test_rs_core_iterator_tags();
-void test_rs_core_iterator_output_iterators();
 void test_rs_core_iterator_input_iterators();
+void test_rs_core_iterator_output_iterators();
 void test_rs_core_iterator_forward_iterators();
 void test_rs_core_iterator_bidirectional_iterators();
 void test_rs_core_iterator_random_access_iterators();
@@ -223,6 +224,8 @@ void test_rs_core_uuid_variant_and_version();
 void test_rs_core_uuid_comparison();
 void test_rs_core_uuid_random_v4();
 void test_rs_core_uuid_random_v7();
+void test_rs_core_var_array_int();
+void test_rs_core_var_array_string();
 void test_rs_core_version();
 
 int main(int argc, char** argv) {
@@ -306,9 +309,10 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_io_string_buffer_byte_io, "test_rs_core_io_string_buffer_byte_io");
     call_me_maybe(test_rs_core_io_string_buffer_formatting, "test_rs_core_io_string_buffer_formatting");
     call_me_maybe(test_rs_core_io_string_buffer_line_iterator, "test_rs_core_io_string_buffer_line_iterator");
+    call_me_maybe(test_rs_core_iterator_concepts, "test_rs_core_iterator_concepts");
     call_me_maybe(test_rs_core_iterator_tags, "test_rs_core_iterator_tags");
-    call_me_maybe(test_rs_core_iterator_output_iterators, "test_rs_core_iterator_output_iterators");
     call_me_maybe(test_rs_core_iterator_input_iterators, "test_rs_core_iterator_input_iterators");
+    call_me_maybe(test_rs_core_iterator_output_iterators, "test_rs_core_iterator_output_iterators");
     call_me_maybe(test_rs_core_iterator_forward_iterators, "test_rs_core_iterator_forward_iterators");
     call_me_maybe(test_rs_core_iterator_bidirectional_iterators, "test_rs_core_iterator_bidirectional_iterators");
     call_me_maybe(test_rs_core_iterator_random_access_iterators, "test_rs_core_iterator_random_access_iterators");
@@ -448,6 +452,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_uuid_comparison, "test_rs_core_uuid_comparison");
     call_me_maybe(test_rs_core_uuid_random_v4, "test_rs_core_uuid_random_v4");
     call_me_maybe(test_rs_core_uuid_random_v7, "test_rs_core_uuid_random_v7");
+    call_me_maybe(test_rs_core_var_array_int, "test_rs_core_var_array_int");
+    call_me_maybe(test_rs_core_var_array_string, "test_rs_core_var_array_string");
     call_me_maybe(test_rs_core_version, "test_rs_core_version");
 
     std::println("{}{}{}", xrule, rule, xreset);

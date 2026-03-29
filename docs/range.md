@@ -25,21 +25,16 @@ template <typename R, typename V> concept WritableForwardRange;
 template <typename R, typename V> concept WritableBidirectionalRange;
 template <typename R, typename V> concept WritableRandomAccessRange;
 template <typename R, typename V> concept WritableContiguousRange;
-template <typename R, typename V> concept ReadWriteRange
-    = ReadableRange<R, V> && WritableRange<R, V>;
-template <typename R, typename V> concept ReadWriteForwardRange
-    = ReadableForwardRange<R, V> && WritableForwardRange<R, V>;
-template <typename R, typename V> concept ReadWriteBidirectionalRange
-    = ReadableBidirectionalRange<R, V> && WritableBidirectionalRange<R, V>;
-template <typename R, typename V> concept ReadWriteRandomAccessRange
-    = ReadableRandomAccessRange<R, V> && WritableRandomAccessRange<R, V>;
-template <typename R, typename V> concept ReadWriteContiguousRange
-    = ReadableContiguousRange<R, V> && WritableContiguousRange<R, V>;
+template <typename R, typename V> concept ReadWriteRange;
+template <typename R, typename V> concept ReadWriteForwardRange;
+template <typename R, typename V> concept ReadWriteBidirectionalRange;
+template <typename R, typename V> concept ReadWriteRandomAccessRange;
+template <typename R, typename V> concept ReadWriteContiguousRange;
 ```
 
 Range concepts compatible with specific value types. All of these require `R`
 to be a range of the appropriate type. `ReadableRange` also requires a
-dereferenced iterator to be assignable to a `V` object; `WritableRange` also
+dereferenced iterator to be assignable to a `V` object; `WritableRange`
 requires a dereferenced iterator to be assignable from a `V` object.
 
 ## Range functions

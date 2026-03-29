@@ -12,6 +12,32 @@ namespace RS;
 * TOC
 {:toc}
 
+## Iterator concepts
+
+```c++
+template <typename I, typename V> concept ReadableIterator;
+template <typename I, typename V> concept ReadableForwardIterator;
+template <typename I, typename V> concept ReadableBidirectionalIterator;
+template <typename I, typename V> concept ReadableRandomAccessIterator;
+template <typename I, typename V> concept ReadableContiguousIterator;
+template <typename I, typename V> concept WritableIterator;
+template <typename I, typename V> concept WritableForwardIterator;
+template <typename I, typename V> concept WritableBidirectionalIterator;
+template <typename I, typename V> concept WritableRandomAccessIterator;
+template <typename I, typename V> concept WritableContiguousIterator;
+template <typename I, typename V> concept ReadWriteIterator;
+template <typename I, typename V> concept ReadWriteForwardIterator;
+template <typename I, typename V> concept ReadWriteBidirectionalIterator;
+template <typename I, typename V> concept ReadWriteRandomAccessIterator;
+template <typename I, typename V> concept ReadWriteContiguousIterator;
+```
+
+Iterator concepts compatible with specific value types. All of these require
+`I` to be an iterator of the appropriate type. `ReadableIterator` also
+requires a dereferenced iterator to be assignable to a `V` object;
+`WritableIterator` requires a dereferenced iterator to be assignable from a
+`V` object.
+
 ## Iterator base class
 
 ```c++
@@ -23,7 +49,7 @@ CRTP pattern. In the template parameters:
 
 * `I` is the iterator class being defined.
 * `CV` is either the iterator's `value_type` or `const value_type` depending on whether we want a mutable or constant iterator.
-* `Guide` is a type used to indicate the intended iterator category. It can be one of:
+* `Guide` is a type used to indicate the intended iterator category. It can be any of:
     * One of the standard iterator category tag classes.
     * Another iterator type of the intended category.
     * A range type of the intended category.

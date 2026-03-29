@@ -73,7 +73,7 @@ namespace RS {
 
     namespace Detail {
 
-        template <auto...> class UseNontypeParameter {};
+        template <auto> class UseNontypeParameter {};
 
     }
 
