@@ -1,6 +1,6 @@
 #include "rs-core/uuid.hpp"
+#include "rs-core/bitwise-integer.hpp"
 #include "rs-core/random.hpp"
-#include "rs-core/uint128.hpp"
 #include "rs-core/unit-test.hpp"
 #include <bit>
 #include <format>

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "rs-core/arithmetic.hpp"
+#include "rs-core/bitwise-integer.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include "rs-core/random.hpp"
-#include "rs-core/uint128.hpp"
 #include <array>
 #include <bit>
 #include <chrono>

@@ -30,6 +30,7 @@ Requires C++23. Not yet tested on all compilers.
 * Mathematical utilities
     * [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
     * [`rs-core/astronomy.hpp` -- Astronomical constants and functions](astronomy.html)
+    * [`rs-core/bitwise-integer.hpp` -- Fixed size unsigned integers](bitwise-integer.html)
     * [`rs-core/constants.hpp` -- Physical constants](constants.html)
     * [`rs-core/interpolate.hpp` -- Numerical interpolation](interpolate.html)
     * [`rs-core/linear-algebra.hpp` -- Linear algebra](linear-algebra.html)
@@ -37,7 +38,6 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/random.hpp` -- Random number generators](random.html)
     * [`rs-core/rational.hpp` -- Rational numbers](rational.html)
     * [`rs-core/root-finding.hpp` -- Root finding](root-finding.html)
-    * [`rs-core/uint128.hpp` -- 129-bit integers](uint128.html)
 * Text utilities
     * [`rs-core/character.hpp` -- Character functions](character.html)
     * [`rs-core/format.hpp` -- Formatting and parsing](format.html)

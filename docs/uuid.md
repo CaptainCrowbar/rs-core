@@ -83,7 +83,8 @@ These allow iteration over the bytes in a UUID, starting with the most
 significant.
 
 ```c++
-constexpr Uint128 as_integer(std::endian order = std::endian::big) const noexcept;
+constexpr Uint128
+    Uuid::as_integer(std::endian order = std::endian::big) const noexcept;
 ```
 
 Copies the UUID into a 128-bit integer, in big or little endian byte order.
