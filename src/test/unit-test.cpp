@@ -46,6 +46,7 @@ void test_rs_core_bitwise_integer_small_uint_5();
 void test_rs_core_bitwise_integer_small_uint_35();
 void test_rs_core_bitwise_integer_large_uint_35();
 void test_rs_core_bitwise_integer_large_uint_100();
+void test_rs_core_bitwise_integer_concepts();
 void test_rs_core_bitwise_integer_implementation_selection();
 void test_rs_core_bitwise_integer_type_conversions();
 void test_rs_core_bitwise_integer_string_parsing();
@@ -274,6 +275,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_bitwise_integer_small_uint_35, "test_rs_core_bitwise_integer_small_uint_35");
     call_me_maybe(test_rs_core_bitwise_integer_large_uint_35, "test_rs_core_bitwise_integer_large_uint_35");
     call_me_maybe(test_rs_core_bitwise_integer_large_uint_100, "test_rs_core_bitwise_integer_large_uint_100");
+    call_me_maybe(test_rs_core_bitwise_integer_concepts, "test_rs_core_bitwise_integer_concepts");
     call_me_maybe(test_rs_core_bitwise_integer_implementation_selection, "test_rs_core_bitwise_integer_implementation_selection");
     call_me_maybe(test_rs_core_bitwise_integer_type_conversions, "test_rs_core_bitwise_integer_type_conversions");
     call_me_maybe(test_rs_core_bitwise_integer_string_parsing, "test_rs_core_bitwise_integer_string_parsing");

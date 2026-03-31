@@ -7,6 +7,61 @@
 using namespace RS;
 using namespace RS::Literals;
 
+void test_rs_core_bitwise_integer_concepts() {
+
+    TEST(Integral<Uint<1>>);
+    TEST(Integral<Uint<2>>);
+    TEST(Integral<Uint<5>>);
+    TEST(Integral<Uint<10>>);
+    TEST(Integral<Uint<20>>);
+    TEST(Integral<Uint<50>>);
+    TEST(Integral<Uint<100>>);
+    TEST(Integral<Uint<200>>);
+    TEST(Integral<Uint<500>>);
+    TEST(Integral<Uint<1000>>);
+    TEST(! SignedIntegral<Uint<1>>);
+    TEST(! SignedIntegral<Uint<2>>);
+    TEST(! SignedIntegral<Uint<5>>);
+    TEST(! SignedIntegral<Uint<10>>);
+    TEST(! SignedIntegral<Uint<20>>);
+    TEST(! SignedIntegral<Uint<50>>);
+    TEST(! SignedIntegral<Uint<100>>);
+    TEST(! SignedIntegral<Uint<200>>);
+    TEST(! SignedIntegral<Uint<500>>);
+    TEST(! SignedIntegral<Uint<1000>>);
+    TEST(UnsignedIntegral<Uint<1>>);
+    TEST(UnsignedIntegral<Uint<2>>);
+    TEST(UnsignedIntegral<Uint<5>>);
+    TEST(UnsignedIntegral<Uint<10>>);
+    TEST(UnsignedIntegral<Uint<20>>);
+    TEST(UnsignedIntegral<Uint<50>>);
+    TEST(UnsignedIntegral<Uint<100>>);
+    TEST(UnsignedIntegral<Uint<200>>);
+    TEST(UnsignedIntegral<Uint<500>>);
+    TEST(UnsignedIntegral<Uint<1000>>);
+    TEST(! FloatingPoint<Uint<1>>);
+    TEST(! FloatingPoint<Uint<2>>);
+    TEST(! FloatingPoint<Uint<5>>);
+    TEST(! FloatingPoint<Uint<10>>);
+    TEST(! FloatingPoint<Uint<20>>);
+    TEST(! FloatingPoint<Uint<50>>);
+    TEST(! FloatingPoint<Uint<100>>);
+    TEST(! FloatingPoint<Uint<200>>);
+    TEST(! FloatingPoint<Uint<500>>);
+    TEST(! FloatingPoint<Uint<1000>>);
+    TEST(Arithmetic<Uint<1>>);
+    TEST(Arithmetic<Uint<2>>);
+    TEST(Arithmetic<Uint<5>>);
+    TEST(Arithmetic<Uint<10>>);
+    TEST(Arithmetic<Uint<20>>);
+    TEST(Arithmetic<Uint<50>>);
+    TEST(Arithmetic<Uint<100>>);
+    TEST(Arithmetic<Uint<200>>);
+    TEST(Arithmetic<Uint<500>>);
+    TEST(Arithmetic<Uint<1000>>);
+
+}
+
 void test_rs_core_bitwise_integer_implementation_selection() {
 
     TEST((std::same_as<Uint<1>, SmallUint<1>>));
