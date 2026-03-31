@@ -144,10 +144,10 @@ constexpr Uint& Uint::operator=(Uint&& x) noexcept;
 Other life cycle operations.
 
 ```c++
-constexpr auto LargeUint::begin() noexcept;
-constexpr auto LargeUint::begin() const noexcept;
-constexpr auto LargeUint::end() noexcept;
-constexpr auto LargeUint::end() const noexcept;
+constexpr [iterator] LargeUint::begin() noexcept;
+constexpr [const iterator] LargeUint::begin() const noexcept;
+constexpr [iterator] LargeUint::end() noexcept;
+constexpr [const iterator] LargeUint::end() const noexcept;
 constexpr LargeUint::word_type&
     LargeUint::operator[](std::size_t i) noexcept;
 constexpr const LargeUint::word_type&
