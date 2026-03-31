@@ -17,8 +17,8 @@ namespace RS;
 ```c++
 template <std::size_t N> class SmallUint;
 template <std::size_t N> class LargeUint;
-template <std::size_t N> using Uint
-    = [SmallUint if N<=64, otherwise LargeUint];
+template <std::size_t N> using Uint =
+    [SmallUint if N<=64, otherwise LargeUint];
 ```
 
 All of these classes represent unsigned integers with `N` bits. `SmallUint`
@@ -58,6 +58,14 @@ constexpr auto max128 = ~ uint128_t{0};
 ```
 
 The maximum value of the native (if possible) 128-bit type.
+
+```c++
+using Uint::word_type = [see below];
+```
+
+The data type used in the class's internal storage. For `SmallUint` this is
+the smallest fixed size integer type with at least `N` bits. For `LargeUint`
+this is always `std::uint32_t.`
 
 ```c++
 static constexpr std::size_t Uint::bits = N;
@@ -136,6 +144,22 @@ constexpr Uint& Uint::operator=(Uint&& x) noexcept;
 Other life cycle operations.
 
 ```c++
+constexpr auto LargeUint::begin() noexcept;
+constexpr auto LargeUint::begin() const noexcept;
+constexpr auto LargeUint::end() noexcept;
+constexpr auto LargeUint::end() const noexcept;
+constexpr LargeUint::word_type&
+    LargeUint::operator[](std::size_t i) noexcept;
+constexpr const LargeUint::word_type&
+    LargeUint::operator[](std::size_t i) const noexcept;
+```
+
+Accessors for the internal array. The words are in little endian order. If `N`
+is not a multiple of the word size, the padding bits (the unused high bits of
+the last word) will always be zero when read, but behaviour is undefined if
+these bits are changed through these functions.
+
+```c++
 std::string Uint::bin() const;
 std::string Uint::dec() const;
 std::string Uint::hex() const;
@@ -199,8 +223,8 @@ template <std::size_t M> constexpr explicit
     LargeUint::operator SmallUint<M>() const noexcept;
 ```
 
-Converts a fixed binary number into a standard integer or floating point type,
-or another fixed binary type. The usual arithmetic overflow rules apply if
+Converts a bitwise integer into a standard integer or floating point type, or
+another bitwise integer type. The usual arithmetic overflow rules apply if
 the value is out of range for the result type. Behaviour is undefined if `T`
 is a signed integer and `fits_in<T>()` is false.
 

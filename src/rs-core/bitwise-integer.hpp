@@ -132,22 +132,16 @@ namespace RS {
     template <std::size_t N>
     class SmallUint {
 
-    private:
+    public:
 
         static_assert(N >= 1 && N <= 64);
 
-        using value_type = std::conditional_t<(N <= 8), std::uint8_t,
+        using word_type = std::conditional_t<(N <= 8), std::uint8_t,
             std::conditional_t<(N <= 16), std::uint16_t,
             std::conditional_t<(N <= 32), std::uint32_t, std::uint64_t>>>;
 
-        static constexpr value_type mask = static_cast<value_type>(1ull << N / 2 << (N + 1) / 2) - value_type{1};
-
-        value_type value_ = 0;
-
-    public:
-
         static constexpr std::size_t bits = N;
-        static constexpr std::size_t bytes = sizeof(value_type);
+        static constexpr std::size_t bytes = sizeof(word_type);
         static constexpr std::size_t hex_digits = (N + 3) / 4;
 
         constexpr SmallUint() noexcept = default;
@@ -166,7 +160,7 @@ namespace RS {
         constexpr unsigned char* data() noexcept { return reinterpret_cast<unsigned char*>(&value_); }
         constexpr const unsigned char* data() const noexcept { return reinterpret_cast<const unsigned char*>(&value_); }
         template <Arithmetic T> constexpr bool fits_in() const noexcept { return significant_bits() <= std::numeric_limits<T>::digits; }
-        constexpr std::size_t hash() const noexcept { return std::hash<value_type>{}(value_); }
+        constexpr std::size_t hash() const noexcept { return std::hash<word_type>{}(value_); }
         constexpr std::size_t significant_bits() const noexcept { return static_cast<std::size_t>(std::bit_width(value_)); }
 
         constexpr explicit operator bool() const noexcept { return value_ != 0; }
@@ -213,13 +207,19 @@ namespace RS {
 
         friend std::string to_string(SmallUint x) { return x.dec(); }
 
+    private:
+
+        static constexpr word_type mask = static_cast<word_type>(1ull << N / 2 << (N + 1) / 2) - word_type{1};
+
+        word_type value_ = 0;
+
     };
 
         template <std::size_t N>
         template <std::unsigned_integral T>
         requires (sizeof(T) <= N / 8)
         constexpr SmallUint<N>::SmallUint(T t) noexcept:
-        value_{static_cast<value_type>(t)} {
+        value_{static_cast<word_type>(t)} {
             value_ &= mask;
         }
 
@@ -227,14 +227,14 @@ namespace RS {
         template <std::unsigned_integral T>
         requires (sizeof(T) > N / 8)
         constexpr SmallUint<N>::SmallUint(T t) noexcept:
-        value_{static_cast<value_type>(t)} {
+        value_{static_cast<word_type>(t)} {
             value_ &= mask;
         }
 
         template <std::size_t N>
         template <std::signed_integral T>
         constexpr SmallUint<N>::SmallUint(T t) noexcept:
-        value_{static_cast<value_type>(t)} {
+        value_{static_cast<word_type>(t)} {
             value_ &= mask;
         }
 
@@ -242,7 +242,7 @@ namespace RS {
         template <std::size_t M>
         requires (M < N)
         constexpr SmallUint<N>::SmallUint(SmallUint<M> x) noexcept:
-        SmallUint{static_cast<value_type>(x)} {
+        SmallUint{static_cast<word_type>(x)} {
             value_ &= mask;
         }
 
@@ -250,14 +250,14 @@ namespace RS {
         template <std::size_t M>
         requires (M > N)
         constexpr SmallUint<N>::SmallUint(SmallUint<M> x) noexcept:
-        SmallUint{static_cast<value_type>(x)} {
+        SmallUint{static_cast<word_type>(x)} {
             value_ &= mask;
         }
 
         template <std::size_t N>
         constexpr SmallUint<N>::SmallUint(std::initializer_list<std::uint64_t> init) noexcept {
             if (init.size() > 0) {
-                value_ = static_cast<value_type>(*init.begin());
+                value_ = static_cast<word_type>(*init.begin());
             }
             value_ &= mask;
         }
@@ -289,27 +289,28 @@ namespace RS {
     template <std::size_t N>
     class LargeUint {
 
-    private:
+    public:
 
         static_assert(N >= 1);
 
-        using unit_type = std::uint32_t;
+        using word_type = std::uint32_t;
 
-        static constexpr std::size_t unit_bytes = sizeof(unit_type);
-        static constexpr std::size_t unit_bits = 8 * unit_bytes;
-        static constexpr std::size_t units = (N + unit_bits - 1) / unit_bits;
-        static constexpr std::size_t final_bits = N % unit_bits ? N % unit_bits : unit_bits;
+    private:
+
+        static constexpr std::size_t word_size = 8 * sizeof(word_type);
+        static constexpr std::size_t word_count = (N + word_size - 1) / word_size;
+        static constexpr std::size_t final_bits = N % word_size ? N % word_size : word_size;
         static constexpr std::size_t final_hex_digits = (final_bits + 3) / 4;
-        static constexpr std::size_t excess_bits = unit_bits - final_bits;
-        static constexpr auto unit_mask = ~ unit_type(0);
-        static constexpr auto high_mask = unit_mask >> excess_bits;
+        static constexpr std::size_t excess_bits = word_size - final_bits;
+        static constexpr auto word_mask = ~ word_type(0);
+        static constexpr auto high_mask = word_mask >> excess_bits;
 
-        std::array<unit_type, units> array_ {{}}; // Little endian order
+        std::array<word_type, word_count> array_ {{}}; // Little endian order
 
     public:
 
         static constexpr std::size_t bits = N;
-        static constexpr std::size_t bytes = units * unit_bytes;
+        static constexpr std::size_t bytes = word_count * sizeof(word_type);
         static constexpr std::size_t hex_digits = (N + 3) / 4;
 
         constexpr LargeUint() noexcept = default;
@@ -323,6 +324,13 @@ namespace RS {
         constexpr explicit LargeUint(std::initializer_list<std::uint64_t> init) noexcept;
         explicit LargeUint(std::string_view str, int base = 0) { *this = parse(str, base); }
 
+        constexpr auto begin() noexcept { return array_.begin(); }
+        constexpr auto begin() const noexcept { return array_.begin(); }
+        constexpr auto end() noexcept { return array_.end(); }
+        constexpr auto end() const noexcept { return array_.end(); }
+        constexpr word_type& operator[](std::size_t i) noexcept { return array_[i]; }
+        constexpr const word_type& operator[](std::size_t i) const noexcept { return array_[i]; }
+
         std::string bin() const;
         std::string dec() const;
         std::string hex() const;
@@ -330,7 +338,7 @@ namespace RS {
         constexpr unsigned char* data() noexcept { return reinterpret_cast<unsigned char*>(array_.data()); }
         constexpr const unsigned char* data() const noexcept { return reinterpret_cast<const unsigned char*>(array_.data()); }
         template <Arithmetic T> constexpr bool fits_in() const noexcept { return significant_bits() <= std::numeric_limits<T>::digits; }
-        constexpr std::size_t hash() const noexcept;
+        constexpr std::size_t hash() const noexcept { return hash_mix(array_); }
         constexpr std::size_t significant_bits() const noexcept;
 
         constexpr explicit operator bool() const noexcept;
@@ -381,9 +389,9 @@ namespace RS {
     private:
 
         constexpr std::strong_ordering compare(const LargeUint& y) const noexcept;
-        constexpr void do_mask() noexcept { array_[units - 1] &= high_mask; }
+        constexpr void do_mask() noexcept { array_[word_count - 1] &= high_mask; }
 
-        constexpr static void add_with_carry(unit_type& x, unit_type y, unit_type& c) noexcept;
+        constexpr static void add_with_carry(word_type& x, word_type y, word_type& c) noexcept;
 
     };
 
@@ -391,9 +399,9 @@ namespace RS {
         template <std::unsigned_integral T>
         requires (sizeof(T) <= N / 8)
         constexpr LargeUint<N>::LargeUint(T t) noexcept {
-            array_[0] = static_cast<unit_type>(t);
-            if constexpr (units > 1 && sizeof(T) > sizeof(unit_type)) {
-                array_[1] = static_cast<unit_type>(t >> unit_bits);
+            array_[0] = static_cast<word_type>(t);
+            if constexpr (word_count > 1 && sizeof(T) > sizeof(word_type)) {
+                array_[1] = static_cast<word_type>(t >> word_size);
             }
             do_mask();
         }
@@ -402,9 +410,9 @@ namespace RS {
         template <std::unsigned_integral T>
         requires (sizeof(T) > N / 8)
         constexpr LargeUint<N>::LargeUint(T t) noexcept {
-            array_[0] = static_cast<unit_type>(t);
-            if constexpr (units > 1 && sizeof(T) > sizeof(unit_type)) {
-                array_[1] = static_cast<unit_type>(t >> unit_bits);
+            array_[0] = static_cast<word_type>(t);
+            if constexpr (word_count > 1 && sizeof(T) > sizeof(word_type)) {
+                array_[1] = static_cast<word_type>(t >> word_size);
             }
             do_mask();
         }
@@ -412,9 +420,9 @@ namespace RS {
         template <std::size_t N>
         template <std::signed_integral T>
         constexpr LargeUint<N>::LargeUint(T t) noexcept {
-            array_[0] = static_cast<unit_type>(t);
-            if constexpr (units > 1 && sizeof(T) > sizeof(unit_type)) {
-                array_[1] = static_cast<unit_type>(t >> unit_bits);
+            array_[0] = static_cast<word_type>(t);
+            if constexpr (word_count > 1 && sizeof(T) > sizeof(word_type)) {
+                array_[1] = static_cast<word_type>(t >> word_size);
             }
             do_mask();
         }
@@ -439,10 +447,10 @@ namespace RS {
         template <std::size_t M>
         requires (M < N)
         constexpr LargeUint<N>::LargeUint(LargeUint<M> x) noexcept {
-            auto common_units = (M + unit_bits - 1) / unit_bits;
-            auto xdata = reinterpret_cast<const unit_type*>(x.data());
+            auto common_words = (M + word_size - 1) / word_size;
+            auto xdata = reinterpret_cast<const word_type*>(x.data());
             auto i = 0uz;
-            for (; i < common_units; ++i) {
+            for (; i < common_words; ++i) {
                 array_[i] = xdata[i];
             }
             do_mask();
@@ -452,10 +460,10 @@ namespace RS {
         template <std::size_t M>
         requires (M > N)
         constexpr LargeUint<N>::LargeUint(LargeUint<M> x) noexcept {
-            auto common_units = (N + unit_bits - 1) / unit_bits;
-            auto xdata = reinterpret_cast<const unit_type*>(x.data());
+            auto common_words = (N + word_size - 1) / word_size;
+            auto xdata = reinterpret_cast<const word_type*>(x.data());
             auto i = 0uz;
-            for (; i < common_units; ++i) {
+            for (; i < common_words; ++i) {
                 array_[i] = xdata[i];
             }
             do_mask();
@@ -465,10 +473,10 @@ namespace RS {
         constexpr LargeUint<N>::LargeUint(std::initializer_list<std::uint64_t> init) noexcept {
             auto ptr = init.begin();
             auto len = init.size();
-            for (auto i = len - 1uz, j = 0uz; i != npos && j < units; --i, j += 2) {
-                array_[j] = static_cast<unit_type>(ptr[i]);
-                if (j + 1 < units) {
-                    array_[j + 1] = static_cast<unit_type>(ptr[i] >> unit_bits);
+            for (auto i = len - 1uz, j = 0uz; i != npos && j < word_count; --i, j += 2) {
+                array_[j] = static_cast<word_type>(ptr[i]);
+                if (j + 1 < word_count) {
+                    array_[j + 1] = static_cast<word_type>(ptr[i] >> word_size);
                 }
             }
             do_mask();
@@ -478,8 +486,8 @@ namespace RS {
         std::string LargeUint<N>::bin() const {
             std::string s;
             s.reserve(N);
-            s = Detail::unsigned_to_binary(array_[units - 1], final_bits);
-            for (auto i = units - 2; i != npos; --i) {
+            s = Detail::unsigned_to_binary(array_[word_count - 1], final_bits);
+            for (auto i = word_count - 2; i != npos; --i) {
                 s += Detail::unsigned_to_binary(array_[i]);
             }
             return s;
@@ -504,36 +512,26 @@ namespace RS {
         std::string LargeUint<N>::hex() const {
             std::string s;
             s.reserve(hex_digits);
-            s = Detail::unsigned_to_hex(array_[units - 1], final_hex_digits);
-            for (auto i = units - 2; i != npos; --i) {
+            s = Detail::unsigned_to_hex(array_[word_count - 1], final_hex_digits);
+            for (auto i = word_count - 2; i != npos; --i) {
                 s += Detail::unsigned_to_hex(array_[i]);
             }
             return s;
         }
 
         template <std::size_t N>
-        constexpr std::size_t LargeUint<N>::hash() const noexcept {
-            return hash_mix(array_);
-            // auto h = 0uz;
-            // for (auto x: array_) {
-            //     h ^= (h << 6) + (h >> 2) + std::hash<std::uint64_t>()(x) + 0x9e3779b9ul;
-            // }
-            // return h;
-        }
-
-        template <std::size_t N>
         constexpr std::size_t LargeUint<N>::significant_bits() const noexcept {
-            auto i = units - 1;
+            auto i = word_count - 1;
             while (i != npos && array_[i] == 0) {
                 --i;
             }
-            return i == npos ? 0uz : unit_bits * i + static_cast<std::size_t>(std::bit_width(array_[i]));
+            return i == npos ? 0uz : word_size * i + static_cast<std::size_t>(std::bit_width(array_[i]));
         }
 
         template <std::size_t N>
         constexpr LargeUint<N>::operator bool() const noexcept {
-            for (auto u: array_) {
-                if (u) {
+            for (auto w: array_) {
+                if (w) {
                     return true;
                 }
             }
@@ -546,10 +544,10 @@ namespace RS {
             using L = std::numeric_limits<T>;
             using U = std::conditional_t<! L::is_integer, T,
                 std::conditional_t<L::is_signed, std::int64_t, std::uint64_t>>;
-            constexpr auto unit_factor = static_cast<U>(1ull << unit_bits);
+            constexpr auto word_factor = static_cast<U>(1ull << word_size);
             U result = 0;
-            for (auto i = units - 1; i != npos; --i) {
-                result = result * unit_factor + array_[i];
+            for (auto i = word_count - 1; i != npos; --i) {
+                result = result * word_factor + array_[i];
             }
             return static_cast<T>(result);
         }
@@ -563,8 +561,8 @@ namespace RS {
         template <std::size_t N>
         constexpr LargeUint<N> LargeUint<N>::operator~() const noexcept {
             auto y = *this;
-            for (auto& u: y.array_) {
-                u = ~ u;
+            for (auto& w: y.array_) {
+                w = ~ w;
             }
             y.do_mask();
             return y;
@@ -573,7 +571,7 @@ namespace RS {
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator++() noexcept {
             ++array_[0];
-            for (auto i = 1uz; i < units && array_[i - 1] == 0; ++i) {
+            for (auto i = 1uz; i < word_count && array_[i - 1] == 0; ++i) {
                 ++array_[i];
             }
             do_mask();
@@ -583,7 +581,7 @@ namespace RS {
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator--() noexcept {
             --array_[0];
-            for (auto i = 1uz; i < units && array_[i - 1] == unit_mask; ++i) {
+            for (auto i = 1uz; i < word_count && array_[i - 1] == word_mask; ++i) {
                 --array_[i];
             }
             do_mask();
@@ -592,8 +590,8 @@ namespace RS {
 
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator+=(const LargeUint& y) noexcept {
-            unit_type carry = 0;
-            for (auto i = 0uz; i < units; ++i) {
+            word_type carry = 0;
+            for (auto i = 0uz; i < word_count; ++i) {
                 add_with_carry(array_[i], y.array_[i], carry);
             }
             do_mask();
@@ -602,10 +600,10 @@ namespace RS {
 
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator-=(const LargeUint& y) noexcept {
-            unit_type borrow = 0;
-            unit_type next = 0;
-            for (auto i = 0uz; i < units; ++i) {
-                next = static_cast<unit_type>(array_[i] < y.array_[i] || (array_[i] == y.array_[i] && borrow));
+            word_type borrow = 0;
+            word_type next = 0;
+            for (auto i = 0uz; i < word_count; ++i) {
+                next = static_cast<word_type>(array_[i] < y.array_[i] || (array_[i] == y.array_[i] && borrow));
                 array_[i] -= y.array_[i] + borrow;
                 borrow = next;
             }
@@ -616,15 +614,15 @@ namespace RS {
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator*=(const LargeUint& y) noexcept {
             LargeUint z;
-            for (auto i = 0uz; i < units; ++i) {
-                for (auto j = 0uz; j < units - i; ++j) {
+            for (auto i = 0uz; i < word_count; ++i) {
+                for (auto j = 0uz; j < word_count - i; ++j) {
                     auto k = i + j;
                     auto p = static_cast<std::uint64_t>(array_[i]) * static_cast<std::uint64_t>(y.array_[j]);
-                    unit_type carry = 0;
-                    add_with_carry(z.array_[k], unit_type(p), carry);
-                    if (++k < units) {
-                        add_with_carry(z.array_[k], unit_type(p >> unit_bits), carry);
-                        for (++k; k < units && carry; ++k) {
+                    word_type carry = 0;
+                    add_with_carry(z.array_[k], word_type(p), carry);
+                    if (++k < word_count) {
+                        add_with_carry(z.array_[k], word_type(p >> word_size), carry);
+                        for (++k; k < word_count && carry; ++k) {
                             add_with_carry(z.array_[k], 0, carry);
                         }
                     }
@@ -637,7 +635,7 @@ namespace RS {
 
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator&=(const LargeUint& y) noexcept {
-            for (auto i = 0uz; i < units; ++i) {
+            for (auto i = 0uz; i < word_count; ++i) {
                 array_[i] &= y.array_[i];
             }
             return *this;
@@ -645,7 +643,7 @@ namespace RS {
 
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator|=(const LargeUint& y) noexcept {
-            for (auto i = 0uz; i < units; ++i) {
+            for (auto i = 0uz; i < word_count; ++i) {
                 array_[i] |= y.array_[i];
             }
             return *this;
@@ -653,7 +651,7 @@ namespace RS {
 
         template <std::size_t N>
         constexpr LargeUint<N>& LargeUint<N>::operator^=(const LargeUint& y) noexcept {
-            for (auto i = 0uz; i < units; ++i) {
+            for (auto i = 0uz; i < word_count; ++i) {
                 array_[i] ^= y.array_[i];
             }
             return *this;
@@ -666,9 +664,9 @@ namespace RS {
             } else if (static_cast<std::size_t>(y) >= N) {
                 clear();
             } else {
-                auto int_unit_bits = static_cast<int>(unit_bits);
-                auto skip = static_cast<std::size_t>(y / int_unit_bits);
-                auto keep = units - skip;
+                auto int_word_size = static_cast<int>(word_size);
+                auto skip = static_cast<std::size_t>(y / int_word_size);
+                auto keep = word_count - skip;
                 if (skip) {
                     for (auto i = keep - 1; i != npos; --i) {
                         array_[i + skip] = array_[i];
@@ -676,13 +674,13 @@ namespace RS {
                     for (auto i = 0uz; i < skip; ++i) {
                         array_[i] = 0;
                     }
-                    y %= int_unit_bits;
+                    y %= int_word_size;
                 }
-                unit_type carry = 0;
-                unit_type next = 0;
+                word_type carry = 0;
+                word_type next = 0;
                 if (y) {
-                    for (auto i = skip; i < units; ++i) {
-                        next = array_[i] >> (int_unit_bits - y);
+                    for (auto i = skip; i < word_count; ++i) {
+                        next = array_[i] >> (int_word_size - y);
                         array_[i] <<= y;
                         array_[i] += carry;
                         carry = next;
@@ -700,23 +698,23 @@ namespace RS {
             } else if (static_cast<std::size_t>(y) >= N) {
                 clear();
             } else {
-                auto int_unit_bits = static_cast<int>(unit_bits);
-                auto skip = static_cast<std::size_t>(y / int_unit_bits);
-                auto keep = units - skip;
+                auto int_word_size = static_cast<int>(word_size);
+                auto skip = static_cast<std::size_t>(y / int_word_size);
+                auto keep = word_count - skip;
                 if (skip) {
                     for (auto i = 0uz; i < keep; ++i) {
                         array_[i] = array_[i + skip];
                     }
-                    for (auto i = keep; i < units; ++i) {
+                    for (auto i = keep; i < word_count; ++i) {
                         array_[i] = 0;
                     }
-                    y %= int_unit_bits;
+                    y %= int_word_size;
                 }
-                unit_type carry = 0;
-                unit_type next = 0;
+                word_type carry = 0;
+                word_type next = 0;
                 if (y) {
                     for (auto i = keep - 1; i != npos; --i) {
-                        next = array_[i] << (int_unit_bits - y);
+                        next = array_[i] << (int_word_size - y);
                         array_[i] >>= y;
                         array_[i] += carry;
                         carry = next;
@@ -759,8 +757,8 @@ namespace RS {
         template <std::size_t N>
         constexpr LargeUint<N> LargeUint<N>::max() noexcept {
             LargeUint x;
-            for (auto& u: x.array_) {
-                u = unit_mask;
+            for (auto& w: x.array_) {
+                w = word_mask;
             }
             x.do_mask();
             return x;
@@ -768,7 +766,7 @@ namespace RS {
 
         template <std::size_t N>
         constexpr std::strong_ordering LargeUint<N>::compare(const LargeUint& y) const noexcept {
-            for (auto i = units - 1; i != npos; --i) {
+            for (auto i = word_count - 1; i != npos; --i) {
                 auto c = array_[i] <=> y.array_[i];
                 if (c != 0) {
                     return c;
@@ -778,9 +776,9 @@ namespace RS {
         }
 
         template <std::size_t N>
-        constexpr void LargeUint<N>::add_with_carry(unit_type& x, unit_type y, unit_type& c) noexcept {
+        constexpr void LargeUint<N>::add_with_carry(word_type& x, word_type y, word_type& c) noexcept {
             x += y + c;
-            c = static_cast<unit_type>(x < y || (x == y && c != 0));
+            c = static_cast<word_type>(x < y || (x == y && c != 0));
         }
 
     constexpr auto max128 = ~ uint128_t{0};
