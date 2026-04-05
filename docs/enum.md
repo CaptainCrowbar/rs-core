@@ -50,7 +50,9 @@ values. It also defines a few additional features around the new type:
 The list of enumeration values can include explicit integer values, but the
 macro does not understand values based on other identifiers or arithmetic
 expressions. For example, `my_volue=0x100` is fine, but
-`my_value=another_value+2` will not work.
+`my_value=another_value+2` will not work. Character literals will work,
+provided they are single ASCII characters or single letter escape codes;
+numeric literals are not supported (just insert the number literally).
 
 Example:
 

@@ -5,10 +5,10 @@
 #include "rs-core/global.hpp"
 #include <algorithm>
 #include <concepts>
-#include <cstdlib>
 #include <format>
 #include <ranges>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -181,47 +181,88 @@ namespace RS {
         }
 
         template <std::integral T>
-        std::vector<std::pair<T, std::string>> make_enum_list(const char* va_args) {
+        T parse_enum_index(std::string_view str) {
 
-            static constexpr std::string_view whitespace = "\t\n\r ";
+            auto fail = [str] [[noreturn]] {
+                throw std::invalid_argument(std::format("Invalid enumeration index: {:?}", str));
+            };
+
+            if (str.empty()) {
+
+                fail();
+
+            } else if (str.size() == 3 && str[0] == '\'' && str[2] == '\'') {
+
+                return static_cast<T>(str[1]);
+
+            } else if (str.size() == 4 && str[0] == '\'' && str[1] == '\\' && str[3] == '\'') {
+
+                char c;
+
+                switch (str[2]) {
+                    case 'a':  c = '\a'; break;
+                    case 'b':  c = '\b'; break;
+                    case 'f':  c = '\f'; break;
+                    case 'n':  c = '\n'; break;
+                    case 'r':  c = '\r'; break;
+                    case 't':  c = '\t'; break;
+                    case 'v':  c = '\v'; break;
+                    default:   fail();
+                }
+
+                return static_cast<T>(c);
+
+            } else if (ascii_isdigit(str[0]) || str[0] == '+' || str[0] == '-') {
+
+                auto maybe_index = parse_number_maybe<T>(str, 0);
+
+                if (! maybe_index) {
+                    fail();
+                }
+
+                return *maybe_index;
+
+            } else {
+
+                fail();
+
+            }
+
+        }
+
+        inline std::string_view ascii_trim(std::string_view str) noexcept {
+            auto i = str.find_first_not_of(ascii_whitespace);
+            if (i == npos) {
+                return str.substr(0, 0);
+            }
+            auto j = str.find_last_not_of(ascii_whitespace);
+            return str.substr(i, j - i + 1);
+        }
+
+        template <std::integral T>
+        std::vector<std::pair<T, std::string>> make_enum_list(const char* va_args) {
 
             std::string_view va_view = va_args;
             std::vector<std::pair<T, std::string>> list;
+            auto field_pos = 0uz;
             T index = 0;
-            auto begin_field = 0uz;
 
             for (;;) {
 
-                auto comma_pos = va_view.find(',', begin_field);
-                auto field = va_view.substr(begin_field, comma_pos - begin_field);
-                auto begin_name = field.find_first_not_of(whitespace);
+                auto comma_pos = va_view.find(',', field_pos);
+                auto field = ascii_trim(va_view.substr(field_pos, comma_pos - field_pos));
 
-                if (begin_name != std::string::npos) {
+                if (! field.empty()) {
 
-                    field = field.substr(begin_name);
-                    field = field.substr(0, field.find_last_not_of(whitespace) + 1);
                     auto eq_pos = field.find('=');
 
-                    if (eq_pos != std::string::npos) {
-
-                        auto index_str = field.substr(eq_pos + 1);
-                        field = field.substr(0, eq_pos);
-                        auto end_field = field.find_last_not_of(whitespace) + 1;
-
-                        if (end_field != 0) {
-                            field = field.substr(0, end_field);
-                        }
-
-                        if constexpr (std::signed_integral<T>) {
-                            index = static_cast<T>(std::strtoll(index_str.data(), nullptr, 0));
-                        } else {
-                            index = static_cast<T>(std::strtoull(index_str.data(), nullptr, 0));
-                        }
-
+                    if (eq_pos != npos) {
+                        auto index_str = ascii_trim(field.substr(eq_pos + 1));
+                        index = parse_enum_index<T>(index_str);
                     }
 
-                    std::string name{field};
-                    list.push_back({index, name});
+                    auto name = ascii_trim(field.substr(0, eq_pos));
+                    list.push_back({index, std::string{name}});
                     ++index;
 
                 }
@@ -230,7 +271,7 @@ namespace RS {
                     break;
                 }
 
-                begin_field = comma_pos + 1;
+                field_pos = comma_pos + 1;
 
             }
 

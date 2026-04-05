@@ -23,6 +23,12 @@ namespace {
         india_juliet,
     )
 
+    RS_ENUM(Alphabet, int,
+        alpha = 'a',
+        bravo = 'b',
+        charlie = 'c',
+    )
+
     RS_BITMASK(Mask, std::uint16_t,
         none = 0,
         alpha = 1,
@@ -124,6 +130,33 @@ void test_rs_core_enum_class() {
 
     TEST_EQUAL(std::format("{}", enum_values(Simple{})),       "{alpha, bravo, charlie}");
     TEST_EQUAL(std::format("{}", enum_values(Complicated{})),  "{alpha_bravo, charlie_delta, echo_foxtrot, golf_hotel, india_juliet}");
+
+}
+
+void test_rs_core_enum_characters() {
+
+    static_assert(std::same_as<std::underlying_type_t<Alphabet>, int>);
+    static_assert(std::formattable<Alphabet, char>);
+
+    TEST_EQUAL(static_cast<int>(Alphabet::alpha),    97);
+    TEST_EQUAL(static_cast<int>(Alphabet::bravo),    98);
+    TEST_EQUAL(static_cast<int>(Alphabet::charlie),  99);
+
+    TEST_EQUAL(to_string(Alphabet::alpha),           "alpha");
+    TEST_EQUAL(to_string(Alphabet::bravo),           "bravo");
+    TEST_EQUAL(to_string(Alphabet::charlie),         "charlie");
+    TEST_EQUAL(to_string(static_cast<Alphabet>(0)),  "0");
+
+    TEST_EQUAL(std::format("{}", Alphabet::alpha),             "alpha");
+    TEST_EQUAL(std::format("{}", Alphabet::bravo),             "bravo");
+    TEST_EQUAL(std::format("{}", Alphabet::charlie),           "charlie");
+    TEST_EQUAL(std::format("{}", static_cast<Alphabet>(0)),    "0");
+    TEST_EQUAL(std::format("{:i}", Alphabet::alpha),           "97");
+    TEST_EQUAL(std::format("{:i}", Alphabet::bravo),           "98");
+    TEST_EQUAL(std::format("{:i}", Alphabet::charlie),         "99");
+    TEST_EQUAL(std::format("{:i}", static_cast<Alphabet>(0)),  "0");
+
+    TEST_EQUAL(std::format("{}", enum_values(Alphabet{})),  "{alpha, bravo, charlie}");
 
 }
 

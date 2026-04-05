@@ -56,6 +56,7 @@ void test_rs_core_character_string_case_conversion();
 void test_rs_core_constants();
 void test_rs_core_enum_concepts();
 void test_rs_core_enum_class();
+void test_rs_core_enum_characters();
 void test_rs_core_enum_bitmask();
 void test_rs_core_format_floating_point_digits_format();
 void test_rs_core_format_floating_point_exponent_format();
@@ -285,6 +286,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_constants, "test_rs_core_constants");
     call_me_maybe(test_rs_core_enum_concepts, "test_rs_core_enum_concepts");
     call_me_maybe(test_rs_core_enum_class, "test_rs_core_enum_class");
+    call_me_maybe(test_rs_core_enum_characters, "test_rs_core_enum_characters");
     call_me_maybe(test_rs_core_enum_bitmask, "test_rs_core_enum_bitmask");
     call_me_maybe(test_rs_core_format_floating_point_digits_format, "test_rs_core_format_floating_point_digits_format");
     call_me_maybe(test_rs_core_format_floating_point_exponent_format, "test_rs_core_format_floating_point_exponent_format");
