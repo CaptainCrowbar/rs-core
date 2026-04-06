@@ -23,6 +23,8 @@ void test_rs_core_alias_hashing();
 void test_rs_core_alias_maths_functions();
 void test_rs_core_alias_numnbers();
 void test_rs_core_alias_numeric_limits();
+void test_rs_core_alias_point_arithmetic();
+void test_rs_core_alias_point_arithmetic_nested();
 void test_rs_core_arithmetic_binomial_coefficient();
 void test_rs_core_arithmetic_euclidean_division();
 void test_rs_core_arithmetic_gcd_lcm();
@@ -253,6 +255,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_alias_maths_functions, "test_rs_core_alias_maths_functions");
     call_me_maybe(test_rs_core_alias_numnbers, "test_rs_core_alias_numnbers");
     call_me_maybe(test_rs_core_alias_numeric_limits, "test_rs_core_alias_numeric_limits");
+    call_me_maybe(test_rs_core_alias_point_arithmetic, "test_rs_core_alias_point_arithmetic");
+    call_me_maybe(test_rs_core_alias_point_arithmetic_nested, "test_rs_core_alias_point_arithmetic_nested");
     call_me_maybe(test_rs_core_arithmetic_binomial_coefficient, "test_rs_core_arithmetic_binomial_coefficient");
     call_me_maybe(test_rs_core_arithmetic_euclidean_division, "test_rs_core_arithmetic_euclidean_division");
     call_me_maybe(test_rs_core_arithmetic_gcd_lcm, "test_rs_core_arithmetic_gcd_lcm");

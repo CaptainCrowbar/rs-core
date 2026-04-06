@@ -8,7 +8,6 @@
 #include <compare>
 #include <concepts>
 #include <cstddef>
-#include <cstdint>
 #include <format>
 #include <functional>
 #include <iterator>
@@ -19,11 +18,25 @@
 
 namespace RS {
 
-    RS_BITMASK(AliasFlags, std::uint8_t,
+    namespace Detail {
+
+        template <typename T>
+        concept AliasDistanceArithmetic = requires (const T ct, T& tr) {
+            { - ct } -> std::convertible_to<T>;
+            { ct + ct } -> std::convertible_to<T>;
+            { ct - ct } -> std::convertible_to<T>;
+            { tr += ct } -> std::convertible_to<T&>;
+            { tr -= ct } -> std::convertible_to<T&>;
+        };
+
+    }
+
+    RS_BITMASK(AliasFlags, unsigned char,
         none                 = 0,
         cross_compare        = 1,  // Heterogeneous comparison operators
         implicit_from_alias  = 2,  // Implicit conversion from Alias to T
         implicit_to_alias    = 4,  // Implicit conversion from T to Alias
+        point_arithmetic     = 8,  // Point-like arithmetic operators (vs distance-like)
     )
 
     template <typename T, typename Tag = void, AliasFlags Flags = AliasFlags::none>
@@ -32,8 +45,18 @@ namespace RS {
     private:
 
         static constexpr bool cross_compare = has_bit(Flags, AliasFlags::cross_compare);
-        static constexpr bool implicit_to_alias = has_bit(Flags, AliasFlags::implicit_to_alias);
         static constexpr bool implicit_from_alias = has_bit(Flags, AliasFlags::implicit_from_alias);
+        static constexpr bool implicit_to_alias = has_bit(Flags, AliasFlags::implicit_to_alias);
+        static constexpr bool point_arithmetic = has_bit(Flags, AliasFlags::point_arithmetic);
+
+        static_assert(! cross_compare || std::equality_comparable<T>,
+            "Alias cross_compare flag can only be used with comparable types");
+        static_assert(! (implicit_from_alias && implicit_to_alias),
+            "Conversions between alias and underlying type cannot be implicit in both directions");
+        static_assert(! ((cross_compare || implicit_from_alias || implicit_to_alias) && point_arithmetic),
+            "Point arithmetic cannot be combined with other alias flags");
+        static_assert(! point_arithmetic || Detail::AliasDistanceArithmetic<T>,
+            "Inappropriate underlying type for point arithmetic in alias");
 
         T value_;
 
@@ -48,31 +71,56 @@ namespace RS {
 
         // Life cycle operations
 
-        Alias() requires std::default_initializable<T>: value_{} {}
+        Alias()
+            requires std::default_initializable<T>:
+            value_{} {}
+        Alias(const Alias& a)
+            requires std::copyable<T>:
+            value_(a.value_) {}
+        Alias(Alias&& a)
+            requires std::movable<T>:
+            value_(std::move(a.value_)) {}
+        explicit (! implicit_to_alias) Alias(const T& t)
+            requires std::copyable<T>:
+            value_(t) {}
+        explicit (! implicit_to_alias) Alias(T&& t)
+            requires std::movable<T>:
+            value_(std::move(t)) {}
+        template <typename Tag2, AliasFlags F2>
+            explicit Alias(const Alias<T, Tag2, F2>& a)
+            requires std::copyable<T>:
+            value_(a.value_) {}
+        template <typename Tag2, AliasFlags F2>
+            explicit Alias(Alias<T, Tag2, F2>&& a)
+            requires std::movable<T>:
+            value_(std::move(a.value_)) {}
+        template <typename... TS>
+            explicit Alias(TS&&... args)
+            requires std::constructible_from<T, TS...>:
+            value_(std::forward<TS>(args)...) {}
 
-        Alias(const Alias& a) requires std::copyable<T>: value_(a.value_) {}
-        Alias(Alias&& a) requires std::movable<T>: value_(std::move(a.value_)) {}
-        Alias& operator=(const Alias& a) requires std::copyable<T> { value_ = a.value_; return *this; }
-        Alias& operator=(Alias&& a) requires std::movable<T> { value_ = std::move(a.value_); return *this; }
-
-        explicit(! implicit_to_alias) Alias(const T& t) requires std::copyable<T>: value_(t) {}
-        explicit(! implicit_to_alias) Alias(T&& t) requires std::movable<T>: value_(std::move(t)) {}
-        Alias& operator=(const T& t) requires implicit_to_alias && std::copyable<T> { value_ = t; return *this; }
-        Alias& operator=(T&& t) requires implicit_to_alias && std::movable<T> { value_ = std::move(t); return *this; }
-
-        template <typename Tag2, AliasFlags F2> explicit Alias(const Alias<T, Tag2, F2>& a)
-            requires std::copyable<T>: value_(a.value_) {}
-        template <typename Tag2, AliasFlags F2> explicit Alias(Alias<T, Tag2, F2>&& a)
-            requires std::movable<T>: value_(std::move(a.value_)) {}
-
-        template <typename... TS> explicit Alias(TS&&... args)
-            requires std::constructible_from<T, TS...>: value_(std::forward<TS>(args)...) {}
+        Alias& operator=(const Alias& a)
+            requires std::copyable<T>
+            { value_ = a.value_; return *this; }
+        Alias& operator=(Alias&& a)
+            requires std::movable<T>
+            { value_ = std::move(a.value_); return *this; }
+        Alias& operator=(const T& t)
+            requires implicit_to_alias && std::copyable<T>
+            { value_ = t; return *this; }
+        Alias& operator=(T&& t)
+            requires implicit_to_alias && std::movable<T>
+            { value_ = std::move(t); return *this; }
 
         // Conversion operators
 
-        explicit(! implicit_from_alias) operator T() const { return value_; }
-        explicit(! std::convertible_to<T, bool>) operator bool() const
-            requires std::constructible_from<bool, T> { return bool(value_); }
+        explicit (! implicit_from_alias)
+            operator T() const
+            { return value_; }
+        explicit (! std::convertible_to<T, bool>)
+            operator bool() const
+            requires std::constructible_from<bool, T>
+            { return bool(value_); }
 
         // Access operators
 
@@ -83,75 +131,155 @@ namespace RS {
 
         // Arithmetic operators
 
-        Alias operator+() const requires requires (T t) { { + t } -> std::convertible_to<T>; } { return Alias{+ value_}; }
-        Alias operator-() const requires requires (T t) { { - t } -> std::convertible_to<T>; } { return Alias{- value_}; }
-        Alias operator~() const requires requires (T t) { { ~ t } -> std::convertible_to<T>; } { return Alias{~ value_}; }
+        Alias operator+() const
+            requires (! point_arithmetic) && requires (T t) { { + t } -> std::convertible_to<T>; }
+            { return Alias{+ value_}; }
+        Alias operator-() const
+            requires (! point_arithmetic) && requires (T t) { { - t } -> std::convertible_to<T>; }
+            { return Alias{- value_}; }
+        Alias operator~() const
+            requires (! point_arithmetic) && requires (T t) { { ~ t } -> std::convertible_to<T>; }
+            { return Alias{~ value_}; }
 
-        Alias& operator++() requires requires (T& t) { { ++ t }; } { ++ value_; return *this; }
-        Alias operator++(int) requires requires (T& t) { { t ++ }; } { auto old = *this; value_ ++; return old; }
-        Alias& operator--() requires requires (T& t) { { -- t }; } { -- value_; return *this; }
-        Alias operator--(int) requires requires (T& t) { { t -- }; } { auto old = *this; value_ --; return old; }
+        Alias& operator++()
+            requires (! point_arithmetic) && requires (T& t) { { ++ t }; }
+            { ++value_; return *this; }
+        Alias operator++(int)
+            requires (! point_arithmetic) && requires (T& t) { { t ++ }; }
+            { auto old = *this; value_++; return old; }
+        Alias& operator--()
+            requires (! point_arithmetic) && requires (T& t) { { -- t }; }
+            { --value_; return *this; }
+        Alias operator--(int)
+            requires (! point_arithmetic) && requires (T& t) { { t -- }; }
+            { auto old = *this; value_--; return old; }
 
-        Alias& operator+=(const Alias& a) requires requires (T& t, T u) { { t += u }; } { value_ += a.value_; return *this; }
-        Alias& operator-=(const Alias& a) requires requires (T& t, T u) { { t -= u }; } { value_ -= a.value_; return *this; }
-        Alias& operator*=(const Alias& a) requires requires (T& t, T u) { { t *= u }; } { value_ *= a.value_; return *this; }
-        Alias& operator/=(const Alias& a) requires requires (T& t, T u) { { t /= u }; } { value_ /= a.value_; return *this; }
-        Alias& operator%=(const Alias& a) requires requires (T& t, T u) { { t %= u }; } { value_ %= a.value_; return *this; }
-        Alias& operator&=(const Alias& a) requires requires (T& t, T u) { { t &= u }; } { value_ &= a.value_; return *this; }
-        Alias& operator|=(const Alias& a) requires requires (T& t, T u) { { t |= u }; } { value_ |= a.value_; return *this; }
-        Alias& operator^=(const Alias& a) requires requires (T& t, T u) { { t ^= u }; } { value_ ^= a.value_; return *this; }
-        Alias& operator<<=(int j) requires requires (T& t, int i) { { t <<= i }; } { value_ <<= j; return *this; }
-        Alias& operator>>=(int j) requires requires (T& t, int i) { { t >>= i }; } { value_ >>= j; return *this; }
+        Alias& operator+=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t += u }; }
+            { value_ += a.value_; return *this; }
+        Alias& operator-=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t -= u }; }
+            { value_ -= a.value_; return *this; }
+        Alias& operator*=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t *= u }; }
+            { value_ *= a.value_; return *this; }
+        Alias& operator/=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t /= u }; }
+            { value_ /= a.value_; return *this; }
+        Alias& operator%=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t %= u }; }
+            { value_ %= a.value_; return *this; }
+        Alias& operator&=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t &= u }; }
+            { value_ &= a.value_; return *this; }
+        Alias& operator|=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t |= u }; }
+            { value_ |= a.value_; return *this; }
+        Alias& operator^=(const Alias& a)
+            requires (! point_arithmetic) && requires (T& t, T u) { { t ^= u }; }
+            { value_ ^= a.value_; return *this; }
+        Alias& operator<<=(int j)
+            requires (! point_arithmetic) && requires (T& t, int i) { { t <<= i }; }
+            { value_ <<= j; return *this; }
+        Alias& operator>>=(int j)
+            requires (! point_arithmetic) && requires (T& t, int i) { { t >>= i }; }
+            { value_ >>= j; return *this; }
 
         friend Alias operator+(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t + u } -> std::convertible_to<T>; } { return Alias{a.value_ + b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t + u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ + b.value_}; }
         friend Alias operator-(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t - u } -> std::convertible_to<T>; } { return Alias{a.value_ - b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t - u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ - b.value_}; }
         friend Alias operator*(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t * u } -> std::convertible_to<T>; } { return Alias{a.value_ * b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t * u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ * b.value_}; }
         friend Alias operator/(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t / u } -> std::convertible_to<T>; } { return Alias{a.value_ / b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t / u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ / b.value_}; }
         friend Alias operator%(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t % u } -> std::convertible_to<T>; } { return Alias{a.value_ % b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t % u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ % b.value_}; }
         friend Alias operator&(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t & u } -> std::convertible_to<T>; } { return Alias{a.value_ & b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t & u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ & b.value_}; }
         friend Alias operator|(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t | u } -> std::convertible_to<T>; } { return Alias{a.value_ | b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t | u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ | b.value_}; }
         friend Alias operator^(const Alias& a, const Alias& b)
-            requires requires (T t, T u) { { t ^ u } -> std::convertible_to<T>; } { return Alias{a.value_ ^ b.value_}; }
+            requires (! point_arithmetic) && requires (T t, T u) { { t ^ u } -> std::convertible_to<T>; }
+            { return Alias{a.value_ ^ b.value_}; }
         friend Alias operator<<(const Alias& a, int j)
-            requires requires (T t, int i) { { t << i } -> std::convertible_to<T>; } { return Alias{a.value_ << j}; }
+            requires (! point_arithmetic) && requires (T t, int i) { { t << i } -> std::convertible_to<T>; }
+            { return Alias{a.value_ << j}; }
         friend Alias operator>>(const Alias& a, int j)
-            requires requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; } { return Alias{a.value_ >> j}; }
+            requires (! point_arithmetic) && requires (T t, int i) { { (t >> i) } -> std::convertible_to<T>; }
+            { return Alias{a.value_ >> j}; }
+
+        Alias& operator+=(T t)
+            requires point_arithmetic
+            { value_ += t; return *this; }
+        Alias& operator-=(T t)
+            requires point_arithmetic
+            { value_ -= t; return *this; }
+
+        friend Alias operator+(const Alias& a, T t)
+            requires point_arithmetic
+            { return Alias{a.value_ + t}; }
+        friend Alias operator+(T t, const Alias& a)
+            requires point_arithmetic
+            { return Alias{t + a.value_}; }
+        friend Alias operator-(const Alias& a, T t)
+            requires point_arithmetic
+            { return Alias{a.value_ - t}; }
+        friend T operator-(const Alias& a, const Alias& b)
+            requires point_arithmetic
+            { return a.value_ - b.value_; }
 
         // Comparison operators
 
         friend bool operator==(const Alias& a, const Alias& b)
-            requires std::equality_comparable<T> { return a.value_ == b.value_; }
+            requires std::equality_comparable<T>
+            { return a.value_ == b.value_; }
         friend auto operator<=>(const Alias& a, const Alias& b)
-            requires std::three_way_comparable<T> { return a.value_ <=> b.value_; }
+            requires std::three_way_comparable<T>
+            { return a.value_ <=> b.value_; }
         friend bool operator==(const Alias& a, const T& t)
-            requires std::equality_comparable<T> && cross_compare { return a.value_ == t; }
+            requires std::equality_comparable<T> && cross_compare
+            { return a.value_ == t; }
         friend auto operator<=>(const Alias& a, const T& t)
-            requires std::three_way_comparable<T> && cross_compare { return a.value_ <=> t; }
+            requires std::three_way_comparable<T> && cross_compare
+            { return a.value_ <=> t; }
 
         // Range access
 
         auto& operator[](std::size_t i)
-            requires requires (T& t) { { t[0] } -> MutableReference; } { return value_[i]; }
+            requires requires (T& t) { { t[0] } -> MutableReference; }
+            { return value_[i]; }
         const auto& operator[](std::size_t i) const
-            requires requires (const T& t) { { t[0] } -> Reference; } { return value_[i]; }
+            requires requires (const T& t) { { t[0] } -> Reference; }
+            { return value_[i]; }
         auto operator[](std::size_t i) const
-            requires requires (const T& t) { { t[0] } -> NonReference; } { return value_[i]; }
-        auto begin() requires requires (T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
-        auto begin() const requires requires (const T& t) { { std::ranges::begin(t) }; } { return std::ranges::begin(value_); }
-        auto end() requires requires (T& t) { { std::ranges::end(t) }; } { return std::ranges::end(value_); }
-        auto end() const requires requires (const T& t) { { std::ranges::end(t) }; } { return std::ranges::end(value_); }
-
+            requires requires (const T& t) { { t[0] } -> NonReference; }
+            { return value_[i]; }
+        auto begin()
+            requires requires (T& t) { { std::ranges::begin(t) }; }
+            { return std::ranges::begin(value_); }
+        auto begin() const
+            requires requires (const T& t) { { std::ranges::begin(t) }; }
+            { return std::ranges::begin(value_); }
+        auto end()
+            requires requires (T& t) { { std::ranges::end(t) }; }
+            { return std::ranges::end(value_); }
+        auto end() const
+            requires requires (const T& t) { { std::ranges::end(t) }; }
+            { return std::ranges::end(value_); }
         std::size_t size() const
-            requires requires (const T& t) { { std::ranges::size(t) }; } { return std::size_t(std::ranges::size(value_)); }
+            requires requires (const T& t) { { std::ranges::size(t) }; }
+            { return std::size_t(std::ranges::size(value_)); }
         bool empty() const
-            requires requires (const T& t) { { std::ranges::empty(t) }; } { return std::ranges::empty(value_); }
+            requires requires (const T& t) { { std::ranges::empty(t) }; }
+            { return std::ranges::empty(value_); }
 
         // String functions
 

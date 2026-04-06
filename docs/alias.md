@@ -15,7 +15,7 @@ namespace RS;
 ## Supporting types
 
 ```c++
-enum class AliasFlags: uint8_t {
+enum class AliasFlags: unsigned char {
     none,
     cross_compare,        // Define comparison operators between T and Alias
     implicit_from_alias,  // Define implicit conversion from Alias to T
@@ -59,21 +59,30 @@ The third template argument, `Flags`, specifies optional behaviour for the
 alias:
 
 * `AliasFlags::cross_compare` -- If this is supplied, heterogeneous comparison
-  operators between `Alias<T>` and `T` will be defined. By default, only
-  homogeneous comparison operators are defined. This has no effect if `T` is
-  not comparable.
+  operators between `Alias` and `T` will be defined. By default, only
+  homogeneous comparison operators are defined. This flag is only allowed if
+  `T` is comparable.
 * `AliasFlags::implicit_from_alias` -- If this is supplied, an implicit
-  conversion operator from `Alias<T>` to `T` is defined. By default, this
+  conversion operator from `Alias` to `T` is defined. By default, this
   conversion is explicit.
 * `AliasFlags::implicit_to_alias` -- If this is supplied, an implicit
-  conversion constructor from `T` to `Alias<T>` is defined. By default, this
+  conversion constructor from `T` to `Alias` is defined. By default, this
   conversion is explicit.
+* `AliasFlags::point_arithmetic` -- If this is supplied, mixed mode arithmetic
+  operations are generated to make the alias type act like a point-like type
+  to the underlying type's distance-like arithmetic.
 
-Combining `implicit_to_alias` and `implicit_from_alias` is legal but likely to
-lead to ambiguous overload resolution issues.
+The `implicit_from_alias` and `implicit_to_alias` flags cannot be combined,
+partly because this would be likely to lead to ambiguous overload resolution
+issues, but mainly because it would largely defeat the purpose of making a
+hard type alias at all.
 
-Behaviour is undefined if instantiations of `Alias` exist with the same
-underlying type and tag type but different flags.
+The `point_arithmetic` flag cannot be combined with any of the other flags,
+because, again, this would defeat the purpose of making the distance-like and
+point-like types distinct. This flag can only be set if the underlying type
+supports the addition and subtraction operators. If this flag is set, only
+the point-like mixed-mode operators are generated; no other arithmetic
+operators are generated.
 
 ### Parameter visibility
 
@@ -119,7 +128,7 @@ Alias& Alias::operator=(const T& t);
 Alias& Alias::operator=(T&& t);
 ```
 
-Conversions from a `T` to an `Alias.` Conversion constructors are always
+Conversions from a `T` to an `Alias<T>.` Conversion constructors are always
 defined, and are explicit by default; implicit conversions and assignment
 operators are defined if the `implicit_to_alias` flag is present and `T` has
 the necessary properties.
@@ -155,7 +164,7 @@ Destructor.
 [optionally explicit] Alias::operator T() const;
 ```
 
-Conversion operator from an `Alias` to a `T`. This conversion operator is
+Conversion operator from an `Alias<T>` to a `T`. This conversion operator is
 always defined, and is explicit by default; an implicit conversion operator
 is defined if the `implicit_from_alias` flag is present.
 
@@ -212,6 +221,18 @@ Alias operator>>(const Alias& a, int i);
 Arithmetic operators. Each of these is defined if the corresponding operator
 is defined for `T`. Only homogeneous operators are defined, except for the
 bitwise shift operators.
+
+```c++
+Alias& Alias::operator+=(T a);
+Alias& Alias::operator-=(T a);
+Alias operator+(const Alias& a, T t);
+Alias operator+(T t, const Alias& a);
+Alias operator-(const Alias& a, T t);
+T operator-(const Alias& a, const Alias& b);
+```
+
+Point-like arithmetic operators. These are defined only if the
+`point_arithmetic` flag is set.
 
 ### Comparison operators
 
@@ -280,8 +301,8 @@ Range property functions. Defined if `std::ranges::empty/size(T)` are valid.
 
 ### Mathematical functions
 
-All functions in `<cmath>` are defined for `Alias<T,...>` if they are defined
-for `T` (as of C++23).
+All functions in `<cmath>` are defined for `Alias<T>` if they are defined for
+`T` (as of C++23).
 
 ### String functions
 
@@ -290,8 +311,8 @@ Alias Alias::substr(std::size_t pos, std::size_t len = npos) const;
 ```
 
 Defined if `T::substr()` is defined and returns a `T` or a type convertible to
-it. This returns an `Alias` wrapped around the substring, instead of the raw
-`T` substring that `Alias->substr()` would return.
+it. This returns an `Alias<T>` wrapped around the substring, instead of the
+raw `T` substring that `Alias->substr()` would return.
 
 ### Specializations
 
@@ -309,11 +330,11 @@ struct std::hash<Alias>;
 Defined if `std::hash<T>` is defined, and returns the same value.
 
 ```c++
-namespace std::numbers { ... }
+namespace std::numbers;
 ```
 
-The constants in this namespace are duplicated for `Alias<T,...>` if they are
-defined for `T.`
+The constants in this namespace (with the `"_v"` suffix) are duplicated for
+`Alias<T>` if they are defined for `T.`
 
 ```c++
 class std::numeric_limits<Alias>;
