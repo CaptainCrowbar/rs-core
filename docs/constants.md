@@ -44,6 +44,11 @@ appropriate.
 | `yard`           | 0.9144 m                   |
 | `mile`           | 1609 m                     |
 | `nautical_mile`  | 1852 m                     |
+| `minute`         | 60 s                       |
+| `hour`           | 3600 s                     |
+| `day`            | 86'400 s                   |
+| `week`           | 604'800 s                  |
+| `year`           | 31'557'600 s               |
 | `ounce`          | 0.02835 kg                 |
 | `pound`          | 0.4536 kg                  |
 | `short_ton`      | 907.2 kg                   |
@@ -56,7 +61,7 @@ appropriate.
 | `ton_tnt`        | 4.184×10<sup>9</sup> J     |
 | `horsepower`     | 745.7 W                    |
 | `mmHg`           | 133.3 Pa                   |
-| `atmosphere`     | 101300 Pa                  |
+| `atmosphere`     | 101'300 Pa                 |
 | `zero_celsius`   | 273.15 K                   |
 
 ## Physical constants

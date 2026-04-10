@@ -27,6 +27,11 @@ namespace RS {
     RS_CORE_DEFINE_CONSTANT_1(yard,           0.9144);                                   // m
     RS_CORE_DEFINE_CONSTANT_1(mile,           1609.344);                                 // m
     RS_CORE_DEFINE_CONSTANT_1(nautical_mile,  1852.0);                                   // m
+    RS_CORE_DEFINE_CONSTANT_1(minute,         60.0);                                     // s
+    RS_CORE_DEFINE_CONSTANT_1(hour,           3600.0);                                   // s
+    RS_CORE_DEFINE_CONSTANT_1(day,            86'400.0);                                 // s
+    RS_CORE_DEFINE_CONSTANT_1(week,           604'800.0);                                // s
+    RS_CORE_DEFINE_CONSTANT_1(year,           31'557'600.0);                             // s
     RS_CORE_DEFINE_CONSTANT_1(ounce,          0.028'349'523'125);                        // kg
     RS_CORE_DEFINE_CONSTANT_1(pound,          0.453'592'37);                             // kg
     RS_CORE_DEFINE_CONSTANT_1(short_ton,      907.184'74);                               // kg
