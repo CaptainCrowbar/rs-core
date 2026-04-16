@@ -23,6 +23,8 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/hash.hpp` -- Hash functions](hash.html)
     * [`rs-core/range.hpp` -- Range utilities](range.html)
     * [`rs-core/topological.hpp` -- Topological sorting](topological.html)
+* Concurrency utilities
+    * [`rs-core/thread-pool.hpp` -- Thread pool](thread-pool.html)
 * I/O utilities
     * [`rs-core/io.hpp` -- I/O utilities](io.html)
     * [`rs-core/log.hpp` -- Logging](log.html)
