@@ -13,8 +13,16 @@ namespace RS {
     // Sanity check
 
     static_assert(std::numeric_limits<unsigned char>::digits == 8);
+    static_assert(sizeof(int) >= 4);
 
     // Primitive concepts
+
+    template <typename T>
+    concept Character = std::same_as<T, char>
+        || std::same_as<T, char8_t>
+        || std::same_as<T, char16_t>
+        || std::same_as<T, char32_t>
+        || std::same_as<T, wchar_t>;
 
     template <typename T> struct MetaMutableReference: std::false_type {};
     template <typename T> struct MetaMutableReference<T&>: std::true_type {};
@@ -28,7 +36,8 @@ namespace RS {
 
     template <typename T>
     concept Arithmetic = std::numeric_limits<T>::is_specialized
-        && ! std::same_as<T, bool>;
+        && ! std::same_as<T, bool>
+        && ! Character<T>;
 
     template <typename T>
     concept FixedPointArithmetic = Arithmetic<T>

@@ -45,6 +45,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(! SignedIntegral<std::uint64_t>);
     TEST(! SignedIntegral<double>);
     TEST(! SignedIntegral<bool>);
+    TEST(! SignedIntegral<char>);
+    TEST(! SignedIntegral<char32_t>);
     TEST(! SignedIntegral<int*>);
     TEST(! SignedIntegral<std::string>);
     TEST(! UnsignedIntegral<int>);
@@ -53,6 +55,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(UnsignedIntegral<std::uint64_t>);
     TEST(! UnsignedIntegral<double>);
     TEST(! UnsignedIntegral<bool>);
+    TEST(! UnsignedIntegral<char>);
+    TEST(! UnsignedIntegral<char32_t>);
     TEST(! UnsignedIntegral<int*>);
     TEST(! UnsignedIntegral<std::string>);
     TEST(Integral<int>);
@@ -61,6 +65,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(Integral<std::uint64_t>);
     TEST(! Integral<double>);
     TEST(! Integral<bool>);
+    TEST(! Integral<char>);
+    TEST(! Integral<char32_t>);
     TEST(! Integral<int*>);
     TEST(! Integral<std::string>);
     TEST(! FloatingPoint<int>);
@@ -69,6 +75,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(! FloatingPoint<std::uint64_t>);
     TEST(FloatingPoint<double>);
     TEST(! FloatingPoint<bool>);
+    TEST(! FloatingPoint<char>);
+    TEST(! FloatingPoint<char32_t>);
     TEST(! FloatingPoint<int*>);
     TEST(! FloatingPoint<std::string>);
     TEST(! FixedPointArithmetic<int>);
@@ -77,6 +85,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(! FixedPointArithmetic<std::uint64_t>);
     TEST(! FixedPointArithmetic<double>);
     TEST(! FixedPointArithmetic<bool>);
+    TEST(! FixedPointArithmetic<char>);
+    TEST(! FixedPointArithmetic<char32_t>);
     TEST(! FixedPointArithmetic<int*>);
     TEST(! FixedPointArithmetic<std::string>);
     TEST(! RationalArithmetic<int>);
@@ -85,6 +95,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(! RationalArithmetic<std::uint64_t>);
     TEST(! RationalArithmetic<double>);
     TEST(! RationalArithmetic<bool>);
+    TEST(! RationalArithmetic<char>);
+    TEST(! RationalArithmetic<char32_t>);
     TEST(! RationalArithmetic<int*>);
     TEST(! RationalArithmetic<std::string>);
     TEST(Arithmetic<int>);
@@ -93,6 +105,8 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST(Arithmetic<std::uint64_t>);
     TEST(Arithmetic<double>);
     TEST(! Arithmetic<bool>);
+    TEST(! Arithmetic<char>);
+    TEST(! Arithmetic<char32_t>);
     TEST(! Arithmetic<int*>);
     TEST(! Arithmetic<std::string>);
 

@@ -17,6 +17,13 @@ namespace RS;
 ### Primitive concepts
 
 ```c++
+template <typename T> concept Character;
+```
+
+Matches any standard character type: `char, char8_t, char16_t, char32_t,
+wchar_t.`
+
+```c++
 template <typename T> concept Reference;
 template <typename T> concept MutableReference;
 template <typename T> concept ConstReference;
@@ -52,7 +59,8 @@ legal for a type to match both of these.
 The `Arithmetic` concept matches any type that matches any of the other
 concepts listed here.
 
-The `bool` type is excluded from all of these concepts.
+The `bool` type, and all character types, are excluded from all of these
+concepts.
 
 ## Constants
 
