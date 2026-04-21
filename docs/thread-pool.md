@@ -59,11 +59,12 @@ without being executed.
 
 ```c++
 template <typename F> void ThreadPool::insert(F&& f);
+template <typename F> void ThreadPool::operator()(F&& f);
 ```
 
-Queues a job for execution. `F` must be a function-like type callable with no
-arguments. Behaviour is undefined if the callback is a null function pointer
-or `std::function`, or if a callback throws an exception.
+Queue a job for execution. `F` must be a callable type with no arguments.
+Behaviour is undefined if the callback is a null function pointer, a null
+`std::function`, or throws an exception.
 
 ```c++
 bool ThreadPool::poll();
