@@ -48,9 +48,9 @@ Behaviour is undefined if the callback is a null function pointer or
 move constructor, throws an exception.
 
 ```c++
-template <std::invocable F> [scope guard] on_scope_success(F&& f);
-template <std::invocable F> [scope guard] on_scope_failure(F&& f);
-template <std::invocable F> [scope guard] on_scope_exit(F&& f);
+template <std::invocable F> [scope guard] on_success(F&& f);
+template <std::invocable F> [scope guard] on_failure(F&& f);
+template <std::invocable F> [scope guard] on_exit(F&& f);
 ```
 
 These construct scope guards that will invoke their callbacks under the
