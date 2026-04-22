@@ -185,6 +185,8 @@ void test_rs_core_root_finding_bisection();
 void test_rs_core_root_finding_false_position();
 void test_rs_core_root_finding_newton_raphson();
 void test_rs_core_scope_guard();
+void test_rs_core_scope_guard_saved_container_size();
+void test_rs_core_scope_guard_saved_value();
 void test_rs_core_terminal_escape_codes();
 void test_rs_thread_pool_class();
 void test_rs_thread_pool_benchmark();
@@ -419,6 +421,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_root_finding_false_position, "test_rs_core_root_finding_false_position");
     call_me_maybe(test_rs_core_root_finding_newton_raphson, "test_rs_core_root_finding_newton_raphson");
     call_me_maybe(test_rs_core_scope_guard, "test_rs_core_scope_guard");
+    call_me_maybe(test_rs_core_scope_guard_saved_container_size, "test_rs_core_scope_guard_saved_container_size");
+    call_me_maybe(test_rs_core_scope_guard_saved_value, "test_rs_core_scope_guard_saved_value");
     call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
     call_me_maybe(test_rs_thread_pool_class, "test_rs_thread_pool_class");
     call_me_maybe(test_rs_thread_pool_benchmark, "test_rs_thread_pool_benchmark");

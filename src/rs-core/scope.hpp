@@ -3,6 +3,7 @@
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include <concepts>
+#include <cstddef>
 #include <exception>
 #include <utility>
 
@@ -62,6 +63,20 @@ namespace RS {
     template <std::invocable F>
     auto on_exit(F&& f) {
         return BasicScopeGuard<F, ScopeMode::exit>(std::forward<F>(f));
+    }
+
+    template <typename T>
+    requires requires (T& t, const T& ct) {
+        t.resize(1uz);
+        { ct.size() } -> std::convertible_to<std::size_t>;
+    }
+    inline auto guard_size(T& t) {
+        return on_failure([&t,saved=t.size()] { t.resize(saved); });
+    }
+
+    template <std::copyable T>
+    inline auto guard_value(T& t) {
+        return on_failure([&t,saved=t] { t = saved; });
     }
 
 }

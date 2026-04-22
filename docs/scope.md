@@ -43,9 +43,9 @@ functions below rather than being explicitly constructed. The callback type
 Calling `release()` cancels all destructor behaviour; the callback will never
 be invoked after release.
 
-Behaviour is undefined if the callback is a null function pointer, or if the
-callback's function call operator, or its copy or move constructor, throws an
-exception.
+Behaviour is undefined if the callback is a null function pointer or
+`std::function,` or if the callback's function call operator, or its copy or
+move constructor, throws an exception.
 
 ```c++
 template <std::invocable F> [scope guard] on_scope_success(F&& f);
@@ -55,3 +55,20 @@ template <std::invocable F> [scope guard] on_scope_exit(F&& f);
 
 These construct scope guards that will invoke their callbacks under the
 appropriate conditions.
+
+## Scope guard utilities
+
+```c++
+template <[resizeable container] T> [scope guard] guard_size(T& t);
+```
+
+Creates a scope guard that will restore the previous size of a container on
+failure. This does not attempt to preserve element values, only the number of
+elements.
+
+```c++
+template <std::copyable T> [scope guard] guard_value(T& t);
+```
+
+Creates a scope guard that will restore the previous value of a variable on
+failure.
