@@ -138,7 +138,14 @@ Rational Rational::abs() const;
 Returns the absolute value of the rational number.
 
 ```c++
-int Rational::sign() const noexcept;
+Rational Rational::inverse() const;
+```
+
+Returns the reciprocal of the rational number. Behaviour is undefined if the
+input value is zero.
+
+```c++
+T Rational::sign() const noexcept;
 ```
 
 Returns the sign of the rational number (-1 if negative, 0 if zero, +1 if

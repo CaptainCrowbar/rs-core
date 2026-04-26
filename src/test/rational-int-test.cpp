@@ -82,6 +82,7 @@ void test_rs_core_rational_int_properties() {
 
     TRY(r = 42);
     TEST_EQUAL(r.abs(),              IntRational{42});
+    TEST_EQUAL(r.inverse(),          (IntRational{1, 42}));
     TEST_EQUAL(r.sign(),             1);
     TEST_EQUAL(r.whole(),            42);
     TEST_EQUAL(r.fraction(),         IntRational{});
@@ -90,6 +91,7 @@ void test_rs_core_rational_int_properties() {
 
     TRY((r = {3, 4}));
     TEST_EQUAL(r.abs(),              (IntRational{3, 4}));
+    TEST_EQUAL(r.inverse(),          (IntRational{4, 3}));
     TEST_EQUAL(r.sign(),             1);
     TEST_EQUAL(r.whole(),            0);
     TEST_EQUAL(r.fraction(),         (IntRational{3, 4}));
@@ -98,6 +100,7 @@ void test_rs_core_rational_int_properties() {
 
     TRY((r = {9, 4}));
     TEST_EQUAL(r.abs(),              (IntRational{9, 4}));
+    TEST_EQUAL(r.inverse(),          (IntRational{4, 9}));
     TEST_EQUAL(r.sign(),             1);
     TEST_EQUAL(r.whole(),            2);
     TEST_EQUAL(r.fraction(),         (IntRational{1, 4}));
@@ -106,6 +109,7 @@ void test_rs_core_rational_int_properties() {
 
     TRY(r = -42);
     TEST_EQUAL(r.abs(),              IntRational{42});
+    TEST_EQUAL(r.inverse(),          (IntRational{-1, 42}));
     TEST_EQUAL(r.sign(),             -1);
     TEST_EQUAL(r.whole(),            -42);
     TEST_EQUAL(r.fraction(),         IntRational{});
@@ -114,6 +118,7 @@ void test_rs_core_rational_int_properties() {
 
     TRY((r = {-3, 4}));
     TEST_EQUAL(r.abs(),              (IntRational{3, 4}));
+    TEST_EQUAL(r.inverse(),          (IntRational{-4, 3}));
     TEST_EQUAL(r.sign(),             -1);
     TEST_EQUAL(r.whole(),            -1);
     TEST_EQUAL(r.fraction(),         (IntRational{1, 4}));
@@ -122,6 +127,7 @@ void test_rs_core_rational_int_properties() {
 
     TRY((r = {-9, 4}));
     TEST_EQUAL(r.abs(),              (IntRational{9, 4}));
+    TEST_EQUAL(r.inverse(),          (IntRational{-4, 9}));
     TEST_EQUAL(r.sign(),             -1);
     TEST_EQUAL(r.whole(),            -3);
     TEST_EQUAL(r.fraction(),         (IntRational{3, 4}));

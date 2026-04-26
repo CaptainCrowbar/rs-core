@@ -37,7 +37,8 @@ namespace RS {
         constexpr T num() const { return num_; }
         constexpr T den() const { return den_; }
         constexpr Rational abs() const { return num_ >= T{0} ? *this : - *this; }
-        constexpr int sign() const noexcept { return num_ > T{0} ? 1 : num_ == T{0} ? 0 : -1; }
+        constexpr Rational inverse() const { return num_ >= T{0} ? unchecked(den_, num_) : unchecked(- den_, - num_); }
+        constexpr T sign() const noexcept { return num_ > T{0} ? T{1} : num_ == T{0} ? T{0} : T{-1}; }
         constexpr T whole() const;
         constexpr Rational fraction() const;
         constexpr T truncate() const;
