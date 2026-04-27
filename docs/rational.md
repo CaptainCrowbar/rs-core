@@ -43,20 +43,20 @@ constexpr Rational::Rational();
 The default constructor sets the value to zero.
 
 ```c++
-constexpr Rational::Rational(const T& t);
+constexpr Rational::Rational(T t);
 ```
 
 Sets the rational's value to an integer.
 
 ```c++
-constexpr Rational::Rational(const T& n, const T& d);
+constexpr Rational::Rational(T n, T d);
 ```
 
 Sets the rational's value from a numerator and denominator. Behaviour is
 undefined if the denominator is zero.
 
 ```c++
-constexpr Rational::Rational(const T& i, const T& n, const T& d);
+constexpr Rational::Rational(T i, T n, T d);
 ```
 
 Sets the rational's value from a mixed fraction consisting of an integer, a
