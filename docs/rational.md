@@ -37,26 +37,26 @@ using Rational::integer_type = T;
 The underlying integer type.
 
 ```c++
-Rational::Rational();
+constexpr Rational::Rational();
 ```
 
 The default constructor sets the value to zero.
 
 ```c++
-Rational::Rational(const T& t);
+constexpr Rational::Rational(const T& t);
 ```
 
 Sets the rational's value to an integer.
 
 ```c++
-Rational::Rational(const T& n, const T& d);
+constexpr Rational::Rational(const T& n, const T& d);
 ```
 
 Sets the rational's value from a numerator and denominator. Behaviour is
 undefined if the denominator is zero.
 
 ```c++
-Rational::Rational(const T& i, const T& n, const T& d);
+constexpr Rational::Rational(const T& i, const T& n, const T& d);
 ```
 
 Sets the rational's value from a mixed fraction consisting of an integer, a
@@ -83,31 +83,31 @@ is a valid rational expression that contains values outside the range of the
 underlying integer type.
 
 ```c++
-T Rational::num() const;
-T Rational::den() const;
+constexpr T Rational::num() const;
+constexpr T Rational::den() const;
 ```
 
 These return the numerator and denominator.
 
 ```c++
-explicit Rational::operator bool() const noexcept;
-bool Rational::operator!() const noexcept;
+constexpr explicit Rational::operator bool() const noexcept;
+constexpr bool Rational::operator!() const noexcept;
 ```
 
 Boolean conversions. These follow the usual convention that any non-zero value
 is true.
 
 ```c++
-Rational Rational::operator+() const;
-Rational Rational::operator-() const;
-Rational& Rational::operator+=(const Rational& y);
-Rational& Rational::operator-=(const Rational& y);
-Rational& Rational::operator*=(const Rational& y);
-Rational& Rational::operator/=(const Rational& y);
-Rational operator+(const Rational& x, const Rational& y);
-Rational operator-(const Rational& x, const Rational& y);
-Rational operator*(const Rational& x, const Rational& y);
-Rational operator/(const Rational& x, const Rational& y);
+constexpr Rational Rational::operator+() const;
+constexpr Rational Rational::operator-() const;
+constexpr Rational& Rational::operator+=(const Rational& y);
+constexpr Rational& Rational::operator-=(const Rational& y);
+constexpr Rational& Rational::operator*=(const Rational& y);
+constexpr Rational& Rational::operator/=(const Rational& y);
+constexpr Rational operator+(const Rational& x, const Rational& y);
+constexpr Rational operator-(const Rational& x, const Rational& y);
+constexpr Rational operator*(const Rational& x, const Rational& y);
+constexpr Rational operator/(const Rational& x, const Rational& y);
 ```
 
 Arithmetic operators. These all have their usual meanings. Behaviour is
@@ -118,13 +118,14 @@ between `Rational` and `T,` and between `Rational` and any primitive signed
 integer type convertible to `T.`
 
 ```c++
-bool operator==(const Rational& x, const Rational& y) noexcept;
-bool operator!=(const Rational& x, const Rational& y) noexcept;
-bool operator<(const Rational& x, const Rational& y) noexcept;
-bool operator>(const Rational& x, const Rational& y) noexcept;
-bool operator<=(const Rational& x, const Rational& y) noexcept;
-bool operator>=(const Rational& x, const Rational& y) noexcept;
-std::strong_ordering operator<=>(const Rational& x, const Rational& y) noexcept;
+constexpr bool operator==(const Rational& x, const Rational& y) noexcept;
+constexpr bool operator!=(const Rational& x, const Rational& y) noexcept;
+constexpr bool operator<(const Rational& x, const Rational& y) noexcept;
+constexpr bool operator>(const Rational& x, const Rational& y) noexcept;
+constexpr bool operator<=(const Rational& x, const Rational& y) noexcept;
+constexpr bool operator>=(const Rational& x, const Rational& y) noexcept;
+constexpr std::strong_ordering operator<=>(const Rational& x,
+    const Rational& y) noexcept;
 ```
 
 Comparison operators. Corresponding operators are also defined for comparisons
@@ -132,28 +133,28 @@ between `Rational` and `T,` and between `Rational` and any primitive signed
 integer type convertible to `T.`
 
 ```c++
-Rational Rational::abs() const;
+constexpr Rational Rational::abs() const;
 ```
 
 Returns the absolute value of the rational number.
 
 ```c++
-Rational Rational::inverse() const;
+constexpr Rational Rational::inverse() const;
 ```
 
 Returns the reciprocal of the rational number. Behaviour is undefined if the
 input value is zero.
 
 ```c++
-T Rational::sign() const noexcept;
+constexpr T Rational::sign() const noexcept;
 ```
 
 Returns the sign of the rational number (-1 if negative, 0 if zero, +1 if
 positive).
 
 ```c++
-T Rational::whole() const;
-Rational Rational::fraction() const;
+constexpr T Rational::whole() const;
+constexpr Rational Rational::fraction() const;
 ```
 
 These split a rational into a whole and fractional part. The whole part is
@@ -161,8 +162,8 @@ rounded toward negative infinity; if the original value is not an integer,
 the fractional part will always be positive.
 
 ```c++
-T Rational::truncate() const;
-Rational Rational::signed_fraction() const;
+constexpr T Rational::truncate() const;
+constexpr Rational Rational::signed_fraction() const;
 ```
 
 These also split a rational into a whole and fractional part, but with
@@ -170,7 +171,7 @@ truncation toward zero. If the original value is not an integer, the
 fractional part will have the same sign as the original rational number.
 
 ```c++
-std::size_t Rational::hash() const noexcept;
+constexpr std::size_t Rational::hash() const noexcept;
 ```
 
 Hash function.
