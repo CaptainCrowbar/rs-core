@@ -185,6 +185,12 @@ Format a rational number as a string, either as a simple fraction or a mixed
 fraction (both will return a single number if the value is an integer).
 
 ```c++
+template <FloatingPoint U> U Rational::to_floating() const;
+```
+
+Convert a rational number to floating point (possibly an approximation).
+
+```c++
 static std::optional<Rational> Rational::parse(std::string_view str);
 ```
 

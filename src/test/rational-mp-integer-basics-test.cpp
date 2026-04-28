@@ -164,3 +164,15 @@ void test_rs_core_rational_mp_integer_comparison() {
     TRY((x = {-5, 3}));  z = -2;                TEST(x != z);  TEST(x > z);   TEST(x >= z);
 
 }
+
+void test_rs_core_rational_mp_integer_conversion() {
+
+    MPRational r;
+    double d;
+
+    /**/                  TRY(d = r.to_floating<double>());  TEST_EQUAL(d, 0);
+    TRY((r = {1, 2}));    TRY(d = r.to_floating<double>());  TEST_EQUAL(d, 0.5);
+    TRY((r = {11, 5}));   TRY(d = r.to_floating<double>());  TEST_NEAR(d, 2.2, 1e-10);
+    TRY((r = {-11, 5}));  TRY(d = r.to_floating<double>());  TEST_NEAR(d, -2.2, 1e-10);
+
+}

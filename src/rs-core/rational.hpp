@@ -46,6 +46,7 @@ namespace RS {
         constexpr std::size_t hash() const noexcept { std::hash<T> ht; return hash_mix(ht(num_), ht(den_)); }
         std::string mixed() const;
         std::string to_string() const;
+        template <FloatingPoint U> U to_floating() const;
 
         constexpr explicit operator bool() const noexcept { return num_ != T{0}; }
         constexpr bool operator!() const noexcept { return num_ == T{0}; }
@@ -170,6 +171,14 @@ namespace RS {
         } else {
             return std::format("{}/{}", num_, den_);
         }
+    }
+
+    template <SignedIntegral T>
+    template <FloatingPoint U>
+    U Rational<T>::to_floating() const {
+        auto n = static_cast<U>(num_);
+        auto d = static_cast<U>(den_);
+        return n / d;
     }
 
     template <SignedIntegral T>

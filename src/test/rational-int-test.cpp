@@ -403,6 +403,18 @@ void test_rs_core_rational_int_comparison() {
 
 }
 
+void test_rs_core_rational_int_conversion() {
+
+    IntRational r;
+    double d;
+
+    /**/                  TRY(d = r.to_floating<double>());  TEST_EQUAL(d, 0);
+    TRY((r = {1, 2}));    TRY(d = r.to_floating<double>());  TEST_EQUAL(d, 0.5);
+    TRY((r = {11, 5}));   TRY(d = r.to_floating<double>());  TEST_NEAR(d, 2.2, 1e-10);
+    TRY((r = {-11, 5}));  TRY(d = r.to_floating<double>());  TEST_NEAR(d, -2.2, 1e-10);
+
+}
+
 void test_rs_core_rational_int_formatting() {
 
     IntRational r;
