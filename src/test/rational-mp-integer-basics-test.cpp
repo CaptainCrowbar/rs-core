@@ -74,60 +74,112 @@ void test_rs_core_rational_mp_integer_properties() {
 
     MPRational r;
 
-    TEST_EQUAL(r.abs(),              MPRational{});
-    TEST_EQUAL(r.sign(),             0);
-    TEST_EQUAL(r.whole(),            0);
-    TEST_EQUAL(r.fraction(),         MPRational{});
-    TEST_EQUAL(r.truncate(),         0);
-    TEST_EQUAL(r.signed_fraction(),  MPRational{});
+    TEST_EQUAL(r.abs(),                  MPRational{});
+    TEST_EQUAL(r.sign(),                 0);
+    TEST_EQUAL(r.whole(),                0);
+    TEST_EQUAL(r.fraction(),             MPRational{});
+    TEST_EQUAL(r.truncate(),             0);
+    TEST_EQUAL(r.signed_fraction(),      MPRational{});
+    TEST_EQUAL(r.round_td(),             0);
+    TEST_EQUAL(r.round_tt(),             0);
+    TEST_EQUAL(r.round_tu(),             0);
+    TEST_EQUAL(r.to_floating<double>(),  0);
 
     TRY(r = 42);
-    TEST_EQUAL(r.abs(),              MPRational{42});
-    TEST_EQUAL(r.sign(),             1);
-    TEST_EQUAL(r.whole(),            42);
-    TEST_EQUAL(r.fraction(),         MPRational{});
-    TEST_EQUAL(r.truncate(),         42);
-    TEST_EQUAL(r.signed_fraction(),  MPRational{});
+    TEST_EQUAL(r.abs(),                  MPRational{42});
+    TEST_EQUAL(r.sign(),                 1);
+    TEST_EQUAL(r.whole(),                42);
+    TEST_EQUAL(r.fraction(),             MPRational{});
+    TEST_EQUAL(r.truncate(),             42);
+    TEST_EQUAL(r.signed_fraction(),      MPRational{});
+    TEST_EQUAL(r.round_td(),             42);
+    TEST_EQUAL(r.round_tt(),             42);
+    TEST_EQUAL(r.round_tu(),             42);
+    TEST_EQUAL(r.to_floating<double>(),  42);
+
+    TRY((r = {3, 2}));
+    TEST_EQUAL(r.abs(),                  (MPRational{3, 2}));
+    TEST_EQUAL(r.sign(),                 1);
+    TEST_EQUAL(r.whole(),                1);
+    TEST_EQUAL(r.fraction(),             (MPRational{1, 2}));
+    TEST_EQUAL(r.truncate(),             1);
+    TEST_EQUAL(r.signed_fraction(),      (MPRational{1, 2}));
+    TEST_EQUAL(r.round_td(),             1);
+    TEST_EQUAL(r.round_tt(),             1);
+    TEST_EQUAL(r.round_tu(),             2);
+    TEST_EQUAL(r.to_floating<double>(),  1.5);
 
     TRY((r = {3, 4}));
-    TEST_EQUAL(r.abs(),              (MPRational{3, 4}));
-    TEST_EQUAL(r.sign(),             1);
-    TEST_EQUAL(r.whole(),            0);
-    TEST_EQUAL(r.fraction(),         (MPRational{3, 4}));
-    TEST_EQUAL(r.truncate(),         0);
-    TEST_EQUAL(r.signed_fraction(),  (MPRational{3, 4}));
+    TEST_EQUAL(r.abs(),                  (MPRational{3, 4}));
+    TEST_EQUAL(r.sign(),                 1);
+    TEST_EQUAL(r.whole(),                0);
+    TEST_EQUAL(r.fraction(),             (MPRational{3, 4}));
+    TEST_EQUAL(r.truncate(),             0);
+    TEST_EQUAL(r.signed_fraction(),      (MPRational{3, 4}));
+    TEST_EQUAL(r.round_td(),             1);
+    TEST_EQUAL(r.round_tt(),             1);
+    TEST_EQUAL(r.round_tu(),             1);
+    TEST_EQUAL(r.to_floating<double>(),  0.75);
 
     TRY((r = {9, 4}));
-    TEST_EQUAL(r.abs(),              (MPRational{9, 4}));
-    TEST_EQUAL(r.sign(),             1);
-    TEST_EQUAL(r.whole(),            2);
-    TEST_EQUAL(r.fraction(),         (MPRational{1, 4}));
-    TEST_EQUAL(r.truncate(),         2);
-    TEST_EQUAL(r.signed_fraction(),  (MPRational{1, 4}));
+    TEST_EQUAL(r.abs(),                  (MPRational{9, 4}));
+    TEST_EQUAL(r.sign(),                 1);
+    TEST_EQUAL(r.whole(),                2);
+    TEST_EQUAL(r.fraction(),             (MPRational{1, 4}));
+    TEST_EQUAL(r.truncate(),             2);
+    TEST_EQUAL(r.signed_fraction(),      (MPRational{1, 4}));
+    TEST_EQUAL(r.round_td(),             2);
+    TEST_EQUAL(r.round_tt(),             2);
+    TEST_EQUAL(r.round_tu(),             2);
+    TEST_EQUAL(r.to_floating<double>(),  2.25);
 
     TRY(r = -42);
-    TEST_EQUAL(r.abs(),              MPRational{42});
-    TEST_EQUAL(r.sign(),             -1);
-    TEST_EQUAL(r.whole(),            -42);
-    TEST_EQUAL(r.fraction(),         MPRational{});
-    TEST_EQUAL(r.truncate(),         -42);
-    TEST_EQUAL(r.signed_fraction(),  MPRational{});
+    TEST_EQUAL(r.abs(),                  MPRational{42});
+    TEST_EQUAL(r.sign(),                 -1);
+    TEST_EQUAL(r.whole(),                -42);
+    TEST_EQUAL(r.fraction(),             MPRational{});
+    TEST_EQUAL(r.truncate(),             -42);
+    TEST_EQUAL(r.signed_fraction(),      MPRational{});
+    TEST_EQUAL(r.round_td(),             -42);
+    TEST_EQUAL(r.round_tt(),             -42);
+    TEST_EQUAL(r.round_tu(),             -42);
+    TEST_EQUAL(r.to_floating<double>(),  -42);
+
+    TRY((r = {-3, 2}));
+    TEST_EQUAL(r.abs(),                  (MPRational{3, 2}));
+    TEST_EQUAL(r.sign(),                 -1);
+    TEST_EQUAL(r.whole(),                -2);
+    TEST_EQUAL(r.fraction(),             (MPRational{1, 2}));
+    TEST_EQUAL(r.truncate(),             -1);
+    TEST_EQUAL(r.signed_fraction(),      (MPRational{-1, 2}));
+    TEST_EQUAL(r.round_td(),             -2);
+    TEST_EQUAL(r.round_tt(),             -1);
+    TEST_EQUAL(r.round_tu(),             -1);
+    TEST_EQUAL(r.to_floating<double>(),  -1.5);
 
     TRY((r = {-3, 4}));
-    TEST_EQUAL(r.abs(),              (MPRational{3, 4}));
-    TEST_EQUAL(r.sign(),             -1);
-    TEST_EQUAL(r.whole(),            -1);
-    TEST_EQUAL(r.fraction(),         (MPRational{1, 4}));
-    TEST_EQUAL(r.truncate(),         0);
-    TEST_EQUAL(r.signed_fraction(),  (MPRational{-3, 4}));
+    TEST_EQUAL(r.abs(),                  (MPRational{3, 4}));
+    TEST_EQUAL(r.sign(),                 -1);
+    TEST_EQUAL(r.whole(),                -1);
+    TEST_EQUAL(r.fraction(),             (MPRational{1, 4}));
+    TEST_EQUAL(r.truncate(),             0);
+    TEST_EQUAL(r.signed_fraction(),      (MPRational{-3, 4}));
+    TEST_EQUAL(r.round_td(),             -1);
+    TEST_EQUAL(r.round_tt(),             -1);
+    TEST_EQUAL(r.round_tu(),             -1);
+    TEST_EQUAL(r.to_floating<double>(),  -0.75);
 
     TRY((r = {-9, 4}));
-    TEST_EQUAL(r.abs(),              (MPRational{9, 4}));
-    TEST_EQUAL(r.sign(),             -1);
-    TEST_EQUAL(r.whole(),            -3);
-    TEST_EQUAL(r.fraction(),         (MPRational{3, 4}));
-    TEST_EQUAL(r.truncate(),         -2);
-    TEST_EQUAL(r.signed_fraction(),  (MPRational{-1, 4}));
+    TEST_EQUAL(r.abs(),                  (MPRational{9, 4}));
+    TEST_EQUAL(r.sign(),                 -1);
+    TEST_EQUAL(r.whole(),                -3);
+    TEST_EQUAL(r.fraction(),             (MPRational{3, 4}));
+    TEST_EQUAL(r.truncate(),             -2);
+    TEST_EQUAL(r.signed_fraction(),      (MPRational{-1, 4}));
+    TEST_EQUAL(r.round_td(),             -2);
+    TEST_EQUAL(r.round_tt(),             -2);
+    TEST_EQUAL(r.round_tu(),             -2);
+    TEST_EQUAL(r.to_floating<double>(),  -2.25);
 
 }
 
@@ -162,17 +214,5 @@ void test_rs_core_rational_mp_integer_comparison() {
     TRY((x = {-5, 3}));  z = 0;                 TEST(x != z);  TEST(x < z);   TEST(x <= z);
     TRY((x = {-5, 3}));  z = -1;                TEST(x != z);  TEST(x < z);   TEST(x <= z);
     TRY((x = {-5, 3}));  z = -2;                TEST(x != z);  TEST(x > z);   TEST(x >= z);
-
-}
-
-void test_rs_core_rational_mp_integer_conversion() {
-
-    MPRational r;
-    double d;
-
-    /**/                  TRY(d = r.to_floating<double>());  TEST_EQUAL(d, 0);
-    TRY((r = {1, 2}));    TRY(d = r.to_floating<double>());  TEST_EQUAL(d, 0.5);
-    TRY((r = {11, 5}));   TRY(d = r.to_floating<double>());  TEST_NEAR(d, 2.2, 1e-10);
-    TRY((r = {-11, 5}));  TRY(d = r.to_floating<double>());  TEST_NEAR(d, -2.2, 1e-10);
 
 }

@@ -43,6 +43,9 @@ namespace RS {
         constexpr Rational fraction() const;
         constexpr T truncate() const;
         constexpr Rational signed_fraction() const;
+        constexpr T round_td() const;
+        constexpr T round_tt() const;
+        constexpr T round_tu() const;
         constexpr std::size_t hash() const noexcept { std::hash<T> ht; return hash_mix(ht(num_), ht(den_)); }
         std::string mixed() const;
         std::string to_string() const;
@@ -130,6 +133,37 @@ namespace RS {
             rem = - rem;
         }
         return {rem, den_};
+    }
+
+    template <SignedIntegral T>
+    constexpr T Rational<T>::round_td() const {
+        static const Rational half {T{1}, T{2}};
+        auto w = whole();
+        auto f = fraction();
+        if (f > half) {
+            w += T{1};
+        }
+        return w;
+    }
+
+    template <SignedIntegral T>
+    constexpr T Rational<T>::round_tt() const {
+        if (sign() >= T{0}) {
+            return round_td();
+        } else {
+            return round_tu();
+        }
+    }
+
+    template <SignedIntegral T>
+    constexpr T Rational<T>::round_tu() const {
+        static const Rational half {T{1}, T{2}};
+        auto w = whole();
+        auto f = fraction();
+        if (f >= half) {
+            w += T{1};
+        }
+        return w;
     }
 
     template <SignedIntegral T>

@@ -171,6 +171,17 @@ truncation toward zero. If the original value is not an integer, the
 fractional part will have the same sign as the original rational number.
 
 ```c++
+constexpr T Rational::round_td() const;
+constexpr T Rational::round_tt() const;
+constexpr T Rational::round_tu() const;
+```
+
+Round a rational value to the nearest integer. The three functions apply
+different tie breaker rules: `round_td()` rounds halves down (toward negative
+infinity), `round_tt()` rounds halves by truncation (toward zero), and
+`round_tu()` rounds halves up (toward positive infinity).
+
+```c++
 constexpr std::size_t Rational::hash() const noexcept;
 ```
 
