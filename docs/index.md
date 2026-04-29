@@ -31,15 +31,18 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/terminal.hpp` -- Terminal control](terminal.html)
 * Mathematical utilities
     * [`rs-core/arithmetic.hpp` -- Arithmetic types and functions](arithmetic.html)
-    * [`rs-core/astronomy.hpp` -- Astronomical constants and functions](astronomy.html)
     * [`rs-core/bitwise-integer.hpp` -- Fixed size unsigned integers](bitwise-integer.html)
-    * [`rs-core/constants.hpp` -- Physical constants](constants.html)
     * [`rs-core/interpolate.hpp` -- Numerical interpolation](interpolate.html)
     * [`rs-core/linear-algebra.hpp` -- Linear algebra](linear-algebra.html)
     * [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
-    * [`rs-core/random.hpp` -- Random number generators](random.html)
     * [`rs-core/rational.hpp` -- Rational numbers](rational.html)
     * [`rs-core/root-finding.hpp` -- Root finding](root-finding.html)
+* Random number utilities
+    * [`rs-core/dice.hpp` -- Dice](dice.html)
+    * [`rs-core/random.hpp` -- Random number generators](random.html)
+* Scientific utilities
+    * [`rs-core/astronomy.hpp` -- Astronomical constants and functions](astronomy.html)
+    * [`rs-core/constants.hpp` -- Physical constants](constants.html)
 * Text utilities
     * [`rs-core/character.hpp` -- Character functions](character.html)
     * [`rs-core/format.hpp` -- Formatting and parsing](format.html)

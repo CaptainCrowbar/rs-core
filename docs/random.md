@@ -189,42 +189,6 @@ This uses
 _TODO: The current implementation exhibits undefined behaviour if the output
 range is larger than that of a 64-bit unsigned integer._
 
-### Dice roll distribution
-
-```c++
-template <Integral T>
-class Dice {
-    using result_type = T;
-    constexpr Dice() noexcept;
-    constexpr explicit Dice(T number, T faces = 6) noexcept;
-    template <std::uniform_random_bit_generator RNG>
-        constexpr T operator()(RNG& rng) const;
-    constexpr T min() const noexcept;
-    constexpr T max() const noexcept;
-    constexpr T number() const noexcept;
-    constexpr T faces() const noexcept;
-    constexpr double mean() const noexcept;
-    double sd() const noexcept;
-    double pdf(T x) const;
-    double cdf(T x) const;
-    double ccdf(T x) const;
-};
-
-template <Integral T> class std::formatter<Dice<T>>;
-```
-
-Generates the result of rolling `number` dice (default 1), each numbered from
-1 to `faces` (default 6). Behaviour is undefined if `number<0, faces<1,` or
-the maximum possible value is out of range for the return type.
-
-The `pdf(), cdf(),` and `ccdf()` functions calculate the probability density
-function, cumulative density function, and complementary cumulative density
-function. These correspond respectively to the probability of generating a
-result exactly equal to `x,` less than or equal to `x,` and greater than or
-equal to `x.`
-
-The formatter returns conventional dice notation, e.g. `"3d6"`.
-
 ### Uniform floating point distribution
 
 ```c++

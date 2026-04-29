@@ -15,7 +15,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <format>
 #include <initializer_list>
 #include <iterator>
 #include <limits>
@@ -23,7 +22,6 @@
 #include <numbers>
 #include <random>
 #include <ranges>
-#include <string>
 #include <type_traits>
 #include <vector>
 
@@ -291,144 +289,6 @@ namespace RS {
         template <std::uniform_random_bit_generator RNG>
         constexpr bool BernoulliDistribution::operator()(RNG& rng) const {
             return dist_(rng) < threshold_;
-        }
-
-    // Dice roll distribution
-
-    template <Integral T>
-    class Dice {
-
-    public:
-
-        using result_type = T;
-
-        constexpr Dice() noexcept: Dice{T{1}, T{6}} {}
-        constexpr explicit Dice(T number, T faces = T{6}) noexcept: number_(number), single_(T{1}, faces) {}
-
-        template <std::uniform_random_bit_generator RNG> constexpr T operator()(RNG& rng) const;
-
-        constexpr T min() const noexcept { return number_; }
-        constexpr T max() const noexcept { return number_ * single_.max(); }
-        constexpr T number() const noexcept { return number_; }
-        constexpr T faces() const noexcept { return single_.max(); }
-        constexpr double mean() const noexcept;
-        double sd() const noexcept;
-
-        double pdf(T x) const;
-        double cdf(T x) const;
-        double ccdf(T x) const;
-
-    private:
-
-        T number_;
-        UniformInteger<T> single_;
-
-    };
-
-        template <Integral T>
-        template <std::uniform_random_bit_generator RNG>
-        constexpr T Dice<T>::operator()(RNG& rng) const {
-            auto sum = T{0};
-            for (auto i = T{0}; i < number_; ++i) {
-                sum += single_(rng);
-            }
-            return sum;
-        }
-
-        template <Integral T>
-        constexpr double Dice<T>::mean() const noexcept {
-            auto n = static_cast<double>(number_);
-            auto f = static_cast<double>(single_.max());
-            return 0.5 * n * (f + 1.0);
-        }
-
-        template <Integral T>
-        double Dice<T>::sd() const noexcept {
-            auto n = static_cast<double>(number_);
-            auto f = static_cast<double>(single_.max());
-            return std::sqrt(n * (f * f - 1.0) / 12.0);
-        }
-
-        template <Integral T>
-        double Dice<T>::pdf(T x) const {
-
-            auto n = number();
-            auto f = faces();
-
-            if (x < n || x > n * f) {
-                return 0.0;
-            }
-
-            auto sum = 0.0;
-            auto sign = 1.0;
-
-            for (auto i: std::views::iota(T{0}, n)) {
-                auto a = binomial(n, i);
-                auto b = binomial(x - f * i - T{1}, n - T{1});
-                sum += sign * a * b;
-                sign = - sign;
-            }
-
-            auto divisor = std::pow(static_cast<double>(f), static_cast<double>(n));
-
-            return sum / divisor;
-
-        }
-
-        template <Integral T>
-        double Dice<T>::cdf(T x) const {
-
-            auto n = number();
-            auto f = faces();
-
-            if (x < n) {
-                return 0.0;
-            } else if (x >= n * f) {
-                return 1.0;
-            }
-
-            auto sum = 0.0;
-            auto sign = 1.0;
-
-            for (auto i: std::views::iota(T{0}, n)) {
-                auto a = binomial(n, i);
-                auto b = binomial(x - f * i, n);
-                sum += sign * a * b;
-                sign = - sign;
-            }
-
-            auto divisor = std::pow(static_cast<double>(f), static_cast<double>(n));
-
-            return sum / divisor;
-
-        }
-
-        template <Integral T>
-        double Dice<T>::ccdf(T x) const {
-
-            auto n = number();
-            auto f = faces();
-
-            if (x <= n) {
-                return 1.0;
-            } else if (x > n * f) {
-                return 0.0;
-            }
-
-            auto sum = 0.0;
-            auto sign = 1.0;
-
-            for (auto i: std::views::iota(T{0}, n)) {
-                auto a = binomial(n, i);
-                auto b = binomial(f * (n - i) + n - x, n);
-                sum += sign * a * b;
-                sign = - sign;
-            }
-
-            auto divisor = std::pow(static_cast<double>(f), static_cast<double>(n));
-
-            return sum / divisor;
-
         }
 
     // Uniform floating point distribution
@@ -1047,15 +907,3 @@ namespace RS {
 
 
 }
-
-template <RS::Integral T>
-struct std::formatter<RS::Dice<T>>:
-RS::CommonFormatter {
-
-    template <typename FormatContext>
-    auto format(const RS::Dice<T>& d, FormatContext& ctx) const {
-        auto s = std::to_string(d.number()) + 'd' + std::to_string(d.faces());
-        return write_out(s, ctx.out());
-    }
-
-};

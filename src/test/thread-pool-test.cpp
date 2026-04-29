@@ -35,7 +35,7 @@ namespace {
 
 }
 
-void test_rs_thread_pool_class() {
+void test_rs_core_thread_pool_class() {
 
     ThreadPool pool;
     std::string log;
@@ -78,7 +78,7 @@ void test_rs_thread_pool_class() {
 
 }
 
-void test_rs_thread_pool_benchmark() {
+void test_rs_core_thread_pool_benchmark() {
 
     static constexpr int iterations = 1'000'000;
 
