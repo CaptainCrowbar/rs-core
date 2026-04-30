@@ -206,16 +206,16 @@ Flt DiceState::probability() const;
 Returns the probability of the current state.
 
 ```c++
-[range type] asc() const;
-[range type] desc() const;
+[range type] DiceState::asc() const;
+[range type] DiceState::desc() const;
 ```
 
 These ranges iterate over the individual results, in ascending or descending
 order.
 
 ```c++
-[range type] asc_groups() const;
-[range type] desc_groups() const;
+[range type] DiceState::asc_groups() const;
+[range type] DiceState::desc_groups() const;
 ```
 
 These ranges iterate over the grouped results, in ascending or descending
