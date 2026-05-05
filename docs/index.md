@@ -37,6 +37,7 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/mp-integer.hpp` -- Multiple precision integers](mp-integer.html)
     * [`rs-core/rational.hpp` -- Rational numbers](rational.html)
     * [`rs-core/root-finding.hpp` -- Root finding](root-finding.html)
+    * [`rs-core/statistics.hpp` -- Statistics](statistics.html)
 * Random number utilities
     * [`rs-core/dice.hpp` -- Dice](dice.html)
     * [`rs-core/random.hpp` -- Random number generators](random.html)
