@@ -163,6 +163,8 @@ void test_rs_core_random_weighted_choice_floating_point();
 void test_rs_core_random_weighted_choice_mp_integer();
 void test_rs_core_random_engine_concepts();
 void test_rs_core_random_distribution_concepts();
+void test_rs_core_random_lcg_8();
+void test_rs_core_random_lcg_16();
 void test_rs_core_random_lcg_32();
 void test_rs_core_random_lcg_64();
 void test_rs_core_random_lcg_128();
@@ -417,6 +419,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_weighted_choice_mp_integer, "test_rs_core_random_weighted_choice_mp_integer");
     call_me_maybe(test_rs_core_random_engine_concepts, "test_rs_core_random_engine_concepts");
     call_me_maybe(test_rs_core_random_distribution_concepts, "test_rs_core_random_distribution_concepts");
+    call_me_maybe(test_rs_core_random_lcg_8, "test_rs_core_random_lcg_8");
+    call_me_maybe(test_rs_core_random_lcg_16, "test_rs_core_random_lcg_16");
     call_me_maybe(test_rs_core_random_lcg_32, "test_rs_core_random_lcg_32");
     call_me_maybe(test_rs_core_random_lcg_64, "test_rs_core_random_lcg_64");
     call_me_maybe(test_rs_core_random_lcg_128, "test_rs_core_random_lcg_128");

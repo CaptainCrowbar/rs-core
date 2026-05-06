@@ -60,15 +60,19 @@ concept here just checks the distribution against several standard engines.
 ### Linear congruential engines
 
 ```c++
+constexpr std::uint8_t lcg8(std::uint8_t x) noexcept;
+constexpr std::uint16_t lcg16(std::uint16_t x) noexcept;
 constexpr std::uint32_t lcg32(std::uint32_t x) noexcept;
 constexpr std::uint64_t lcg64(std::uint64_t x) noexcept;
 constexpr uint128_t lcg128(uint128_t x) noexcept;
 ```
 
-Good LCG transformations for 32, 64, and 128 bit integers, based on Pierre L'Ecuyer (1999),
+Good LCG transformations for integers of various sizes, partly based on Pierre L'Ecuyer (1999),
 ["Tables of Linear Congruential Generators of Different Sizes and Good Lattice Structure"](http://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf).
 
 ```c++
+class Lcg8;    // RT = std::uint8_t
+class Lcg16;   // RT = std::uint16_t
 class Lcg32;   // RT = std::uint32_t
 class Lcg64;   // RT = std::uint64_t
 class Lcg128;  // RT = uint128_t

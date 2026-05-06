@@ -27,9 +27,21 @@
 
 namespace RS {
 
-    // Good LCG transformations for 32 and 64 bit integers
+    // Good LCG transformations
     // Pierre L'Ecuyer (1999), "Tables of Linear Congruential Generators of Different Sizes and Good Lattice Structure"
     // http://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf
+
+    constexpr std::uint8_t lcg8(std::uint8_t x) noexcept {
+        constexpr std::uint8_t m = 117;
+        constexpr std::uint8_t c = 79;
+        return m * x + c;
+    }
+
+    constexpr std::uint16_t lcg16(std::uint16_t x) noexcept {
+        constexpr std::uint16_t m = 6169;
+        constexpr std::uint16_t c = 20249;
+        return m * x + c;
+    }
 
     constexpr std::uint32_t lcg32(std::uint32_t x) noexcept {
         constexpr std::uint32_t m = 32'310'901ul;
@@ -63,6 +75,22 @@ namespace RS {
         constexpr U get_state() const noexcept { return state_; }
     private:
         U state_ = 0;
+    };
+
+    class Lcg8:
+    public LcgBase<std::uint8_t> {
+    public:
+        constexpr Lcg8() noexcept = default;
+        constexpr explicit Lcg8(std::uint8_t s) noexcept: LcgBase<std::uint8_t>{s} {}
+        constexpr std::uint8_t operator()() noexcept { seed(lcg8(get_state())); return get_state(); }
+    };
+
+    class Lcg16:
+    public LcgBase<std::uint16_t> {
+    public:
+        constexpr Lcg16() noexcept = default;
+        constexpr explicit Lcg16(std::uint16_t s) noexcept: LcgBase<std::uint16_t>{s} {}
+        constexpr std::uint16_t operator()() noexcept { seed(lcg16(get_state())); return get_state(); }
     };
 
     class Lcg32:
