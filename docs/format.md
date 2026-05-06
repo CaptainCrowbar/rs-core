@@ -103,7 +103,7 @@ formats, the case has no effect.
 For `F/f` format, the precision indicates how many decimal places to display.
 For the other formats, the precision indicates how many significant digits to
 display, with a minimum of 1 (note that, for `E/e` format, this behaviour
-differs from `std::printf()`).
+differs from `std::format()`).
 
 ## Roman numerals
 
