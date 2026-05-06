@@ -783,6 +783,10 @@ namespace RS {
 
     constexpr auto max128 = ~ uint128_t{0};
 
+    constexpr uint128_t make_uint128(std::uint64_t hi, std::uint64_t lo) noexcept {
+        return (uint128_t{hi} << 64) + uint128_t{lo};
+    }
+
     namespace Literals {
 
         inline Uint128 operator""_u128(const char* ptr) { return Uint128{std::string_view{ptr}}; }

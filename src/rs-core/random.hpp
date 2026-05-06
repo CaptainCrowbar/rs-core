@@ -27,6 +27,71 @@
 
 namespace RS {
 
+    // Good LCG transformations for 32 and 64 bit integers
+    // Pierre L'Ecuyer (1999), "Tables of Linear Congruential Generators of Different Sizes and Good Lattice Structure"
+    // http://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf
+
+    constexpr std::uint32_t lcg32(std::uint32_t x) noexcept {
+        constexpr std::uint32_t m = 32'310'901ul;
+        constexpr std::uint32_t c = 850'757'001ul;
+        return m * x + c;
+    }
+
+    constexpr std::uint64_t lcg64(std::uint64_t x) noexcept {
+        constexpr std::uint64_t m = 3'935'559'000'370'003'845ull;
+        constexpr std::uint64_t c = 8'831'144'850'135'198'739ull;
+        return m * x + c;
+    }
+
+    constexpr uint128_t lcg128(uint128_t x) noexcept {
+        constexpr auto m = make_uint128(0x2360'ed05'1fc6'5da4ull, 0x4385'df64'9fcc'f645ull);
+        constexpr auto c = make_uint128(0x55bf'e625'0318'f820ull, 0xe2d4'afe5'108d'a1e3ull);
+        return m * x + c;
+    }
+
+    template <UnsignedIntegral U>
+    class LcgBase {
+    public:
+        using result_type = U;
+        constexpr bool operator==(const LcgBase& rhs) const = default;
+        constexpr void seed(U s) noexcept { state_ = s; }
+        constexpr static U min() noexcept { return 0; }
+        constexpr static U max() noexcept { return ~ U(0); }
+    protected:
+        constexpr LcgBase() noexcept = default;
+        constexpr explicit LcgBase(U s) noexcept: state_(s) {}
+        constexpr U get_state() const noexcept { return state_; }
+    private:
+        U state_ = 0;
+    };
+
+    class Lcg32:
+    public LcgBase<std::uint32_t> {
+    public:
+        constexpr Lcg32() noexcept = default;
+        constexpr explicit Lcg32(std::uint32_t s) noexcept: LcgBase<std::uint32_t>{s} {}
+        constexpr std::uint32_t operator()() noexcept { seed(lcg32(get_state())); return get_state(); }
+    };
+
+    class Lcg64:
+    public LcgBase<std::uint64_t> {
+    public:
+        constexpr Lcg64() noexcept = default;
+        constexpr explicit Lcg64(std::uint64_t s) noexcept: LcgBase<std::uint64_t>(s) {}
+        std::uint64_t constexpr operator()() noexcept { seed(lcg64(get_state())); return get_state(); }
+    };
+
+    class Lcg128:
+    public LcgBase<uint128_t> {
+    public:
+        constexpr Lcg128() noexcept = default;
+        constexpr explicit Lcg128(uint128_t s) noexcept: LcgBase<uint128_t>(s) {}
+        constexpr explicit Lcg128(std::uint64_t s1, std::uint64_t s2) noexcept: LcgBase<uint128_t>{make_uint128(s1, s2)} {}
+        uint128_t constexpr operator()() noexcept { seed(lcg128(get_state())); return get_state(); }
+        void constexpr seed(uint128_t s) noexcept { LcgBase<uint128_t>::seed(s); }
+        void constexpr seed(std::uint64_t s1, std::uint64_t s2) noexcept { seed(make_uint128(s1, s2)); }
+    };
+
     // PCG64-DXSM algorithm by Melissa O'Neill and Tony Finch
     // http://www.pcg-random.org/
     // https://dotat.at/@/2023-06-21-pcg64-dxsm.html
@@ -57,7 +122,7 @@ namespace RS {
 
     private:
 
-        static constexpr std::uint64_t default_seed = 0xcafe'f00d'd15e'a5e5ull;
+        constexpr static std::uint64_t default_seed = 0xcafe'f00d'd15e'a5e5ull;
 
         uint128_t state_;
         uint128_t delta_;
@@ -65,7 +130,7 @@ namespace RS {
     };
 
         constexpr std::uint64_t Pcg::operator()() noexcept {
-            static constexpr std::uint64_t k = 0xda94'2042'e4dd'58b5ull;
+            constexpr static std::uint64_t k = 0xda94'2042'e4dd'58b5ull;
             auto u = state_;
             state_ = u * k + delta_;
             auto x = static_cast<std::uint64_t>(u >> 64);
@@ -147,10 +212,10 @@ namespace RS {
         template <std::uniform_random_bit_generator RNG, std::unsigned_integral T>
         constexpr void synthesize_bits(RNG& rng, T& out) {
             using R = typename RNG::result_type;
-            static constexpr auto bits_out = std::numeric_limits<T>::digits;
-            static constexpr auto good_bits = std::bit_width(RNG::max() - RNG::min() + 1) - 1;
-            static constexpr auto mask = (R{1} << good_bits) - 1;
-            static constexpr auto n_calls = (bits_out + good_bits - 1) / good_bits;
+            constexpr static auto bits_out = std::numeric_limits<T>::digits;
+            constexpr static auto good_bits = std::bit_width(RNG::max() - RNG::min() + 1) - 1;
+            constexpr static auto mask = (R{1} << good_bits) - 1;
+            constexpr static auto n_calls = (bits_out + good_bits - 1) / good_bits;
             out = 0;
             for (auto i = 0uz; i < n_calls; ++i) {
                 out = (out << good_bits) + (rng() & mask);
@@ -271,7 +336,7 @@ namespace RS {
 
     private:
 
-        static constexpr auto max64 = static_cast<std::uint64_t>(-1);
+        constexpr static auto max64 = static_cast<std::uint64_t>(-1);
 
         UniformInteger<std::uint64_t> dist_;
         std::uint64_t threshold_{max64 >> 1};
@@ -305,13 +370,13 @@ namespace RS {
 
             using limits = std::numeric_limits<T>;
 
-            static constexpr auto significand_bits = limits::digits - 1;
-            static constexpr auto exponent_range = static_cast<U>(significand_bits) << significand_bits;
-            static constexpr auto underflow_tail = (limits::max_exponent - 1) % significand_bits;
-            static constexpr auto underflow_shift = significand_bits - underflow_tail;
+            constexpr static auto significand_bits = limits::digits - 1;
+            constexpr static auto exponent_range = static_cast<U>(significand_bits) << significand_bits;
+            constexpr static auto underflow_tail = (limits::max_exponent - 1) % significand_bits;
+            constexpr static auto underflow_shift = significand_bits - underflow_tail;
 
             auto generate_bits = [&r] (int bits) {
-                static constexpr UniformInteger<U> uniform_bits;
+                constexpr static UniformInteger<U> uniform_bits;
                 auto u = uniform_bits(r);
                 auto mask = (U{1} << bits) - 1;
                 return u & mask;
@@ -421,7 +486,7 @@ namespace RS {
                 }
 
                 case range_mode::one_ulp: {
-                    static constexpr auto threshold = RNG::min() + (RNG::max() - RNG::min()) / 2;
+                    constexpr static auto threshold = RNG::min() + (RNG::max() - RNG::min()) / 2;
                     return rng() < threshold ? min_ : max_;
                 }
 
@@ -508,8 +573,8 @@ namespace RS {
 
             using Limits = std::numeric_limits<T>;
 
-            static constexpr auto epsilon = T{2} * Limits::epsilon();
-            static constexpr auto sqrtpi_over_2 = T{1} / (T{2} * inv_sqrtpi_v<T>);
+            constexpr static auto epsilon = T{2} * Limits::epsilon();
+            constexpr static auto sqrtpi_over_2 = T{1} / (T{2} * inv_sqrtpi_v<T>);
 
             static const auto inverse_derivative = [] (T x) {
                 return - sqrtpi_over_2 * std::exp(x * x);
@@ -590,14 +655,14 @@ namespace RS {
         template <std::floating_point T>
         T NormalDistribution<T>::pdf_z(T z) const noexcept {
             using namespace std::numbers;
-            static constexpr auto k = inv_sqrtpi_v<T> / sqrt2_v<T>;
+            constexpr static auto k = inv_sqrtpi_v<T> / sqrt2_v<T>;
             return k * std::exp(- z * z / T{2});
         }
 
         template <std::floating_point T>
         T NormalDistribution<T>::cdf_z(T z) const noexcept {
             using namespace std::numbers;
-            static constexpr auto k = T{1} / sqrt2_v<T>;
+            constexpr static auto k = T{1} / sqrt2_v<T>;
             return std::erfc(- k * z) / T{2};
         }
 

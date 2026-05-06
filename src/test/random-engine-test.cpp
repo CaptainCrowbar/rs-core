@@ -1,4 +1,6 @@
 #include "rs-core/random.hpp"
+#include "rs-core/bitwise-integer.hpp"
+#include "rs-core/statistics.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cmath>
 #include <cstdint>
@@ -60,6 +62,14 @@ void test_rs_core_random_engine_concepts() {
     TEST(Exact64Engine<std::mt19937_64>);
     TEST(! LessThan32Engine<std::mt19937_64>);
     TEST(! LessThan64Engine<std::mt19937_64>);
+    TEST(Exact32Engine<Lcg32>);
+    TEST(! Exact64Engine<Lcg32>);
+    TEST(! LessThan32Engine<Lcg32>);
+    TEST(! LessThan64Engine<Lcg32>);
+    TEST(! Exact32Engine<Lcg64>);
+    TEST(Exact64Engine<Lcg64>);
+    TEST(! LessThan32Engine<Lcg64>);
+    TEST(! LessThan64Engine<Lcg64>);
     TEST(! Exact32Engine<Pcg>);
     TEST(Exact64Engine<Pcg>);
     TEST(! LessThan32Engine<Pcg>);
@@ -95,6 +105,95 @@ void test_rs_core_random_distribution_concepts() {
     TEST((RandomDistribution<NormalDistribution<double>>));
     TEST((RandomDistribution<RandomChoice<std::string>>));
     TEST((RandomDistribution<WeightedChoice<std::string>>));
+
+}
+
+void test_rs_core_random_lcg_32() {
+
+    static constexpr int bits = 32;
+    static constexpr int iterations = 1'000'000;
+    static constexpr double max = static_cast<double>(~ std::uint32_t{0});
+    static constexpr double mean = 0.5 * max;
+    static const double sd = std::sqrt((std::ldexp(1.0, 2 * bits) - 1.0) / 12.0);
+    static const double epsilon = 2.0 * mean / std::sqrt(static_cast<double>(iterations));
+
+    Lcg32 rng {42};
+    std::uint32_t x = 0;
+    double y = 0;
+    Statistics<double> stats;
+
+    for (int i = 0; i < iterations; ++i) {
+        TRY(x = rng());
+        y = static_cast<double>(x);
+        stats(y);
+    }
+
+    TEST_NEAR(stats.mean(), mean, epsilon);
+    TEST_NEAR(stats.sd(), sd, epsilon);
+
+}
+
+void test_rs_core_random_lcg_64() {
+
+    static constexpr int bits = 64;
+    static constexpr int iterations = 1'000'000;
+    static constexpr double max = static_cast<double>(~ std::uint64_t{0});
+    static constexpr double mean = 0.5 * max;
+    static const double sd = std::sqrt((std::ldexp(1.0, 2 * bits) - 1.0) / 12.0);
+    static const double epsilon = 2.0 * mean / std::sqrt(static_cast<double>(iterations));
+
+    Lcg64 rng {42};
+    std::uint64_t x = 0;
+    double y = 0;
+    Statistics<double> stats;
+
+    for (int i = 0; i < iterations; ++i) {
+        TRY(x = rng());
+        y = static_cast<double>(x);
+        stats(y);
+    }
+
+    TEST_NEAR(stats.mean(), mean, epsilon);
+    TEST_NEAR(stats.sd(), sd, epsilon);
+
+}
+
+void test_rs_core_random_lcg_128() {
+
+    static constexpr int bits = 128;
+    static constexpr int iterations = 1'000'000;
+    static constexpr double max = static_cast<double>(~ uint128_t{0});
+    static constexpr double mean = 0.5 * max;
+    static const double sd = std::sqrt((std::ldexp(1.0, 2 * bits) - 1.0) / 12.0);
+    static const double epsilon = 2.0 * mean / std::sqrt(static_cast<double>(iterations));
+
+    Lcg128 rng {42};
+    uint128_t x {0};
+    double y = 0;
+    Statistics<double> stats;
+
+    for (int i = 0; i < iterations; ++i) {
+        TRY(x = rng());
+        y = static_cast<double>(x);
+        stats(y);
+    }
+
+    TEST_NEAR(stats.mean(), mean, epsilon);
+    TEST_NEAR(stats.sd(), sd, epsilon);
+
+    rng.seed(86, 99);
+    x = 0;
+    y = 0;
+    stats.clear();
+
+    for (int i = 0; i < iterations; ++i) {
+        TRY(x = rng());
+        y = static_cast<double>(x);
+        stats(y);
+    }
+
+    TEST_NEAR(stats.mean(), mean, epsilon);
+    TEST_NEAR(stats.sd(), sd, epsilon);
 
 }
 

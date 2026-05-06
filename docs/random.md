@@ -57,6 +57,46 @@ concept here just checks the distribution against several standard engines.
 
 ## Random number engines
 
+### Linear congruential engines
+
+```c++
+constexpr std::uint32_t lcg32(std::uint32_t x) noexcept;
+constexpr std::uint64_t lcg64(std::uint64_t x) noexcept;
+constexpr uint128_t lcg128(uint128_t x) noexcept;
+```
+
+Good LCG transformations for 32, 64, and 128 bit integers, based on Pierre L'Ecuyer (1999),
+["Tables of Linear Congruential Generators of Different Sizes and Good Lattice Structure"](http://www.ams.org/journals/mcom/1999-68-225/S0025-5718-99-00996-5/S0025-5718-99-00996-5.pdf).
+
+```c++
+class Lcg32;   // RT = std::uint32_t
+class Lcg64;   // RT = std::uint64_t
+class Lcg128;  // RT = uint128_t
+```
+
+Random number engines using the LCG functions above. The outline below applies
+to all of the LCG engines. In the outline below, `LCG` is the engine
+type (one of those listed immediately above), and `RT` is the unsigned
+integer type used as the result type.
+
+```c++
+class LCG {
+    using result_type = RT;
+    constexpr LCG() noexcept; // Equivalent to seed(0)
+    constexpr explicit LCG(RT seed) noexcept;
+    constexpr explicit LCG(std::uint64_t seed1,
+        std::uint64_t seed2) noexcept; // 128-bit only
+    constexpr RT operator()() noexcept;
+    constexpr bool operator==(const LCG& rhs) const noexcept;
+    constexpr bool operator!=(const LCG& rhs) const noexcept;
+    constexpr void seed(RT seed) noexcept;
+    constexpr void seed(std::uint64_t seed1,
+        std::uint64_t seed2) noexcept; // 128-bit only
+    constexpr static RT min() noexcept;
+    constexpr static RT max() noexcept;
+};
+```
+
 ### PCG engine
 
 ```c++

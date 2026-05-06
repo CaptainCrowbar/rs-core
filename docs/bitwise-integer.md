@@ -319,6 +319,15 @@ std::strong_ordering operator<=>(Uint x, Uint y) noexcept;
 Comparison operators.
 
 ```c++
+constexpr uint128_t make_uint128(std::uint64_t hi,
+    std::uint64_t lo) noexcept;
+```
+
+Constructs a `uint128_t` from a pair of 64-bit integers. This can be used
+regardless of whether `uint128_t` is an alias for `Uint<128>` or a native
+type.
+
+```c++
 namespace Literals {
     Uint128 operator""_u128(const char* ptr);
     Uint256 operator""_u256(const char* ptr);
