@@ -205,7 +205,7 @@ namespace RS {
     // Conversion functions
 
     template <std::integral To, std::integral From>
-    constexpr std::optional<To> checked_cast(From x) noexcept {
+    constexpr std::optional<To> maybe_cast(From x) noexcept {
 
         static constexpr auto from_signed = std::signed_integral<From>;
         static constexpr auto to_signed = std::signed_integral<To>;
@@ -253,13 +253,33 @@ namespace RS {
     }
 
     template <std::integral To, std::integral From>
-    constexpr std::optional<To> checked_cast(std::optional<From> x) noexcept {
+    constexpr std::optional<To> maybe_cast(std::optional<From> x) noexcept {
         if (x) {
-            return checked_cast<To>(*x);
+            return maybe_cast<To>(*x);
         } else {
             return {};
         }
     }
+
+    template <std::integral To, std::integral From>
+    constexpr To try_cast(From x) {
+        auto opt = maybe_cast<To>(x);
+        if (! opt) {
+            throw std::out_of_range("Value is out of range for cast type");
+        }
+        return *opt;
+    }
+
+    template <std::integral To, std::integral From>
+    constexpr std::optional<To> try_cast(std::optional<From> x) {
+        if (x) {
+            return try_cast<To>(*x);
+        } else {
+            return {};
+        }
+    }
+
+    // Geometry functions
 
     template <std::floating_point T>
     constexpr T degrees(T rad) noexcept {
@@ -270,21 +290,6 @@ namespace RS {
     constexpr T radians(T deg) noexcept {
         return deg * std::numbers::pi_v<T> / T{180};
     }
-
-    namespace Literals {
-
-        constexpr float operator""_degf(long double rad) noexcept { return radians(static_cast<float>(rad)); }
-        constexpr float operator""_degf(unsigned long long rad) noexcept { return radians(static_cast<float>(rad)); }
-        constexpr double operator""_deg(long double rad) noexcept { return radians(static_cast<double>(rad)); }
-        constexpr double operator""_deg(unsigned long long rad) noexcept { return radians(static_cast<double>(rad)); }
-        constexpr long double operator""_degld(long double rad) noexcept { return radians(rad); }
-        constexpr long double operator""_degld(unsigned long long rad) noexcept { return radians(static_cast<long double>(rad)); }
-
-    }
-
-    // Geometry functions
-
-    // Surface area and volume of a sphere in N dimensions
 
     namespace Detail {
 
@@ -346,31 +351,25 @@ namespace RS {
         return std::pow(v / Detail::sphere_volume_coeff<N, T>, T{1} / T{N});
     }
 
-    // Integer literals
-
-    namespace Detail {
-
-        template <std::integral To, std::integral From>
-        constexpr To static_checked_cast(From x) {
-            auto opt = checked_cast<To>(x);
-            if (! opt) {
-                throw std::range_error("Integer out of range");
-            }
-            return *opt;
-        }
-
-    }
+    // Literals
 
     namespace Literals {
 
-        constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int8_t>(x); }
-        constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint8_t>(x); }
-        constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int16_t>(x); }
-        constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint16_t>(x); }
-        constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int32_t>(x); }
-        constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint32_t>(x); }
-        constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::int64_t>(x); }
-        constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return Detail::static_checked_cast<std::uint64_t>(x); }
+        constexpr float operator""_degf(long double rad) noexcept { return radians(static_cast<float>(rad)); }
+        constexpr float operator""_degf(unsigned long long rad) noexcept { return radians(static_cast<float>(rad)); }
+        constexpr double operator""_deg(long double rad) noexcept { return radians(static_cast<double>(rad)); }
+        constexpr double operator""_deg(unsigned long long rad) noexcept { return radians(static_cast<double>(rad)); }
+        constexpr long double operator""_degld(long double rad) noexcept { return radians(rad); }
+        constexpr long double operator""_degld(unsigned long long rad) noexcept { return radians(static_cast<long double>(rad)); }
+
+        constexpr std::int8_t operator""_i8(unsigned long long x) noexcept { return try_cast<std::int8_t>(x); }
+        constexpr std::uint8_t operator""_u8(unsigned long long x) noexcept { return try_cast<std::uint8_t>(x); }
+        constexpr std::int16_t operator""_i16(unsigned long long x) noexcept { return try_cast<std::int16_t>(x); }
+        constexpr std::uint16_t operator""_u16(unsigned long long x) noexcept { return try_cast<std::uint16_t>(x); }
+        constexpr std::int32_t operator""_i32(unsigned long long x) noexcept { return try_cast<std::int32_t>(x); }
+        constexpr std::uint32_t operator""_u32(unsigned long long x) noexcept { return try_cast<std::uint32_t>(x); }
+        constexpr std::int64_t operator""_i64(unsigned long long x) noexcept { return try_cast<std::int64_t>(x); }
+        constexpr std::uint64_t operator""_u64(unsigned long long x) noexcept { return try_cast<std::uint64_t>(x); }
 
     }
 

@@ -49,28 +49,28 @@ void test_rs_core_mp_integer_unsigned_conversion_from_integer() {
     TEST_EQUAL(static_cast<std::uint64_t>(x), 0x1234'5678'9abc'def0ull);
 
     TRY(x = 32'767ul);
-    TEST(x.in_range<std::int16_t>());   TRY(i = x.checked_cast<std::int16_t>());   TEST(i); TEST_EQUAL(*i, 32'767l);
-    TEST(x.in_range<std::uint16_t>());  TRY(u = x.checked_cast<std::uint16_t>());  TEST(u); TEST_EQUAL(*u, 32'767ul);
-    TEST(x.in_range<std::int32_t>());   TRY(j = x.checked_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 32'767l);
-    TEST(x.in_range<std::uint32_t>());  TRY(v = x.checked_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 32'767ul);
+    TEST(x.in_range<std::int16_t>());   TRY(i = x.maybe_cast<std::int16_t>());   TEST(i); TEST_EQUAL(*i, 32'767l);
+    TEST(x.in_range<std::uint16_t>());  TRY(u = x.maybe_cast<std::uint16_t>());  TEST(u); TEST_EQUAL(*u, 32'767ul);
+    TEST(x.in_range<std::int32_t>());   TRY(j = x.maybe_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 32'767l);
+    TEST(x.in_range<std::uint32_t>());  TRY(v = x.maybe_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 32'767ul);
 
     TRY(x = 32'768ul);
-    TEST(! x.in_range<std::int16_t>());  TRY(i = x.checked_cast<std::int16_t>());   TEST(! i);
-    TEST(x.in_range<std::uint16_t>());   TRY(u = x.checked_cast<std::uint16_t>());  TEST(u); TEST_EQUAL(*u, 32'768ul);
-    TEST(x.in_range<std::int32_t>());    TRY(j = x.checked_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 32'768l);
-    TEST(x.in_range<std::uint32_t>());   TRY(v = x.checked_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 32'768ul);
+    TEST(! x.in_range<std::int16_t>());  TRY(i = x.maybe_cast<std::int16_t>());   TEST(! i);
+    TEST(x.in_range<std::uint16_t>());   TRY(u = x.maybe_cast<std::uint16_t>());  TEST(u); TEST_EQUAL(*u, 32'768ul);
+    TEST(x.in_range<std::int32_t>());    TRY(j = x.maybe_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 32'768l);
+    TEST(x.in_range<std::uint32_t>());   TRY(v = x.maybe_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 32'768ul);
 
     TRY(x = 65'535ul);
-    TEST(! x.in_range<std::int16_t>());  TRY(i = x.checked_cast<std::int16_t>());   TEST(! i);
-    TEST(x.in_range<std::uint16_t>());   TRY(u = x.checked_cast<std::uint16_t>());  TEST(u); TEST_EQUAL(*u, 65'535ul);
-    TEST(x.in_range<std::int32_t>());    TRY(j = x.checked_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 65'535l);
-    TEST(x.in_range<std::uint32_t>());   TRY(v = x.checked_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 65'535ul);
+    TEST(! x.in_range<std::int16_t>());  TRY(i = x.maybe_cast<std::int16_t>());   TEST(! i);
+    TEST(x.in_range<std::uint16_t>());   TRY(u = x.maybe_cast<std::uint16_t>());  TEST(u); TEST_EQUAL(*u, 65'535ul);
+    TEST(x.in_range<std::int32_t>());    TRY(j = x.maybe_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 65'535l);
+    TEST(x.in_range<std::uint32_t>());   TRY(v = x.maybe_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 65'535ul);
 
     TRY(x = 65'536ul);
-    TEST(! x.in_range<std::int16_t>());   TRY(i = x.checked_cast<std::int16_t>());   TEST(! i);
-    TEST(! x.in_range<std::uint16_t>());  TRY(u = x.checked_cast<std::uint16_t>());  TEST(! u);
-    TEST(x.in_range<std::int32_t>());     TRY(j = x.checked_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 65'536l);
-    TEST(x.in_range<std::uint32_t>());    TRY(v = x.checked_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 65'536ul);
+    TEST(! x.in_range<std::int16_t>());   TRY(i = x.maybe_cast<std::int16_t>());   TEST(! i);
+    TEST(! x.in_range<std::uint16_t>());  TRY(u = x.maybe_cast<std::uint16_t>());  TEST(! u);
+    TEST(x.in_range<std::int32_t>());     TRY(j = x.maybe_cast<std::int32_t>());   TEST(j); TEST_EQUAL(*j, 65'536l);
+    TEST(x.in_range<std::uint32_t>());    TRY(v = x.maybe_cast<std::uint32_t>());  TEST(v); TEST_EQUAL(*v, 65'536ul);
 
 }
 

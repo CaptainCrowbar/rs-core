@@ -88,9 +88,10 @@ namespace RS {
         double as_double() const noexcept;
         explicit operator double() const noexcept { return as_double(); }
         template <std::integral T> bool in_range() const noexcept;
-        template <std::integral T> std::optional<T> checked_cast() const noexcept;
+        template <std::integral T> std::optional<T> maybe_cast() const noexcept;
+        template <std::integral T> T try_cast() const;
         template <std::integral T> T unchecked_cast() const noexcept; // UB if out of range
-        template <std::integral T> explicit operator T() const noexcept { return checked_cast<T>().value_or(0); }
+        template <std::integral T> explicit operator T() const noexcept { return maybe_cast<T>().value_or(0); }
         std::size_t hash() const noexcept;
         std::string to_string(unsigned base = 10, std::size_t digits = 1) const;
 
@@ -627,11 +628,20 @@ namespace RS {
     }
 
     template <std::integral T>
-    std::optional<T> Natural::checked_cast() const noexcept {
+    std::optional<T> Natural::maybe_cast() const noexcept {
         if (in_range<T>()) {
             return unchecked_cast<T>();
         } else {
             return {};
+        }
+    }
+
+    template <std::integral T>
+    T Natural::try_cast() const {
+        if (in_range<T>()) {
+            return unchecked_cast<T>();
+        } else {
+            throw std::out_of_range("Value is out of range for cast type");
         }
     }
 
@@ -800,9 +810,10 @@ namespace RS {
         double as_double() const noexcept;
         explicit operator double() const noexcept { return as_double(); }
         template <std::integral T> bool in_range() const noexcept;
-        template <std::integral T> std::optional<T> checked_cast() const noexcept;
+        template <std::integral T> std::optional<T> maybe_cast() const noexcept;
+        template <std::integral T> T try_cast() const;
         template <std::integral T> T unchecked_cast() const noexcept; // UB if out of range
-        template <std::integral T> explicit operator T() const noexcept { return checked_cast<T>().value_or(0); }
+        template <std::integral T> explicit operator T() const noexcept { return maybe_cast<T>().value_or(0); }
         explicit operator Natural() const { return sign_ ? Natural{} : mag_; }
         Natural abs() const { return mag_; }
         std::size_t hash() const noexcept;
@@ -1008,11 +1019,20 @@ namespace RS {
     }
 
     template <std::integral T>
-    std::optional<T> Integer::checked_cast() const noexcept {
+    std::optional<T> Integer::maybe_cast() const noexcept {
         if (in_range<T>()) {
             return unchecked_cast<T>();
         } else {
             return {};
+        }
+    }
+
+    template <std::integral T>
+    T Integer::try_cast() const {
+        if (in_range<T>()) {
+            return unchecked_cast<T>();
+        } else {
+            throw std::out_of_range("Value is out of range for cast type");
         }
     }
 

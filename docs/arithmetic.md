@@ -74,30 +74,33 @@ be any integer or enumeration type.
 
 ```c++
 template <std::integral To, std::integral From>
-    constexpr std::optional<To> checked_cast(From x) noexcept;
+    constexpr std::optional<To> maybe_cast(From x) noexcept;
 template <std::integral To, std::integral From>
-    constexpr std::optional<To> checked_cast(std::optional<From> x) noexcept;
+    constexpr std::optional<To> maybe_cast(std::optional<From> x) noexcept;
 ```
 
 Convert an integer to a different type, returning null if the argument is out
 of range for the return type.
 
 ```c++
+template <std::integral To, std::integral From>
+    constexpr To try_cast(From x);
+template <std::integral To, std::integral From>
+    constexpr std::optional<To> try_cast(std::optional<From> x);
+```
+
+These perform the same checks as `maybe_cast(),` but throw a
+`std::out_of_range` exception if the cast fails. The second version will
+return a null optional only if the argument is already null.
+
+## Geometry functions
+
+```c++
 template <std::floating_point T> constexpr T degrees(T rad) noexcept;
 template <std::floating_point T> constexpr T radians(T deg) noexcept;
-namespace Literals {
-    constexpr float operator""_degf(long double rad) noexcept;
-    constexpr float operator""_degf(unsigned long long rad) noexcept;
-    constexpr double operator""_deg(long double rad) noexcept;
-    constexpr double operator""_deg(unsigned long long rad) noexcept;
-    constexpr long double operator""_degld(long double rad) noexcept;
-    constexpr long double operator""_degld(unsigned long long rad) noexcept;
-}
 ```
 
 Degree/radian conversions.
-
-## Geometry functions
 
 ```c++
 template <std::size_t N = 3, std::floating_point T>
@@ -120,7 +123,20 @@ The `sphere_radius_from_area()` function is restricted to `N>=2` because
 the "surface" of a 1-sphere is always two points, so no radius can be
 deduced.
 
-## Integer literals
+## Literals
+
+```c++
+namespace Literals {
+    constexpr float operator""_degf(long double rad) noexcept;
+    constexpr float operator""_degf(unsigned long long rad) noexcept;
+    constexpr double operator""_deg(long double rad) noexcept;
+    constexpr double operator""_deg(unsigned long long rad) noexcept;
+    constexpr long double operator""_degld(long double rad) noexcept;
+    constexpr long double operator""_degld(unsigned long long rad) noexcept;
+}
+```
+
+Angle literals in degrees, returning the value in radians.
 
 ```c++
 namespace Literals {
@@ -135,4 +151,4 @@ namespace Literals {
 }
 ```
 
-Defined for convenience.
+Integer literals.

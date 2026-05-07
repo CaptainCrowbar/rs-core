@@ -226,11 +226,14 @@ type.
 
 ```c++
 template <std::integral T> std::optional<T>
-    Mpitype::checked_cast() const noexcept;
+    Mpitype::maybe_cast() const noexcept;
+template <std::integral T>
+    T Mpitype::try_cast() const;
 ```
 
-Returns the value as a primitive integer type, or a null optional if the value
-is out of range for the return type.
+Convert the value to a primitive integer type. If the value is out of range
+for the return type, these will return a null optional or throw
+`std::out_of_range.`
 
 ```c++
 template <std::integral T> T Mpitype::unchecked_cast() const noexcept;
