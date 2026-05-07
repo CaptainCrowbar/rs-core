@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.197
+    VERSION 0.1.198
     LANGUAGES CXX
 )
 
@@ -46,7 +46,9 @@ add_executable(${unittest}
     test/alias-core-test.cpp
     test/alias-maths-functions-test.cpp
     test/alias-point-arithmetic-test.cpp
-    test/arithmetic-test.cpp
+    test/arithmetic-conversion-test.cpp
+    test/arithmetic-division-test.cpp
+    test/arithmetic-function-test.cpp
     test/astronomy-test.cpp
     test/bitwise-integer-small-binary-5-test.cpp
     test/bitwise-integer-small-binary-35-test.cpp
