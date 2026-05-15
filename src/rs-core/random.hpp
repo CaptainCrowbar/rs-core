@@ -6,6 +6,7 @@
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/iterator.hpp"
+#include "rs-core/linear-algebra.hpp"
 #include "rs-core/mp-integer.hpp"
 #include <algorithm>
 #include <bit>
@@ -840,6 +841,135 @@ namespace RS {
                 dist_ = weight_dist(w);
             }
         }
+
+    // Spatial distributions
+
+    template <std::floating_point T, std::size_t N>
+    class SphericalSurfaceDistribution {
+
+    public:
+
+        static_assert(N > 0);
+
+        using result_type = Vector<T, N>;
+        using value_type = T;
+
+        static constexpr std::size_t dim = N;
+
+        SphericalSurfaceDistribution() noexcept = default;
+        explicit SphericalSurfaceDistribution(T radius) noexcept: radius_{radius} {}
+
+        template <std::uniform_random_bit_generator RNG>
+        result_type operator()(RNG& rng) const {
+
+            using std::numbers::pi_v;
+
+            result_type v;
+
+            if constexpr (N == 1) {
+
+                v[0] = BernoulliDistribution{}(rng) ? T{1} : T{-1};
+
+            } else if constexpr (N == 2) {
+
+                auto phi = UniformReal<T>{T{2} * pi_v<T>}(rng);
+                v[0] = std::cos(phi);
+                v[1] = std::sin(phi);
+
+            } else if constexpr (N == 3) {
+
+                auto phi = UniformReal<T>{T{2} * pi_v<T>}(rng);
+                v[2] = UniformReal<T>{T{-1}, T{1}}(rng);
+                auto r = std::sqrt(T{1} - v[2] * v[2]);
+                v[0] = r * std::cos(phi);
+                v[1] = r * std::sin(phi);
+
+            } else {
+
+                UniformReal<T> unit;
+
+                for (auto i = 0uz; i < N; i += 2) {
+
+                    auto a = std::sqrt(T{-2} * std::log(unit(rng)));
+                    auto b = T{2} * pi_v<T> * unit(rng);
+                    v[i] = a * std::cos(b);
+
+                    if (i + 1 < N) {
+                        v[i + 1] = a * std::sin(b);
+                    }
+
+                }
+
+                v = v.dir();
+
+            }
+
+            return v * radius_;
+
+        }
+
+        T radius() const noexcept { return radius_; }
+
+    private:
+
+        T radius_ {1};
+
+    };
+
+    template <std::floating_point T, std::size_t N>
+    class SphericalVolumeDistribution {
+
+    public:
+
+        static_assert(N > 0);
+
+        using result_type = Vector<T, N>;
+        using value_type = T;
+
+        static constexpr std::size_t dim = N;
+
+        SphericalVolumeDistribution() noexcept = default;
+        explicit SphericalVolumeDistribution(T radius) noexcept: radius_{radius} {}
+
+        template <std::uniform_random_bit_generator RNG>
+        result_type operator()(RNG& rng) const {
+
+            using std::numbers::pi_v;
+
+            result_type v;
+
+            if constexpr (N == 1) {
+
+                v[0] = UniformReal<T>{T{-1}, T{1}}(rng);
+
+            } else if constexpr (N <= 4) {
+
+                UniformReal<T> symmetric {T{-1}, T{1}};
+
+                do {
+                    for (auto& x: v) {
+                        x = symmetric(rng);
+                    }
+                } while (v.r2() > T{1});
+
+            } else {
+
+                v = SphericalSurfaceDistribution<T, N>{}(rng);
+                v *= std::pow(UniformReal<T>{}(rng), T{1} / T{N});
+
+            }
+
+            return v * radius_;
+
+        }
+
+        T radius() const noexcept { return radius_; }
+
+    private:
+
+        T radius_ {1};
+
+    };
 
     // Random algorithms
 

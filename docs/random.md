@@ -166,7 +166,7 @@ class RandomDevice64;
 This performs the same function as `std::random_device` but generates 64-bit
 integers instead of 32-bit.
 
-## Random distributions
+## Integer distributions
 
 ### Bernoulli distribution
 
@@ -232,6 +232,8 @@ This uses
 
 _TODO: The current implementation exhibits undefined behaviour if the output
 range is larger than that of a 64-bit unsigned integer._
+
+## Floating point distributions
 
 ### Uniform floating point distribution
 
@@ -342,6 +344,8 @@ For all of the statistics functions, behaviour is undefined if the standard
 deviation is zero. For the quantile functions, behaviour is undefined if the
 argument is less than or equal to zero or greater than or equal to 1.
 
+## Discrete distributions
+
 ### Random choice class
 
 ```c++
@@ -416,6 +420,49 @@ are not counted towards `empty(), size(),` or `total().`
 
 Behaviour is undefined if the function call operator is called on an empty
 list.
+
+## Spatial distributions
+
+### Spherical surface distribution
+
+```c++
+template <std::floating_point T, std::size_t N>
+class SphericalSurfaceDistribution {
+    using result_type = Vector<T, N>;
+    using value_type = T;
+    static constexpr std::size_t dim = N;
+    SphericalSurfaceDistribution() noexcept;
+    explicit SphericalSurfaceDistribution(T radius) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        result_type operator()(RNG& rng) const;
+    T radius() const;
+};
+```
+
+Generates a random vector, uniformly distributed in `N` dimensions, pointing
+in a random direction, with the given length (defaulting to 1). The length
+may not be exactly equal to `radius` due to floating point rounding.
+Behaviour is undefined if the radius is negative.
+
+### Spherical volume distribution
+
+```c++
+template <std::floating_point T, std::size_t N>
+class SphericalVolumeDistribution {
+    using result_type = Vector<T, N>;
+    using value_type = T;
+    static constexpr std::size_t dim = N;
+    SphericalVolumeDistribution() noexcept;
+    explicit SphericalVolumeDistribution(T radius) noexcept;
+    template <std::uniform_random_bit_generator RNG>
+        result_type operator()(RNG& rng) const;
+    T radius() const;
+};
+```
+
+Generates a random point, uniformly distributed within the volume of a sphere
+in `N` dimensions, with the given radius (defaulting to 1). Behaviour is
+undefined if the radius is negative.
 
 ## Random algorithms
 
