@@ -860,7 +860,20 @@ namespace RS {
         explicit SphericalSurfaceDistribution(T radius) noexcept: radius_{radius} {}
 
         template <std::uniform_random_bit_generator RNG>
-        result_type operator()(RNG& rng) const {
+            result_type operator()(RNG& rng) const;
+
+        T radius() const noexcept { return radius_; }
+
+    private:
+
+        T radius_ {1};
+
+    };
+
+        template <std::floating_point T, std::size_t N>
+        template <std::uniform_random_bit_generator RNG>
+        typename SphericalSurfaceDistribution<T, N>::result_type
+        SphericalSurfaceDistribution<T, N>::operator()(RNG& rng) const {
 
             using std::numbers::pi_v;
 
@@ -908,14 +921,6 @@ namespace RS {
 
         }
 
-        T radius() const noexcept { return radius_; }
-
-    private:
-
-        T radius_ {1};
-
-    };
-
     template <std::floating_point T, std::size_t N>
     class SphericalVolumeDistribution {
 
@@ -932,7 +937,20 @@ namespace RS {
         explicit SphericalVolumeDistribution(T radius) noexcept: radius_{radius} {}
 
         template <std::uniform_random_bit_generator RNG>
-        result_type operator()(RNG& rng) const {
+            result_type operator()(RNG& rng) const;
+
+        T radius() const noexcept { return radius_; }
+
+    private:
+
+        T radius_ {1};
+
+    };
+
+        template <std::floating_point T, std::size_t N>
+        template <std::uniform_random_bit_generator RNG>
+        typename SphericalVolumeDistribution<T, N>::result_type
+        SphericalVolumeDistribution<T, N>::operator()(RNG& rng) const {
 
             using std::numbers::pi_v;
 
@@ -962,14 +980,6 @@ namespace RS {
             return v * radius_;
 
         }
-
-        T radius() const noexcept { return radius_; }
-
-    private:
-
-        T radius_ {1};
-
-    };
 
     // Random algorithms
 
