@@ -12,6 +12,11 @@ namespace RS;
 * TOC
 {:toc}
 
+## Notes
+
+This header also includes [`"rs-core/log.hpp"`](log.html) to allow users to
+easily add logging in arbitrary locations without dependency changes.
+
 ## Concepts
 
 ### Primitive concepts

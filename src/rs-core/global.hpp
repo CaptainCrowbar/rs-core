@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/log.hpp"
 #include <concepts>
 #include <cstddef>
 #include <cstdint>

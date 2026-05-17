@@ -1,17 +1,14 @@
 #pragma once
 
-#include "rs-core/arithmetic.hpp"
-#include "rs-core/enum.hpp"
-#include "rs-core/global.hpp"
-#include "rs-core/io.hpp"
-#include "rs-core/terminal.hpp"
+#include <algorithm>
+#include <cerrno>
 #include <chrono>
 #include <concepts>
 #include <condition_variable>
-#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <deque>
+#include <exception>
 #include <filesystem>
 #include <format>
 #include <functional>
@@ -20,14 +17,17 @@
 #include <source_location>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <thread>
 #include <type_traits>
 
 #ifdef _WIN32
 
     extern "C" {
+        _declspec(dllimport) int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
         _declspec(dllimport) unsigned long __stdcall GetCurrentProcessId();
         _declspec(dllimport) unsigned long __stdcall GetCurrentThreadId();
+        _declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
     }
 
 #else
@@ -42,7 +42,7 @@
 
 namespace RS {
 
-    RS_BITMASK(LogFlags, std::uint32_t,
+    enum class LogFlags: std::uint32_t {
         none      = 0,
         // Context flags
         all       = 0x0000'ffff,
@@ -59,7 +59,17 @@ namespace RS {
         append    = 0x0001'0000,
         colour    = 0x0002'0000,
         enabled   = 0x0004'0000,
-    )
+    };
+
+    constexpr LogFlags operator|(LogFlags a, LogFlags b) noexcept {
+        using U = std::underlying_type_t<LogFlags>;
+        return static_cast<LogFlags>(static_cast<U>(a) | static_cast<U>(b));
+    }
+
+    constexpr LogFlags operator&(LogFlags a, LogFlags b) noexcept {
+        using U = std::underlying_type_t<LogFlags>;
+        return static_cast<LogFlags>(static_cast<U>(a) & static_cast<U>(b));
+    }
 
     class Log {
 
@@ -72,10 +82,10 @@ namespace RS {
         struct message {
             std::function<std::string()> get_message;
             template <typename... Args> message(std::format_string<const Args&...> fmt, const Args&... args):
-                get_message([=] { return std::format(fmt, args...); }) {}
+                get_message{[=] { return std::format(fmt, args...); }} {}
         };
 
-        Log(): out_(stderr) {}
+        Log(): out_{stderr} {}
         explicit Log(const std::filesystem::path& path, LogFlags flags = defaults);
         explicit Log(std::FILE* out, LogFlags flags = defaults);
         ~Log() noexcept;
@@ -93,32 +103,46 @@ namespace RS {
         using clock = std::chrono::system_clock;
 
         #ifdef _WIN32
+
             using process_id = unsigned long;
             using thread_id = unsigned long;
+
+            static constexpr const char* path_delimiters = "/\\";
+
         #else
+
             using process_id = pid_t;
             using thread_id = std::conditional_t<std::integral<pthread_t>, pthread_t, std::uintptr_t>;
+
+            static constexpr const char* path_delimiters = "/";
+
         #endif
 
         struct log_entry {
+
             std::source_location where;
             message what;
             clock::time_point when;
             process_id process;
             thread_id thread;
+
             log_entry(std::source_location loc, const message& msg):
-                where(loc), what(msg), when(clock::now()),
-                process(get_current_process()), thread(get_current_thread()) {}
+                where{loc},
+                what{msg},
+                when{clock::now()},
+                process{get_current_process()},
+                thread{get_current_thread()} {}
+
         };
 
         std::deque<log_entry> queue_;
         std::mutex mutex_;
         std::condition_variable cv_;
-        std::thread thread_;
+        std::jthread thread_;
         std::filesystem::path path_;
-        Cstdio out_;
-        LogFlags flags_{defaults};
-        bool stop_request_{};
+        std::FILE* out_ {nullptr};
+        LogFlags flags_ {defaults};
+        bool stop_request_ {false};
 
         void add_context(const log_entry& entry, std::string& text) const;
         void payload() noexcept;
@@ -128,33 +152,45 @@ namespace RS {
         static process_id get_current_process();
         static thread_id get_current_thread();
         static std::string make_prefix();
+        static bool xterm_is_tty(std::FILE* fp) noexcept;
+        static const char* xterm_reset() noexcept { return "\x1b[0m"; }
+        static std::string xterm_rgb(int r, int g, int b);
 
     };
 
         inline Log::Log(const std::filesystem::path& path, LogFlags flags):
-        path_(path), flags_(flags) {
-            enable(has_bit(flags_, enabled));
+        path_{path},
+        flags_{flags} {
+            enable((flags_ & enabled) != none);
         }
 
         inline Log::Log(std::FILE* out, LogFlags flags):
-        out_(out), flags_(flags) {
-            enable(has_bit(flags_, enabled));
+        out_{out},
+        flags_{flags} {
+            enable((flags_ & enabled) != none);
         }
 
         inline Log::~Log() noexcept {
+
             {
-                auto lock = std::unique_lock{mutex_};
+                std::unique_lock lock {mutex_};
                 stop_request_ = true;
                 cv_.notify_one();
             }
+
             thread_.join();
+
+            if (! path_.empty() && out_ != nullptr) {
+                std::fclose(out_);
+            }
+
         }
 
         inline void Log::enable(bool flag) {
 
             {
 
-                auto lock = std::unique_lock{mutex_};
+                std::unique_lock lock {mutex_};
                 auto running = thread_.joinable();
 
                 if (flag == running) {
@@ -162,42 +198,63 @@ namespace RS {
                 }
 
                 stop_request_ = ! flag;
-                auto append_mode = has_bit(flags_, append);
 
                 if (flag) {
+
                     if (! path_.empty()) {
-                        out_ = Cstdio{path_, append_mode ? IO::append : IO::write_only};
+
+                        errno = 0;
+
+                        if ((flags_ & append) != none) {
+                            out_ = std::fopen(path_.c_str(), "ab");
+                        } else {
+                            out_ = std::fopen(path_.c_str(), "wb");
+                        }
+
+                        int err = errno;
+
+                        if (out_ == nullptr) {
+                            throw std::system_error(std::error_code(err, std::system_category()), path_.string());
+                        }
+
                     }
-                    thread_ = std::thread{&Log::payload, this};
+
+                    thread_ = std::jthread{&Log::payload, this};
+
                 }
 
             }
 
             if (! flag) {
+
                 cv_.notify_one();
                 thread_.join();
+
+                if (! path_.empty()) {
+                    std::fclose(out_);
+                    out_ = nullptr;
+                }
+
             }
 
         }
 
         inline void Log::operator()(const message& msg, const std::source_location loc) {
             if (thread_.joinable()) {
-                auto lock = std::unique_lock{mutex_};
-                if (thread_.joinable()) {
-                    queue_.push_back(log_entry{loc, msg});
-                    cv_.notify_one();
-                }
+                std::unique_lock lock {mutex_};
+                queue_.push_back(log_entry{loc, msg});
+                cv_.notify_one();
             }
         }
 
         inline void Log::add_context(const log_entry& entry, std::string& text) const {
 
-            if (! has_bit(flags_, all)) {
+            if ((flags_ & all) == none) {
                 return;
             }
 
             auto field = [this,&text] <typename T> (LogFlags mask, std::format_string<const T&> fmt, const T& t) {
-                if (! has_bit(flags_, mask)) {
+                if ((flags_ & mask) == none) {
                     return false;
                 }
                 text += std::format(fmt, t);
@@ -224,53 +281,54 @@ namespace RS {
 
         inline void Log::payload() noexcept {
 
-            std::string prefix, suffix;
+            try {
 
-            if (has_bit(flags_, colour) && Xterm::is_tty(out_.handle()))  {
-                try {
+                std::string prefix, suffix;
+
+                if ((flags_ & colour) != none && xterm_is_tty(out_))  {
                     prefix = make_prefix();
-                    suffix = Xterm(true).reset();
-                }
-                catch (...) {}
-            }
-
-            auto lock = std::unique_lock{mutex_};
-
-            while (! stop_request_ || ! queue_.empty()) {
-
-                cv_.wait(lock, [this] { return stop_request_ || ! queue_.empty(); });
-
-                if (stop_request_ && queue_.empty()) {
-                    break;
+                    suffix = xterm_reset();
                 }
 
-                try {
+                std::unique_lock lock {mutex_};
+
+                while (! stop_request_ || ! queue_.empty()) {
+
+                    cv_.wait(lock, [this] { return stop_request_ || ! queue_.empty(); });
+
+                    if (stop_request_ && queue_.empty()) {
+                        break;
+                    }
+
                     auto text{prefix};
                     add_context(queue_.front(), text);
                     text += queue_.front().what.get_message();
                     text += suffix;
                     text += '\n';
-                    out_.write_str(text);
-                    out_.flush();
-                }
-                catch (...) {}
+                    std::fputs(text.data(), out_);
+                    std::fflush(out_);
+                    queue_.pop_front();
 
-                queue_.pop_front();
+                }
+
+                queue_.clear();
 
             }
 
-            queue_.clear();
-            out_ = {};
+            catch (const std::exception& ex) {
+                std::fputs("Exception while logging\n", stderr);
+                std::fputs(ex.what(), stderr);
+                std::fputs("\n", stderr);
+            }
+
+            catch (...) {
+                std::fputs("Unknown exception while logging", stderr);
+            }
 
         }
 
         inline std::string_view Log::file_leaf_name(std::string_view path) {
-            std::size_t last_delimiter;
-            #ifdef _WIN32
-                last_delimiter = path.find_last_of("/\\");
-            #else
-                last_delimiter = path.find_last_of('/');
-            #endif
+            auto last_delimiter = path.find_last_of(path_delimiters);
             return path.substr(last_delimiter + 1);
         }
 
@@ -284,17 +342,21 @@ namespace RS {
 
             auto anon_pos = pretty.find(anon_text);
 
-            if (anon_pos != npos) {
+            if (anon_pos != std::string::npos) {
                 pretty = pretty.substr(anon_pos + anon_text.size() + 1);
             }
 
             static const auto name_char = [] (char c) {
-                return ascii_isalnum_w(c) || static_cast<unsigned char>(c) >= 0x80;
+                return (c >= '0' && c <= '9')
+                    || (c >= 'A' && c <= 'Z')
+                    || (c >= 'a' && c <= 'z')
+                    || c == '_'
+                    || static_cast<unsigned char>(c) >= 0x80;
             };
 
             auto end_name = pretty.find('(');
 
-            if (end_name == 0 || end_name == npos) {
+            if (end_name == 0 || end_name == std::string::npos) {
                 return pretty;
             }
 
@@ -341,20 +403,58 @@ namespace RS {
 
         inline std::string Log::make_prefix() {
 
-            auto seed = static_cast<std::uint32_t>(get_current_thread());
-            std::minstd_rand rng(seed);
-            std::uniform_int_distribution<int> channel(0, 5);
-            int r, g, b, sum;
+            auto id = static_cast<std::uint64_t>(get_current_thread());
+            auto seed = static_cast<std::uint32_t>((id >> 32) | id);
+            std::minstd_rand rng {seed};
+            std::uniform_int_distribution<int> random_channel {0, 5};
+            int r, g, b;
 
             do {
-                r = channel(rng);
-                g = channel(rng);
-                b = channel(rng);
-                sum = r + g + b;
-            } while (sum == 0 || sum == 15);
+                r = random_channel(rng);
+                g = random_channel(rng);
+                b = random_channel(rng);
+            } while (r + g + b < 1 || r + g + b > 14);
 
-            return Xterm(true).rgb(r, g, b);
+            return xterm_rgb(r, g, b);
 
+        }
+
+        inline bool Log::xterm_is_tty(std::FILE* fp) noexcept {
+
+            int fd;
+
+            if (fp == stdin) {
+                fd = 0;
+            } else if (fp == stdout) {
+                fd = 1;
+            } else if (fp == stderr) {
+                fd = 2;
+            } else {
+                return false;
+            }
+
+            #ifdef _WIN32
+
+                auto handle_num = static_cast<unsigned long>(-10 - fd);
+                auto handle = GetStdHandle(handle_num);
+                auto mode = 0ul;
+
+                return GetConsoleMode(handle, &mode) != 0;
+
+            #else
+
+                return ::isatty(fd) != 0;
+
+            #endif
+
+        }
+
+        inline std::string Log::xterm_rgb(int r, int g, int b) {
+            r = std::clamp(r, 0, 5);
+            g = std::clamp(g, 0, 5);
+            b = std::clamp(b, 0, 5);
+            auto index = 36 * r + 6 * g + b + 16;
+            return "\x1b[38;5;" + std::to_string(index) + "m";
         }
 
 }
