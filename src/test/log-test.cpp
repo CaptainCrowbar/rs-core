@@ -24,7 +24,7 @@ void test_rs_core_log_message() {
     {
         std::shared_ptr<Log> logptr;
         TRY(logptr = std::make_shared<Log>(logfile));
-        TRY(logptr->enable());
+        // TRY(logptr->enable());
         line_number = __LINE__;
         TRY((*logptr)({"Hello"}));
     }
@@ -39,7 +39,7 @@ void test_rs_core_log_message() {
     {
         std::shared_ptr<Log> logptr;
         TRY(logptr = std::make_shared<Log>(logfile));
-        TRY(logptr->enable());
+        // TRY(logptr->enable());
         line_number = __LINE__;
         TRY((*logptr)({"Answer {}", 42}));
         TRY((*logptr)({"Project {}", 2501}));
@@ -64,7 +64,7 @@ void test_rs_core_log_message() {
 
 // void test_rs_core_log_terminal() {
 
-//     Log log(stdout, Log::defaults | Log::date | Log::colour | Log::enabled);
+//     Log log(stdout, Log::defaults | Log::date | Log::colour);
 //     TRY(log({"Answer {}", 42}));
 //     TRY(log({"Project {}", 2501}));
 //     TRY(log({"Agent {} ❤️ {}", 86, 99}));
@@ -77,7 +77,7 @@ void test_rs_core_log_context() {
     TEST(! std::filesystem::exists(logfile));
 
     {
-        Log log(logfile, Log::enabled);
+        Log log(logfile, Log::none);
         TRY(log({"Hello"}));
     }
 
@@ -89,7 +89,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::date | Log::enabled);
+        Log log(logfile, Log::date);
         TRY(log({"Hello"}));
     }
 
@@ -101,7 +101,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::time | Log::enabled);
+        Log log(logfile, Log::time);
         TRY(log({"Hello"}));
     }
 
@@ -113,7 +113,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::process | Log::enabled);
+        Log log(logfile, Log::process);
         TRY(log({"Hello"}));
     }
 
@@ -125,7 +125,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::thread | Log::enabled);
+        Log log(logfile, Log::thread);
         TRY(log({"Hello"}));
     }
 
@@ -137,7 +137,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::path | Log::enabled);
+        Log log(logfile, Log::path);
         TRY(log({"Hello"}));
     }
 
@@ -153,7 +153,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::file | Log::enabled);
+        Log log(logfile, Log::file);
         TRY(log({"Hello"}));
     }
 
@@ -165,7 +165,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::pretty | Log::enabled);
+        Log log(logfile, Log::pretty);
         TRY(log({"Hello"}));
     }
 
@@ -177,7 +177,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::function | Log::enabled);
+        Log log(logfile, Log::function);
         TRY(log({"Hello"}));
     }
 
@@ -189,7 +189,7 @@ void test_rs_core_log_context() {
     }
 
     {
-        Log log(logfile, Log::file | Log::line | Log::enabled);
+        Log log(logfile, Log::file | Log::line);
         TRY(log({"Hello"}));
     }
 
@@ -233,7 +233,7 @@ void test_rs_core_log_function_context() {
     TEST(! std::filesystem::exists(logfile));
 
     {
-        Log log(logfile, Log::pretty | Log::enabled);
+        Log log(logfile, Log::pretty);
         TRY(foo(log, 42));
     }
 
@@ -245,7 +245,7 @@ void test_rs_core_log_function_context() {
     }
 
     {
-        Log log(logfile, Log::function | Log::enabled);
+        Log log(logfile, Log::function);
         TRY(foo(log, 42));
     }
 
@@ -258,7 +258,7 @@ void test_rs_core_log_function_context() {
 
     {
         Alpha a;
-        Log log(logfile, Log::pretty | Log::enabled);
+        Log log(logfile, Log::pretty);
         TRY(a.f(log, 86));
     }
 
@@ -271,7 +271,7 @@ void test_rs_core_log_function_context() {
 
     {
         Alpha a;
-        Log log(logfile, Log::function | Log::enabled);
+        Log log(logfile, Log::function);
         TRY(a.f(log, 86));
     }
 
@@ -284,7 +284,7 @@ void test_rs_core_log_function_context() {
 
     {
         Bravo b;
-        Log log(logfile, Log::pretty | Log::enabled);
+        Log log(logfile, Log::pretty);
         TRY(b.f(log, 99));
     }
 
@@ -297,7 +297,7 @@ void test_rs_core_log_function_context() {
 
     {
         Bravo b;
-        Log log(logfile, Log::function | Log::enabled);
+        Log log(logfile, Log::function);
         TRY(b.f(log, 99));
     }
 

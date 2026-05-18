@@ -58,7 +58,7 @@ namespace RS {
         // Other flags
         append    = 0x0001'0000,
         colour    = 0x0002'0000,
-        enabled   = 0x0004'0000,
+        quiet     = 0x0004'0000,
     };
 
     constexpr LogFlags operator|(LogFlags a, LogFlags b) noexcept {
@@ -161,24 +161,28 @@ namespace RS {
         inline Log::Log(const std::filesystem::path& path, LogFlags flags):
         path_{path},
         flags_{flags} {
-            enable((flags_ & enabled) != none);
+            enable((flags_ & quiet) == none);
         }
 
         inline Log::Log(std::FILE* out, LogFlags flags):
         out_{out},
         flags_{flags} {
-            enable((flags_ & enabled) != none);
+            enable((flags_ & quiet) == none);
         }
 
         inline Log::~Log() noexcept {
 
-            {
-                std::unique_lock lock {mutex_};
-                stop_request_ = true;
-                cv_.notify_one();
-            }
+            if (thread_.joinable()) {
 
-            thread_.join();
+                {
+                    std::unique_lock lock {mutex_};
+                    stop_request_ = true;
+                    cv_.notify_one();
+                }
+
+                thread_.join();
+
+            }
 
             if (! path_.empty() && out_ != nullptr) {
                 std::fclose(out_);

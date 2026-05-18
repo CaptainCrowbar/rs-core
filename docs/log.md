@@ -37,7 +37,7 @@ enum class LogFlags: std::uint32_t {
     // Other flags
     append,    // Append to existing file
     colour,    // Colour console output by thread
-    enabled,   // Enable logging immediately
+    quiet,     // Start disabled
 };
 ```
 
@@ -71,7 +71,6 @@ Example:
 
 ```c++
 Log my_log("my-log-file.txt", Log::file | Log::function | Log::line);
-my_log.enable();
 my_log({"answer={}", 42});
 my_log({"foo={}, bar={}", foo, bar});
 ```
@@ -111,8 +110,8 @@ explicit Log::Log(const std::filesystem::path& path,
 
 Constructor from a file name. Log entries will be written to the specified
 file. Any existing file will be overwritten unless the `append` flag was
-supplied. By default, logging is disabled until `enable()` is called. This
-will throw `std::system_error` if the file can't be opened for writing.
+supplied. This will throw `std::system_error` if the file can't be opened for
+writing.
 
 ```c++
 explicit Log::Log(std::FILE* out, LogFlags flags = defaults);
@@ -129,12 +128,12 @@ Destructor. If logging is currently enabled, this will wait until any log
 entries already queued have been written.
 
 ```c++
-void Log::enable(bool flag = true);
+void Log::enable(bool flag);
 ```
 
-Enable or disable logging. Logging starts out disabled unless the `enabled`
-flag was passed to the constructor. Calling `enable(false)` will block until
-any log entries queued but not yet written have been completed.
+Enable or disable logging. Logging starts out enabled unless the `quiet` flag
+was passed to the constructor. Calling `enable(false)` will block until any
+log entries queued but not yet written have been completed.
 
 ```c++
 void Log::operator()(const message& msg,
