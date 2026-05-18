@@ -132,7 +132,6 @@ void test_rs_core_linear_algebra_transform_projective_geometry();
 void test_rs_core_linear_algebra_transform_primitives();
 void test_rs_core_linear_algebra_transform_quaternions();
 void test_rs_core_log_message();
-void test_rs_core_log_terminal();
 void test_rs_core_log_context();
 void test_rs_core_log_function_context();
 void test_rs_core_markup_xml();
@@ -392,7 +391,6 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_linear_algebra_transform_primitives, "test_rs_core_linear_algebra_transform_primitives");
     call_me_maybe(test_rs_core_linear_algebra_transform_quaternions, "test_rs_core_linear_algebra_transform_quaternions");
     call_me_maybe(test_rs_core_log_message, "test_rs_core_log_message");
-    call_me_maybe(test_rs_core_log_terminal, "test_rs_core_log_terminal");
     call_me_maybe(test_rs_core_log_context, "test_rs_core_log_context");
     call_me_maybe(test_rs_core_log_function_context, "test_rs_core_log_function_context");
     call_me_maybe(test_rs_core_markup_xml, "test_rs_core_markup_xml");

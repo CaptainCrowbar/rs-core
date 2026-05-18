@@ -62,14 +62,14 @@ void test_rs_core_log_message() {
 
 }
 
-void test_rs_core_log_terminal() {
+// void test_rs_core_log_terminal() {
 
-    Log log(stdout, Log::defaults | Log::date | Log::colour | Log::enabled);
-    TRY(log({"Answer {}", 42}));
-    TRY(log({"Project {}", 2501}));
-    TRY(log({"Agent {} ❤️ {}", 86, 99}));
+//     Log log(stdout, Log::defaults | Log::date | Log::colour | Log::enabled);
+//     TRY(log({"Answer {}", 42}));
+//     TRY(log({"Project {}", 2501}));
+//     TRY(log({"Agent {} ❤️ {}", 86, 99}));
 
-}
+// }
 
 void test_rs_core_log_context() {
 

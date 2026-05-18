@@ -12,6 +12,12 @@ namespace RS;
 * TOC
 {:toc}
 
+## Notes
+
+This header is included by [`"rs-core/global.hpp"`](global.html) to allow
+users to easily add logging in arbitrary locations without dependency
+changes.
+
 ## Supporting types
 
 ```c++
