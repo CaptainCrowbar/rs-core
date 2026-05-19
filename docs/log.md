@@ -128,7 +128,7 @@ Destructor. If logging is currently enabled, this will wait until any log
 entries already queued have been written.
 
 ```c++
-void Log::enable(bool flag);
+void Log::enable(bool state);
 ```
 
 Enable or disable logging. Logging starts out enabled unless the `quiet` flag

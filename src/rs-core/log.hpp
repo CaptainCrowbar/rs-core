@@ -95,7 +95,7 @@ namespace RS {
         Log& operator=(const Log&) = delete;
         Log& operator=(Log&&) = delete;
 
-        void enable(bool flag = true);
+        void enable(bool state);
         void operator()(const message& msg, const std::source_location loc = std::source_location::current());
 
     private:
@@ -190,31 +190,26 @@ namespace RS {
 
         }
 
-        inline void Log::enable(bool flag) {
+        inline void Log::enable(bool state) {
 
             {
 
                 std::unique_lock lock {mutex_};
                 auto running = thread_.joinable();
 
-                if (flag == running) {
+                if (state == running) {
                     return;
                 }
 
-                stop_request_ = ! flag;
+                stop_request_ = ! state;
 
-                if (flag) {
+                if (state) {
 
-                    if (! path_.empty()) {
+                    if (! path_.empty() && out_ == nullptr) {
 
+                        const char* mode = (flags_ & append) == none ? "wb" : "ab";
                         errno = 0;
-
-                        if ((flags_ & append) != none) {
-                            out_ = std::fopen(path_.c_str(), "ab");
-                        } else {
-                            out_ = std::fopen(path_.c_str(), "wb");
-                        }
-
+                        out_ = std::fopen(path_.c_str(), mode);
                         int err = errno;
 
                         if (out_ == nullptr) {
@@ -229,16 +224,9 @@ namespace RS {
 
             }
 
-            if (! flag) {
-
+            if (! state) {
                 cv_.notify_one();
                 thread_.join();
-
-                if (! path_.empty()) {
-                    std::fclose(out_);
-                    out_ = nullptr;
-                }
-
             }
 
         }
