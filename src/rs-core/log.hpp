@@ -24,10 +24,12 @@
 #ifdef _WIN32
 
     extern "C" {
+
         _declspec(dllimport) int __stdcall GetConsoleMode(void* hConsoleHandle, unsigned long* lpMode);
         _declspec(dllimport) unsigned long __stdcall GetCurrentProcessId();
         _declspec(dllimport) unsigned long __stdcall GetCurrentThreadId();
         _declspec(dllimport) void* __stdcall GetStdHandle(unsigned long nStdHandle);
+
     }
 
 #else
@@ -100,8 +102,6 @@ namespace RS {
 
     private:
 
-        using clock = std::chrono::system_clock;
-
         #ifdef _WIN32
 
             using process_id = unsigned long;
@@ -117,6 +117,8 @@ namespace RS {
             static constexpr const char* path_delimiters = "/";
 
         #endif
+
+        using clock = std::chrono::system_clock;
 
         struct log_entry {
 
@@ -152,6 +154,7 @@ namespace RS {
         static process_id get_current_process();
         static thread_id get_current_thread();
         static std::string make_prefix();
+        static bool xterm_is_tty(int fd) noexcept;
         static bool xterm_is_tty(std::FILE* fp) noexcept;
         static const char* xterm_reset() noexcept { return "\x1b[0m"; }
         static std::string xterm_rgb(int r, int g, int b);
@@ -326,17 +329,7 @@ namespace RS {
 
         inline std::string_view Log::function_leaf_name(std::string_view pretty) {
 
-            if (pretty.empty()) {
-                return {};
-            }
-
             static constexpr std::string_view anon_text = "anonymous namespace";
-
-            auto anon_pos = pretty.find(anon_text);
-
-            if (anon_pos != std::string::npos) {
-                pretty = pretty.substr(anon_pos + anon_text.size() + 1);
-            }
 
             static const auto name_char = [] (char c) {
                 return (c >= '0' && c <= '9')
@@ -346,6 +339,16 @@ namespace RS {
                     || static_cast<unsigned char>(c) >= 0x80;
             };
 
+            if (pretty.empty()) {
+                return {};
+            }
+
+            auto anon_pos = pretty.find(anon_text);
+
+            if (anon_pos != std::string::npos) {
+                pretty = pretty.substr(anon_pos + anon_text.size() + 1);
+            }
+
             auto end_name = pretty.find('(');
 
             if (end_name == 0 || end_name == std::string::npos) {
@@ -353,7 +356,9 @@ namespace RS {
             }
 
             if (pretty[end_name - 1] == '>') {
+
                 auto depth = 0;
+
                 do {
                     --end_name;
                     if (pretty[end_name] == '<') {
@@ -362,9 +367,11 @@ namespace RS {
                         ++depth;
                     }
                 } while (end_name != 0 && depth > 0);
+
                 if (end_name == 0) {
                     return pretty;
                 }
+
             }
 
             auto begin_name = end_name;
@@ -375,22 +382,6 @@ namespace RS {
 
             return pretty.substr(begin_name, end_name - begin_name);
 
-        }
-
-        inline Log::process_id Log::get_current_process() {
-            #ifdef _WIN32
-                return GetCurrentProcessId();
-            #else
-                return getpid();
-            #endif
-        }
-
-        inline Log::thread_id Log::get_current_thread() {
-            #ifdef _WIN32
-                return GetCurrentThreadId();
-            #else
-                return reinterpret_cast<thread_id>(pthread_self());
-            #endif
         }
 
         inline std::string Log::make_prefix() {
@@ -412,33 +403,15 @@ namespace RS {
         }
 
         inline bool Log::xterm_is_tty(std::FILE* fp) noexcept {
-
-            int fd;
-
             if (fp == stdin) {
-                fd = 0;
+                return xterm_is_tty(0);
             } else if (fp == stdout) {
-                fd = 1;
+                return xterm_is_tty(1);
             } else if (fp == stderr) {
-                fd = 2;
+                return xterm_is_tty(2);
             } else {
                 return false;
             }
-
-            #ifdef _WIN32
-
-                auto handle_num = static_cast<unsigned long>(-10 - fd);
-                auto handle = GetStdHandle(handle_num);
-                auto mode = 0ul;
-
-                return GetConsoleMode(handle, &mode) != 0;
-
-            #else
-
-                return ::isatty(fd) != 0;
-
-            #endif
-
         }
 
         inline std::string Log::xterm_rgb(int r, int g, int b) {
@@ -448,5 +421,38 @@ namespace RS {
             auto index = 36 * r + 6 * g + b + 16;
             return "\x1b[38;5;" + std::to_string(index) + "m";
         }
+
+        #ifdef _WIN32
+
+            inline Log::process_id Log::get_current_process() {
+                return GetCurrentProcessId();
+            }
+
+            inline Log::thread_id Log::get_current_thread() {
+                return GetCurrentThreadId();
+            }
+
+            inline bool Log::xterm_is_tty(int fd) noexcept {
+                auto handle_num = static_cast<unsigned long>(-10 - fd);
+                auto handle = GetStdHandle(handle_num);
+                auto mode = 0ul;
+                return GetConsoleMode(handle, &mode) != 0;
+            }
+
+        #else
+
+            inline Log::process_id Log::get_current_process() {
+                return getpid();
+            }
+
+            inline Log::thread_id Log::get_current_thread() {
+                return reinterpret_cast<thread_id>(pthread_self());
+            }
+
+            inline bool Log::xterm_is_tty(int fd) noexcept {
+                return ::isatty(fd) != 0;
+            }
+
+        #endif
 
 }
