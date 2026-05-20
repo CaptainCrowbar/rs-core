@@ -48,12 +48,14 @@ either argument is zero. For the `lcm()` function, behaviour is undefined if
 the correct result would be out of range for the type.
 
 ```c++
-template <typename T> constexpr T int_power(T x, int y);
+template <[see below] T, std::integral U>
+    constexpr T int_power(T x, U y);
 ```
 
 Calculates `x` to the power of `y` quickly using a binary algorithm. `T` can
-be any type that supports multiplication. Behaviour is undefined if `y` is
-negative, or if the result would be out of range for the return type.
+be any type that supports multiplication and is constructible from an `int.`
+Behaviour is undefined if `y` is negative, or if the result would be out of
+range for the return type.
 
 ## Bitmask operations
 

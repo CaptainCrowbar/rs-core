@@ -136,32 +136,27 @@ namespace RS {
 
     }
 
-    template <typename T>
-    constexpr T int_power(T x, int y) {
-
-        if (y == 0) {
-
-            return T{1};
-
-        } else if (y == 1) {
-
-            return x;
-
-        } else {
-
-            auto bits = std::bit_width(static_cast<unsigned>(y));
-            auto z = T{1};
-
-            for (auto bit = bits - 1; bit >= 0; --bit) {
-                z *= z;
-                if (((y >> bit) & 1) == 1) {
-                    z *= x;
-                }
-            }
-
-            return z;
-
+    template <typename T, std::integral U>
+    requires std::constructible_from<T, int>
+        && requires (T t) {
+            { t * t } -> std::convertible_to<T>;
+            { t *= t };
         }
+    constexpr T int_power(T x, U y) {
+
+        using UU = std::make_unsigned_t<U>;
+
+        auto bits = std::bit_width(static_cast<UU>(y));
+        auto z = static_cast<T>(1);
+
+        for (auto bit = bits - 1; bit >= 0; --bit) {
+            z *= z;
+            if (((y >> bit) & U{1}) == U{1}) {
+                z *= x;
+            }
+        }
+
+        return z;
 
     }
 
