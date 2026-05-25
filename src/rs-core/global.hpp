@@ -4,8 +4,10 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <iterator>
 #include <limits>
 #include <print>
+#include <ranges>
 #include <string_view>
 #include <type_traits>
 
@@ -17,6 +19,13 @@ namespace RS {
     static_assert(sizeof(int) >= 4);
 
     // Primitive concepts
+
+    template <typename T>
+    concept ByteType = std::same_as<T, char>
+        || std::same_as<T, signed char>
+        || std::same_as<T, unsigned char>
+        || std::same_as<T, char8_t>
+        || std::same_as<T, std::byte>;
 
     template <typename T>
     concept Character = std::same_as<T, char>
@@ -67,6 +76,28 @@ namespace RS {
     template <typename T>
     concept UnsignedIntegral = Integral<T>
         && ! std::numeric_limits<T>::is_signed;
+
+    // Range concepts
+
+    template <typename T>
+    concept InputSpan = std::ranges::contiguous_range<T>
+        && ByteType<std::ranges::range_value_t<T>>
+        && requires (const T& t, std::ranges::range_value_t<T>& v) {
+            { v = *std::ranges::begin(t) };
+        };
+
+    template <typename T>
+    concept OutputSpan = std::ranges::contiguous_range<T>
+        && ByteType<std::ranges::range_value_t<T>>
+        && requires (T& t, const std::ranges::range_value_t<T>& v) {
+            { *std::ranges::begin(t) = v };
+        };
+
+    template <typename T>
+    concept OutputBuffer = OutputSpan<T>
+        && requires (T& t, std::size_t n, const std::ranges::range_value_t<T>& v) {
+            { t.resize(n, v) };
+        };
 
     // Constants
 

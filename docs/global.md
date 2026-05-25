@@ -22,6 +22,13 @@ easily add logging in arbitrary locations without dependency changes.
 ### Primitive concepts
 
 ```c++
+template <typename T> concept ByteType;
+```
+
+Matches the types that can alias a byte of memory: `char, signed char,
+unsigned char, char8_t, std::byte.`
+
+```c++
 template <typename T> concept Character;
 ```
 
@@ -64,8 +71,24 @@ legal for a type to match both of these.
 The `Arithmetic` concept matches any type that matches any of the other
 concepts listed here.
 
-The `bool` type, and all character types, are excluded from all of these
-concepts.
+The `bool` type, and any type matching `Character,` are excluded from all of
+these concepts.
+
+## Range concepts
+
+```c++
+template <typename T> concept InputSpan
+    = [readable contiguous range]
+    && [value type matches ByteType];
+template <typename T> concept OutputSpan
+    = [writable contiguous range]
+    && [value type matches ByteType];
+template <typename T> concept OutputBuffer
+    = OutputSpan
+    && [resize(number, value) member function];
+```
+
+Byte-oriented ranges and containers used as I/O buffers.
 
 ## Constants
 

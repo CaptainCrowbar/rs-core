@@ -3,8 +3,11 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <deque>
+#include <span>
 #include <string>
 #include <string_view>
+#include <vector>
 
 using namespace RS;
 
@@ -21,6 +24,24 @@ namespace {
 }
 
 void test_rs_core_global_primitive_concepts() {
+
+    TEST(ByteType<std::byte>);
+    TEST(ByteType<char>);
+    TEST(ByteType<signed char>);
+    TEST(ByteType<unsigned char>);
+    TEST(ByteType<char8_t>);
+    TEST(! ByteType<char16_t>);
+    TEST(! ByteType<char32_t>);
+    TEST(! ByteType<wchar_t>);
+    TEST(! ByteType<std::int16_t>);
+    TEST(! ByteType<std::int32_t>);
+    TEST(! ByteType<std::int64_t>);
+    TEST(! ByteType<std::uint16_t>);
+    TEST(! ByteType<std::uint32_t>);
+    TEST(! ByteType<std::uint64_t>);
+    TEST(! ByteType<bool>);
+    TEST(! ByteType<void>);
+    TEST(! ByteType<void*>);
 
     TEST(! Reference<int>);
     TEST(Reference<int&>);
@@ -113,6 +134,40 @@ void test_rs_core_global_arithmetic_concepts() {
     TEST_EQUAL(select(86),     "SignedIntegral");
     TEST_EQUAL(select(99u),    "UnsignedIntegral");
     TEST_EQUAL(select(12.34),  "FloatingPoint");
+
+}
+
+void test_rs_core_global_range_concepts() {
+
+    TEST(InputSpan<std::string>);
+    TEST(InputSpan<std::string_view>);
+    TEST(InputSpan<std::u8string>);
+    TEST(InputSpan<std::u8string_view>);
+    TEST(InputSpan<std::vector<std::byte>>);
+    TEST(InputSpan<std::span<std::byte>>);
+    TEST(! InputSpan<std::deque<std::byte>>);
+    TEST(! InputSpan<char*>);
+    TEST(! InputSpan<const char*>);
+
+    TEST(OutputSpan<std::string>);
+    TEST(! OutputSpan<std::string_view>);
+    TEST(OutputSpan<std::u8string>);
+    TEST(! OutputSpan<std::u8string_view>);
+    TEST(OutputSpan<std::vector<std::byte>>);
+    TEST(OutputSpan<std::span<std::byte>>);
+    TEST(! OutputSpan<std::deque<std::byte>>);
+    TEST(! OutputSpan<char*>);
+    TEST(! OutputSpan<const char*>);
+
+    TEST(OutputBuffer<std::string>);
+    TEST(! OutputBuffer<std::string_view>);
+    TEST(OutputBuffer<std::u8string>);
+    TEST(! OutputBuffer<std::u8string_view>);
+    TEST(OutputBuffer<std::vector<std::byte>>);
+    TEST(! OutputBuffer<std::span<std::byte>>);
+    TEST(! OutputBuffer<std::deque<std::byte>>);
+    TEST(! OutputBuffer<char*>);
+    TEST(! OutputBuffer<const char*>);
 
 }
 
