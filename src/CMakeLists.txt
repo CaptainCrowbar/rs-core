@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.207
+    VERSION 0.1.208
     LANGUAGES CXX
 )
 
@@ -36,6 +36,7 @@ else()
 endif()
 
 find_package(Threads REQUIRED)
+find_package(ZLIB REQUIRED)
 include_directories(.)
 set(library rs-core)
 set(unittest test-rs-core)
@@ -56,6 +57,7 @@ add_executable(${unittest}
     test/bitwise-integer-large-binary-100-test.cpp
     test/bitwise-integer-misc-test.cpp
     test/character-test.cpp
+    test/compress-test.cpp
     test/constants-test.cpp
     test/dice-basic-test.cpp
     test/dice-set-test.cpp
@@ -111,6 +113,7 @@ add_executable(${unittest}
 
 target_link_libraries(${unittest}
     PRIVATE Threads::Threads
+    PRIVATE ZLIB::ZLIB
 )
 
 install(DIRECTORY ${library} DESTINATION include)

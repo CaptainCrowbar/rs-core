@@ -17,12 +17,14 @@ Requires C++23. Not yet tested on all compilers.
 * General utilities
     * [`rs-core/global.hpp` -- Global definitions](global.html)
     * [`rs-core/scope.hpp` -- Scope guards](scope.html)
-    * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
     * [`rs-core/version.hpp` -- Version information](version.html)
 * Algorithms
     * [`rs-core/hash.hpp` -- Hash functions](hash.html)
     * [`rs-core/range.hpp` -- Range utilities](range.html)
     * [`rs-core/topological.hpp` -- Topological sorting](topological.html)
+* Byte array utilities
+    * [`rs-core/compress.hpp` -- Compression](compress.html)
+    * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
 * Concurrency utilities
     * [`rs-core/thread-pool.hpp` -- Thread pool](thread-pool.html)
 * I/O utilities
@@ -68,5 +70,6 @@ cmake --build . --config Release --target install
 
 will do this, or you can just copy or symlink it by hand.
 
-To use the library, just `#include` the headers you want. No special link-time
-options are needed.
+To use the library, just `#include` the headers you want. Link with Zlib if
+you use the compression module. Otherwise, no special link-time options are
+needed.

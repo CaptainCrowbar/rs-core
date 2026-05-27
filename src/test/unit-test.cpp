@@ -57,6 +57,8 @@ void test_rs_core_bitwise_integer_string_parsing();
 void test_rs_core_bitwise_integer_hash();
 void test_rs_core_character_properties();
 void test_rs_core_character_string_case_conversion();
+void test_rs_core_compress_single_block();
+void test_rs_core_compress_multiple_blocks();
 void test_rs_core_constants();
 void test_rs_core_dice_basic_statistics();
 void test_rs_core_dice_basic_formatting();
@@ -317,6 +319,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_bitwise_integer_hash, "test_rs_core_bitwise_integer_hash");
     call_me_maybe(test_rs_core_character_properties, "test_rs_core_character_properties");
     call_me_maybe(test_rs_core_character_string_case_conversion, "test_rs_core_character_string_case_conversion");
+    call_me_maybe(test_rs_core_compress_single_block, "test_rs_core_compress_single_block");
+    call_me_maybe(test_rs_core_compress_multiple_blocks, "test_rs_core_compress_multiple_blocks");
     call_me_maybe(test_rs_core_constants, "test_rs_core_constants");
     call_me_maybe(test_rs_core_dice_basic_statistics, "test_rs_core_dice_basic_statistics");
     call_me_maybe(test_rs_core_dice_basic_formatting, "test_rs_core_dice_basic_formatting");

@@ -77,14 +77,14 @@ these concepts.
 ## Range concepts
 
 ```c++
-template <typename T> concept InputSpan
-    = [readable contiguous range]
+template <typename T> concept InputSpan =
+    [readable contiguous range]
     && [value type matches ByteType];
-template <typename T> concept OutputSpan
-    = [writable contiguous range]
+template <typename T> concept OutputSpan =
+    [writable contiguous range]
     && [value type matches ByteType];
-template <typename T> concept OutputBuffer
-    = OutputSpan
+template <typename T> concept OutputBuffer =
+    OutputSpan
     && [resize(number, value) member function];
 ```
 
