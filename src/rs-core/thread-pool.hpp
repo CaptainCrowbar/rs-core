@@ -60,6 +60,9 @@ namespace RS {
         void thread_payload(worker* wptr) noexcept;
 
         static std::size_t actual_threads(std::size_t threads) noexcept;
+        template <std::invocable<> F> static bool callback_is_null(F&&) { return false; }
+        static bool callback_is_null(void (*f)()) { return f == nullptr; }
+        static bool callback_is_null(std::function<void()> f) { return ! f; }
 
     };
 
@@ -99,7 +102,7 @@ namespace RS {
     template <std::invocable<> F>
     void ThreadPool::insert(F&& f) {
 
-        if (clear_count_) {
+        if (clear_count_ || callback_is_null(std::forward<F>(f))) {
             return;
         }
 
@@ -142,10 +145,12 @@ namespace RS {
 
         auto seed = static_cast<std::uint32_t>(reinterpret_cast<std::uintptr_t>(wptr));
         std::minstd_rand rng{seed};
+        std::function<void()> call;
+        worker* alt_worker;
 
-        for (;;) {
+        while (! shutting_down_) {
 
-            std::function<void()> call;
+            call = {};
 
             {
                 std::unique_lock lock{wptr->mutex};
@@ -155,21 +160,21 @@ namespace RS {
                 }
             }
 
-            if (! call) {
-                auto index = rng() % threads();
-                auto& w = workers_[index];
-                std::unique_lock lock{w.mutex};
-                if (! w.queue.empty()) {
-                    call = std::move(w.queue.front());
-                    w.queue.pop_front();
+            if (! call && workers_.size() >= 2) {
+                do {
+                    auto index = rng() % threads();
+                    alt_worker = &workers_[index];
+                } while (alt_worker != wptr);
+                std::unique_lock lock{alt_worker->mutex};
+                if (! alt_worker->queue.empty()) {
+                    call = std::move(alt_worker->queue.front());
+                    alt_worker->queue.pop_front();
                 }
             }
 
             if (call) {
                 call();
                 --unfinished_jobs_;
-            } else if (shutting_down_) {
-                break;
             } else {
                 std::this_thread::sleep_for(poll_interval);
             }

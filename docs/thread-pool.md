@@ -63,8 +63,8 @@ template <typename F> void ThreadPool::operator()(F&& f);
 ```
 
 Queue a job for execution. `F` must be a callable type with no arguments.
-Behaviour is undefined if the callback is a null function pointer, a null
-`std::function`, or throws an exception.
+These will do nothing if the argument is a null function pointer or a null
+`std::function`. Behaviour is undefined if the callback throws an exception.
 
 ```c++
 bool ThreadPool::poll();
