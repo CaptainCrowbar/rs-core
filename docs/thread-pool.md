@@ -37,9 +37,10 @@ explicit ThreadPool::ThreadPool(std::size_t threads);
 ```
 
 Constructors. `ThreadPool` is not copyable or movable. The number of system
-threads is specified to the constructor. If no thread count is specified, or
-the count is zero, `std::thread::hardware_concurrency()` will be used
-instead, with a minimum of one thread if no concurrency value is available.
+threads is determined at construction and cannot be changed afterwards. If no
+thread count is specified, or the count is zero,
+`std::thread::hardware_concurrency()` will be used instead. There is always a
+minimum of two threads regardless of the argument.
 
 ```c++
 ThreadPool::~ThreadPool() noexcept;

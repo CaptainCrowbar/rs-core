@@ -185,10 +185,9 @@ namespace RS {
 
     inline std::size_t ThreadPool::actual_threads(std::size_t threads) noexcept {
         if (threads == 0) {
-            return std::max(std::thread::hardware_concurrency(), 1u);
-        } else {
-            return threads;
+            threads = std::thread::hardware_concurrency();
         }
+        return std::max(threads, 2uz);
     }
 
 }
