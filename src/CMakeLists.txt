@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.210
+    VERSION 0.1.211
     LANGUAGES CXX
 )
 
@@ -97,6 +97,8 @@ add_executable(${unittest}
     test/rational-mp-integer-maths-division-test.cpp
     test/rational-mp-integer-maths-multiplication-test.cpp
     test/rational-mp-integer-string-conversion-test.cpp
+    test/ring-buffer-basic-test.cpp
+    test/ring-buffer-static-test.cpp
     test/root-finding-test.cpp
     test/scope-test.cpp
     test/statistics-test.cpp

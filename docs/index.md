@@ -27,6 +27,8 @@ Requires C++23. Not yet tested on all compilers.
     * [`rs-core/uuid.hpp` -- UUID class](uuid.html)
 * Concurrency utilities
     * [`rs-core/thread-pool.hpp` -- Thread pool](thread-pool.html)
+* Containers
+    * [`rs-core/ring-buffer.hpp` -- Ring buffer](ring-buffer.html)
 * I/O utilities
     * [`rs-core/io.hpp` -- I/O utilities](io.html)
     * [`rs-core/log.hpp` -- Logging](log.html)
