@@ -1,8 +1,11 @@
 #pragma once
 
 #include "rs-core/global.hpp"
+#include "rs-core/iterator.hpp"
 #include <algorithm>
+#include <compare>
 #include <concepts>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <ranges>
@@ -86,6 +89,89 @@ namespace RS {
     template <std::ranges::range Range>
     std::vector<std::ranges::range_value_t<Range>> sorted(const Range& range) {
         return sorted(range, std::less<std::ranges::range_value_t<Range>>{});
+    }
+
+    // Range algorithms
+
+    template <std::ranges::forward_range Range>
+    class CartesianPowerIterator:
+    public Iterator<CartesianPowerIterator<Range>, const std::vector<std::ranges::range_value_t<Range>>,
+        std::forward_iterator_tag> {
+
+    public:
+
+        CartesianPowerIterator() = default;
+
+        explicit CartesianPowerIterator(const Range& range, std::size_t k):
+        range_{&range}, index_{0} {
+
+            using std::begin;
+
+            if (k > 0) {
+                iterators_.resize(k, begin(range));
+                elements_.resize(k, *iterators_[0]);
+            }
+
+        }
+
+        const auto& operator*() const noexcept {
+            return elements_;
+        }
+
+        CartesianPowerIterator& operator++() {
+
+            using std::begin;
+            using std::end;
+
+            ++index_;
+            auto p = iterators_.end();
+            auto q = elements_.end();
+
+            while (p != iterators_.begin()) {
+
+                --p;
+                --q;
+                ++*p;
+
+                if (*p != end(*range_)) {
+                    *q = **p;
+                    return *this;
+                }
+
+                *p = begin(*range_);
+                *q = **p;
+
+            }
+
+            index_ = npos;
+
+            return *this;
+
+        }
+
+        bool operator==(const CartesianPowerIterator& i) const noexcept {
+            return index_ == i.index_;
+        }
+
+    private:
+
+        using iterator_type = std::ranges::iterator_t<const Range>;
+        using iterator_vector = std::vector<iterator_type>;
+        using element_type = std::ranges::range_value_t<Range>;
+        using element_vector = std::vector<element_type>;
+
+        iterator_vector iterators_;
+        element_vector elements_;
+        const Range* range_ = nullptr;
+        std::size_t index_ = npos;
+
+    };
+
+    template <std::ranges::forward_range Range>
+    std::ranges::subrange<CartesianPowerIterator<Range>>
+    cartesian_power(const Range& range, std::size_t k) {
+        CartesianPowerIterator<Range> begin{range, k};
+        return {begin, {}};
     }
 
 }

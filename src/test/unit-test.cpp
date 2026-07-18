@@ -184,6 +184,7 @@ void test_rs_core_random_uniform_mp_integer();
 void test_rs_core_random_iterator();
 void test_rs_core_random_spherical_surface_distribution();
 void test_rs_core_random_spherical_volume_distribution();
+void test_rs_core_range_cartesian_power();
 void test_rs_core_range_concepts();
 void test_rs_core_range_as_range();
 void test_rs_core_range_sorted();
@@ -447,6 +448,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_random_iterator, "test_rs_core_random_iterator");
     call_me_maybe(test_rs_core_random_spherical_surface_distribution, "test_rs_core_random_spherical_surface_distribution");
     call_me_maybe(test_rs_core_random_spherical_volume_distribution, "test_rs_core_random_spherical_volume_distribution");
+    call_me_maybe(test_rs_core_range_cartesian_power, "test_rs_core_range_cartesian_power");
     call_me_maybe(test_rs_core_range_concepts, "test_rs_core_range_concepts");
     call_me_maybe(test_rs_core_range_as_range, "test_rs_core_range_as_range");
     call_me_maybe(test_rs_core_range_sorted, "test_rs_core_range_sorted");

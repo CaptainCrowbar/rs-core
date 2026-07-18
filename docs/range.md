@@ -58,3 +58,28 @@ template <std::ranges::range Range,
 ```
 
 Return a sorted copy of the range.
+
+## Range algorithms
+
+### Cartesian power
+
+```c++
+template <std::ranges::forward_range Range>
+class CartesianPowerIterator {
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = std::vector<[range value type]>;
+    CartesianPowerIterator();
+    explicit CartesianPowerIterator(const Range& range, std::size_t k);
+};
+
+template <std::ranges::forward_range Range>
+    std::ranges::subrange<CartesianPowerIterator<Range>>
+    cartesian_power(const Range& range, std::size_t k);
+```
+
+This iterates over the Cartesian power `k` of the input range, i.e.
+`range×range×...×range`. The dereferenced vector contains `k` elements from
+the input range. The output range contains _n<sup>k</sup>_ elements, where
+`n` is the size of the input range. The output elements are in their natural
+order based on the order of the input range, with the last element varying
+fastest.

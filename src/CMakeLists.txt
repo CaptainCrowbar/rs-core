@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.213
+    VERSION 0.1.214
     LANGUAGES CXX
 )
 
@@ -90,7 +90,9 @@ add_executable(${unittest}
     test/random-integer-test.cpp
     test/random-iterator-test.cpp
     test/random-spatial-test.cpp
-    test/range-test.cpp
+    test/range-algorithms-test.cpp
+    test/range-concepts-test.cpp
+    test/range-functions-test.cpp
     test/rational-int-test.cpp
     test/rational-mp-integer-basics-test.cpp
     test/rational-mp-integer-maths-addition-subtraction-test.cpp
