@@ -1,10 +1,28 @@
 #include "rs-core/arithmetic.hpp"
 #include "rs-core/unit-test.hpp"
+#include <concepts>
 #include <cstdint>
 #include <optional>
 #include <stdexcept>
 
 using namespace RS;
+
+void test_rs_core_arithmetic_to_signed_or_unsigned() {
+
+    auto a = to_signed(10);        TEST_EQUAL(a, 10);    static_assert(std::same_as<decltype(a), int>);
+    auto b = to_signed(20u);       TEST_EQUAL(b, 20);    static_assert(std::same_as<decltype(b), int>);
+    auto c = to_signed(30l);       TEST_EQUAL(c, 30);    static_assert(std::same_as<decltype(c), long>);
+    auto d = to_signed(40ul);      TEST_EQUAL(d, 40);    static_assert(std::same_as<decltype(d), long>);
+    auto e = to_signed(50ll);      TEST_EQUAL(e, 50);    static_assert(std::same_as<decltype(e), long long>);
+    auto f = to_signed(60ull);     TEST_EQUAL(f, 60);    static_assert(std::same_as<decltype(f), long long>);
+    auto g = to_unsigned(70);      TEST_EQUAL(g, 70u);   static_assert(std::same_as<decltype(g), unsigned>);
+    auto h = to_unsigned(80u);     TEST_EQUAL(h, 80u);   static_assert(std::same_as<decltype(h), unsigned>);
+    auto i = to_unsigned(90l);     TEST_EQUAL(i, 90u);   static_assert(std::same_as<decltype(i), unsigned long>);
+    auto j = to_unsigned(100ul);   TEST_EQUAL(j, 100u);  static_assert(std::same_as<decltype(j), unsigned long>);
+    auto k = to_unsigned(110ll);   TEST_EQUAL(k, 110u);  static_assert(std::same_as<decltype(k), unsigned long long>);
+    auto l = to_unsigned(120ull);  TEST_EQUAL(l, 120u);  static_assert(std::same_as<decltype(l), unsigned long long>);
+
+}
 
 void test_rs_core_arithmetic_maybe_cast() {
 

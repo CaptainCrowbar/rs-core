@@ -86,7 +86,7 @@ namespace RS {
                 throw std::out_of_range{std::format("Dice value ({}) is out of range (1-{})", value, faces_)};
             }
 
-            results_.resize(static_cast<std::size_t>(number), value);
+            results_.resize(to_unsigned(number), value);
 
         }
 
@@ -729,7 +729,7 @@ namespace RS {
 
                 if (a.dice == b.dice) {
                     a.factor += b.factor;
-                    elements_.erase(elements_.begin() + static_cast<std::ptrdiff_t>(i + 1));
+                    elements_.erase(elements_.begin() + to_signed(i + 1));
                 } else {
                     ++i;
                 }
@@ -749,7 +749,7 @@ namespace RS {
 
                     if (a.factor == b.factor) {
                         a.dice = dice_type{a.dice.number() + b.dice.number(), a.dice.faces()};
-                        elements_.erase(elements_.begin() + static_cast<std::ptrdiff_t>(j));
+                        elements_.erase(elements_.begin() + to_signed(j));
                     } else {
                         ++j;
                     }

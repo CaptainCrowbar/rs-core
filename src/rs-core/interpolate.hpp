@@ -304,7 +304,7 @@ namespace RS {
                 --it;
             }
 
-            auto j = static_cast<std::size_t>(it - points_.begin());
+            auto j = to_unsigned(it - points_.begin());
             auto dx = px(j + 1) - px(j);
             auto q_prev = (x - px(j)) / dx;
             auto q_next = (px(j + 1) - x) / dx;

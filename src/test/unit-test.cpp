@@ -26,6 +26,7 @@ void test_rs_core_alias_numnbers();
 void test_rs_core_alias_numeric_limits();
 void test_rs_core_alias_point_arithmetic();
 void test_rs_core_alias_point_arithmetic_nested();
+void test_rs_core_arithmetic_to_signed_or_unsigned();
 void test_rs_core_arithmetic_maybe_cast();
 void test_rs_core_arithmetic_try_cast();
 void test_rs_core_arithmetic_euclidean_division();
@@ -290,6 +291,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_alias_numeric_limits, "test_rs_core_alias_numeric_limits");
     call_me_maybe(test_rs_core_alias_point_arithmetic, "test_rs_core_alias_point_arithmetic");
     call_me_maybe(test_rs_core_alias_point_arithmetic_nested, "test_rs_core_alias_point_arithmetic_nested");
+    call_me_maybe(test_rs_core_arithmetic_to_signed_or_unsigned, "test_rs_core_arithmetic_to_signed_or_unsigned");
     call_me_maybe(test_rs_core_arithmetic_maybe_cast, "test_rs_core_arithmetic_maybe_cast");
     call_me_maybe(test_rs_core_arithmetic_try_cast, "test_rs_core_arithmetic_try_cast");
     call_me_maybe(test_rs_core_arithmetic_euclidean_division, "test_rs_core_arithmetic_euclidean_division");

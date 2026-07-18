@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/arithmetic.hpp"
 #include "rs-core/enum.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/iterator.hpp"
@@ -148,7 +149,7 @@ namespace RS {
                 seek(0, end);
                 auto signed_size = tell() - start;
                 seek(- signed_size, current);
-                auto size = static_cast<std::size_t>(signed_size);
+                auto size = to_unsigned(signed_size);
                 buf.resize(size);
                 read(buf.data(), size);
 
@@ -495,7 +496,7 @@ namespace RS {
         std::string read_full_line() override;
         std::string read_str(std::size_t len) override;
         void seek(std::ptrdiff_t offset, IOSeek from = current) override;
-        std::ptrdiff_t tell() const override { return static_cast<std::ptrdiff_t>(pos_); }
+        std::ptrdiff_t tell() const override { return to_signed(pos_); }
         std::size_t write(const void* ptr, std::size_t len) override;
 
         void clear() noexcept;
@@ -569,14 +570,14 @@ namespace RS {
         }
 
         inline void StringBuffer::seek(std::ptrdiff_t offset, IOSeek from) {
-            auto signed_pos = static_cast<std::ptrdiff_t>(pos_);
-            auto signed_size = static_cast<std::ptrdiff_t>(buf_ptr_->size());
+            auto signed_pos = to_signed(pos_);
+            auto signed_size = to_signed(buf_ptr_->size());
             switch (from) {
                 case set:  signed_pos = offset; break;
                 case end:  signed_pos = signed_size - offset; break;
                 default:   signed_pos += offset; break;
             }
-            pos_ = static_cast<std::size_t>(std::clamp(signed_pos, 0z, signed_size));
+            pos_ = to_unsigned(std::clamp(signed_pos, 0z, signed_size));
         }
 
         inline std::size_t StringBuffer::write(const void* ptr, std::size_t len) {

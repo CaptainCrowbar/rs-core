@@ -199,25 +199,35 @@ namespace RS {
 
     // Conversion functions
 
+    template <std::integral T>
+    constexpr auto to_signed(T t) noexcept {
+        return static_cast<std::make_signed_t<T>>(t);
+    }
+
+    template <std::integral T>
+    constexpr auto to_unsigned(T t) noexcept {
+        return static_cast<std::make_unsigned_t<T>>(t);
+    }
+
     template <std::integral To, std::integral From>
     constexpr std::optional<To> maybe_cast(From x) noexcept {
 
-        static constexpr auto from_signed = std::signed_integral<From>;
-        static constexpr auto to_signed = std::signed_integral<To>;
-        static constexpr auto min_to = std::numeric_limits<To>::min();
-        static constexpr auto max_to = std::numeric_limits<To>::max();
+        static constexpr auto input_is_signed = std::signed_integral<From>;
+        static constexpr auto output_is_signed = std::signed_integral<To>;
+        static constexpr auto min_output = std::numeric_limits<To>::min();
+        static constexpr auto max_output = std::numeric_limits<To>::max();
 
-        if constexpr (from_signed == to_signed) {
+        if constexpr (input_is_signed == output_is_signed) {
 
             // Same signedness
 
             if constexpr (sizeof(To) < sizeof(From)) {
-                if (x < static_cast<From>(min_to) || x > static_cast<From>(max_to)) {
+                if (x < static_cast<From>(min_output) || x > static_cast<From>(max_output)) {
                     return {};
                 }
             }
 
-        } else if constexpr (from_signed) {
+        } else if constexpr (input_is_signed) {
 
             // Signed to unsigned
 
@@ -226,7 +236,7 @@ namespace RS {
             }
 
             if constexpr (sizeof(To) < sizeof(From)) {
-                if (x > static_cast<From>(max_to)) {
+                if (x > static_cast<From>(max_output)) {
                     return {};
                 }
             }
@@ -236,7 +246,7 @@ namespace RS {
             // Unsigned to signed
 
             if constexpr (sizeof(To) <= sizeof(From)) {
-                if (x > static_cast<From>(max_to)) {
+                if (x > static_cast<From>(max_output)) {
                     return {};
                 }
             }

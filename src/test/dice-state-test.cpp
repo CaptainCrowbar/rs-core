@@ -1,4 +1,5 @@
 #include "rs-core/dice.hpp"
+#include "rs-core/arithmetic.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cstddef>
 #include <format>
@@ -79,7 +80,7 @@ void test_rs_core_dice_state_formatting() {
     TEST_EQUAL(std::format("{:cd}", state), "[5:3]");
 
     for (auto i = 6; i >= 1; --i) {
-        vec.insert(vec.end(), static_cast<std::size_t>(i), i);
+        vec.insert(vec.end(), to_unsigned(i), i);
     }
 
     TRY((state = State::from_range(6, vec)));

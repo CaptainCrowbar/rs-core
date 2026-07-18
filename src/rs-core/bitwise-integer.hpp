@@ -1,5 +1,6 @@
 #pragma once
 
+#include "rs-core/arithmetic.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
@@ -161,7 +162,7 @@ namespace RS {
         constexpr const unsigned char* data() const noexcept { return reinterpret_cast<const unsigned char*>(&value_); }
         template <Arithmetic T> constexpr bool fits_in() const noexcept { return significant_bits() <= std::numeric_limits<T>::digits; }
         constexpr std::size_t hash() const noexcept { return std::hash<word_type>{}(value_); }
-        constexpr std::size_t significant_bits() const noexcept { return static_cast<std::size_t>(std::bit_width(value_)); }
+        constexpr std::size_t significant_bits() const noexcept { return to_unsigned(std::bit_width(value_)); }
 
         constexpr explicit operator bool() const noexcept { return value_ != 0; }
         template <Arithmetic T> constexpr explicit operator T() const noexcept { return static_cast<T>(value_); }
@@ -525,7 +526,7 @@ namespace RS {
             while (i != npos && array_[i] == 0) {
                 --i;
             }
-            return i == npos ? 0uz : word_size * i + static_cast<std::size_t>(std::bit_width(array_[i]));
+            return i == npos ? 0uz : word_size * i + to_unsigned(std::bit_width(array_[i]));
         }
 
         template <std::size_t N>
@@ -661,11 +662,11 @@ namespace RS {
         constexpr LargeUint<N>& LargeUint<N>::operator<<=(int y) noexcept {
             if (y < 0) {
                 *this >>= - y;
-            } else if (static_cast<std::size_t>(y) >= N) {
+            } else if (to_unsigned(y) >= N) {
                 clear();
             } else {
                 auto int_word_size = static_cast<int>(word_size);
-                auto skip = static_cast<std::size_t>(y / int_word_size);
+                auto skip = to_unsigned(y / int_word_size);
                 auto keep = word_count - skip;
                 if (skip) {
                     for (auto i = keep - 1; i != npos; --i) {
@@ -695,11 +696,11 @@ namespace RS {
         constexpr LargeUint<N>& LargeUint<N>::operator>>=(int y) noexcept {
             if (y < 0) {
                 *this <<= - y;
-            } else if (static_cast<std::size_t>(y) >= N) {
+            } else if (to_unsigned(y) >= N) {
                 clear();
             } else {
                 auto int_word_size = static_cast<int>(word_size);
-                auto skip = static_cast<std::size_t>(y / int_word_size);
+                auto skip = to_unsigned(y / int_word_size);
                 auto keep = word_count - skip;
                 if (skip) {
                     for (auto i = 0uz; i < keep; ++i) {

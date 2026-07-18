@@ -75,6 +75,18 @@ be any integer or enumeration type.
 ## Conversion functions
 
 ```c++
+template <std::integral T>
+    constexpr auto to_signed(T t) noexcept;
+template <std::integral T>
+    constexpr auto to_unsigned(T t) noexcept;
+```
+
+Convert an integer using `static_cast` to the corresponding signed or unsigned
+type. If `T` already has the requested signedness, the input will be returned
+unchanged. Otherwise, the usual rules for well-definedness of integer
+conversions apply.
+
+```c++
 template <std::integral To, std::integral From>
     constexpr std::optional<To> maybe_cast(From x) noexcept;
 template <std::integral To, std::integral From>
