@@ -255,6 +255,7 @@ void test_rs_core_typelist_is_sorted();
 void test_rs_core_typelist_is_unique();
 void test_rs_core_typename_static();
 void test_rs_core_typename_dynamic();
+void test_rs_core_unit_counted();
 void test_rs_core_uuid_conversion();
 void test_rs_core_uuid_variant_and_version();
 void test_rs_core_uuid_comparison();
@@ -517,6 +518,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_typelist_is_unique, "test_rs_core_typelist_is_unique");
     call_me_maybe(test_rs_core_typename_static, "test_rs_core_typename_static");
     call_me_maybe(test_rs_core_typename_dynamic, "test_rs_core_typename_dynamic");
+    call_me_maybe(test_rs_core_unit_counted, "test_rs_core_unit_counted");
     call_me_maybe(test_rs_core_uuid_conversion, "test_rs_core_uuid_conversion");
     call_me_maybe(test_rs_core_uuid_variant_and_version, "test_rs_core_uuid_variant_and_version");
     call_me_maybe(test_rs_core_uuid_comparison, "test_rs_core_uuid_comparison");

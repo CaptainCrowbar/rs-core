@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <concepts>
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -14,6 +15,7 @@
 #include <regex>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -98,6 +100,27 @@ namespace RS::UnitTest {
         return true;
 
     }
+
+    // Class with a static instance count, useful for testing that
+    // construction and destruction are happening as expected.
+
+    template <std::regular T>
+    class Counted {
+    public:
+        Counted() { ++static_count(); }
+        Counted(const T& t): value_{t} { ++static_count(); }
+        ~Counted() { --static_count(); }
+        Counted(const Counted& t): value_{t.value_} { ++static_count(); }
+        Counted(Counted&& t): value_{std::exchange(t.value_, T{})} { ++static_count(); }
+        Counted& operator=(const Counted& t) { value_ = t.value_; return *this; }
+        Counted& operator=(Counted&& t) { value_ = std::exchange(t.value_, T{}); return *this; }
+        T get() const { return value_; }
+        static int count() { return static_count(); }
+        static void reset() { static_count() = 0; }
+    private:
+        T value_ {};
+        static int& static_count() { static int c = 0; return c; }
+    };
 
 }
 
