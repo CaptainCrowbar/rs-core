@@ -1,6 +1,7 @@
 #include "rs-core/bitwise-integer.hpp"
 #include "rs-core/unit-test.hpp"
 #include <cstdint>
+#include <format>
 
 using namespace RS;
 
@@ -24,18 +25,66 @@ void test_rs_core_bitwise_integer_small_uint_35() {
     TEST_EQUAL(static_cast<std::int64_t>(y), 11259375);
     TEST_EQUAL(static_cast<std::int64_t>(z), 0);
 
-    TEST_EQUAL(x.bin(), "00100100011010001010110011110001001");
-    TEST_EQUAL(y.bin(), "00000000000101010111100110111101111");
-    TEST_EQUAL(z.bin(), "00000000000000000000000000000000000");
-    TEST_EQUAL(x.dec(), "4886718345");
-    TEST_EQUAL(y.dec(), "11259375");
-    TEST_EQUAL(z.dec(), "0");
-    TEST_EQUAL(x.hex(), "123456789");
-    TEST_EQUAL(y.hex(), "000abcdef");
-    TEST_EQUAL(z.hex(), "000000000");
+    TEST_EQUAL(x.bin(),    "00100100011010001010110011110001001");
+    TEST_EQUAL(x.bin(5),   "100100011010001010110011110001001");
+    TEST_EQUAL(x.bin(50),  "00000000000000000100100011010001010110011110001001");
+    TEST_EQUAL(y.bin(),    "00000000000101010111100110111101111");
+    TEST_EQUAL(y.bin(5),   "101010111100110111101111");
+    TEST_EQUAL(y.bin(50),  "00000000000000000000000000101010111100110111101111");
+    TEST_EQUAL(z.bin(),    "00000000000000000000000000000000000");
+    TEST_EQUAL(z.bin(5),   "00000");
+    TEST_EQUAL(z.bin(50),  "00000000000000000000000000000000000000000000000000");
+    TEST_EQUAL(x.dec(),    "4886718345");
+    TEST_EQUAL(x.dec(5),   "4886718345");
+    TEST_EQUAL(x.dec(20),  "00000000004886718345");
+    TEST_EQUAL(y.dec(),    "11259375");
+    TEST_EQUAL(y.dec(5),   "11259375");
+    TEST_EQUAL(y.dec(20),  "00000000000011259375");
+    TEST_EQUAL(z.dec(),    "0");
+    TEST_EQUAL(z.dec(5),   "00000");
+    TEST_EQUAL(z.dec(20),  "00000000000000000000");
+    TEST_EQUAL(x.hex(),    "123456789");
+    TEST_EQUAL(x.hex(5),   "123456789");
+    TEST_EQUAL(x.hex(20),  "00000000000123456789");
+    TEST_EQUAL(y.hex(),    "000abcdef");
+    TEST_EQUAL(y.hex(5),   "abcdef");
+    TEST_EQUAL(y.hex(20),  "00000000000000abcdef");
+    TEST_EQUAL(z.hex(),    "000000000");
+    TEST_EQUAL(z.hex(5),   "00000");
+    TEST_EQUAL(z.hex(20),  "00000000000000000000");
+
+    TEST_EQUAL(std::format("{:b}", x),     "00100100011010001010110011110001001");
+    TEST_EQUAL(std::format("{:05b}", x),   "100100011010001010110011110001001");
+    TEST_EQUAL(std::format("{:050b}", x),  "00000000000000000100100011010001010110011110001001");
+    TEST_EQUAL(std::format("{:b}", y),     "00000000000101010111100110111101111");
+    TEST_EQUAL(std::format("{:05b}", y),   "101010111100110111101111");
+    TEST_EQUAL(std::format("{:050b}", y),  "00000000000000000000000000101010111100110111101111");
+    TEST_EQUAL(std::format("{:b}", z),     "00000000000000000000000000000000000");
+    TEST_EQUAL(std::format("{:05b}", z),   "00000");
+    TEST_EQUAL(std::format("{:050b}", z),  "00000000000000000000000000000000000000000000000000");
+    TEST_EQUAL(std::format("{:d}", x),     "4886718345");
+    TEST_EQUAL(std::format("{:05d}", x),   "4886718345");
+    TEST_EQUAL(std::format("{:020d}", x),  "00000000004886718345");
+    TEST_EQUAL(std::format("{:d}", y),     "11259375");
+    TEST_EQUAL(std::format("{:05d}", y),   "11259375");
+    TEST_EQUAL(std::format("{:020d}", y),  "00000000000011259375");
+    TEST_EQUAL(std::format("{:d}", z),     "0");
+    TEST_EQUAL(std::format("{:05d}", z),   "00000");
+    TEST_EQUAL(std::format("{:020d}", z),  "00000000000000000000");
+    TEST_EQUAL(std::format("{:x}", x),     "123456789");
+    TEST_EQUAL(std::format("{:05x}", x),   "123456789");
+    TEST_EQUAL(std::format("{:020x}", x),  "00000000000123456789");
+    TEST_EQUAL(std::format("{:x}", y),     "000abcdef");
+    TEST_EQUAL(std::format("{:05x}", y),   "abcdef");
+    TEST_EQUAL(std::format("{:020x}", y),  "00000000000000abcdef");
+    TEST_EQUAL(std::format("{:x}", z),     "000000000");
+    TEST_EQUAL(std::format("{:05x}", z),   "00000");
+    TEST_EQUAL(std::format("{:020x}", z),  "00000000000000000000");
+
     TEST_EQUAL(static_cast<double>(x), 4886718345.0);
     TEST_EQUAL(static_cast<double>(y), 11259375.0);
     TEST_EQUAL(static_cast<double>(z), 0.0);
+
     TEST_EQUAL(x.significant_bits(), 33u);
     TEST_EQUAL(y.significant_bits(), 24u);
     TEST_EQUAL(z.significant_bits(), 0u);

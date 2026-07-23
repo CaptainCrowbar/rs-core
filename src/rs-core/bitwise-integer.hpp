@@ -54,22 +54,22 @@ namespace RS {
             return static_cast<int>(bits * 8'651uz / 28'738uz);
         }
 
-        template <std::unsigned_integral T>
-        std::string unsigned_to_binary(T t, std::size_t digits = 8 * sizeof(T)) {
-            std::string s(digits, '0');
-            for (auto i = digits - 1; i != npos && t != 0; --i, t /= 2) {
-                s[i] = static_cast<char>('0' + static_cast<int>(t % 2));
+        template <int Base, std::unsigned_integral T>
+        std::string format_small_unsigned(T t, std::size_t digits) {
+            static constexpr auto b = static_cast<T>(Base);
+            std::string s;
+            T q, r;
+            while (t != 0 || s.size() < digits) {
+                q = t / b;
+                r = t % b;
+                if (r >= 10) {
+                    s += static_cast<char>(static_cast<int>(r - 10) + 'a');
+                } else {
+                    s += static_cast<char>(static_cast<int>(r) + '0');
+                }
+                t = q;
             }
-            return s;
-        }
-
-        template <std::unsigned_integral T>
-        std::string unsigned_to_hex(T t, std::size_t digits = 2 * sizeof(T)) {
-            static constexpr const char* xdigits = "0123456789abcdef";
-            std::string s(digits, '0');
-            for (auto i = digits - 1; i != npos && t != 0; --i, t /= 16) {
-                s[i] = xdigits[t % 16];
-            }
+            std::ranges::reverse(s);
             return s;
         }
 
@@ -154,9 +154,9 @@ namespace RS {
         constexpr explicit SmallUint(std::initializer_list<std::uint64_t> init) noexcept;
         explicit SmallUint(std::string_view str, int base = 0) { *this = parse(str, base); }
 
-        std::string bin() const { return Detail::unsigned_to_binary(value_, N); }
-        std::string dec() const { return std::to_string(value_); }
-        std::string hex() const { return Detail::unsigned_to_hex(value_, hex_digits); }
+        std::string bin(std::size_t digits = N) const { return Detail::format_small_unsigned<2>(value_, digits); }
+        std::string dec(std::size_t digits = 1) const { return Detail::format_small_unsigned<10>(value_, digits); }
+        std::string hex(std::size_t digits = hex_digits) const { return Detail::format_small_unsigned<16>(value_, digits); }
         constexpr void clear() noexcept { value_ = 0; }
         constexpr unsigned char* data() noexcept { return reinterpret_cast<unsigned char*>(&value_); }
         constexpr const unsigned char* data() const noexcept { return reinterpret_cast<const unsigned char*>(&value_); }
@@ -332,9 +332,9 @@ namespace RS {
         constexpr word_type& operator[](std::size_t i) noexcept { return array_[i]; }
         constexpr const word_type& operator[](std::size_t i) const noexcept { return array_[i]; }
 
-        std::string bin() const;
-        std::string dec() const;
-        std::string hex() const;
+        std::string bin(std::size_t digits = N) const { return format_as_base(2, digits); }
+        std::string dec(std::size_t digits = 1) const { return format_as_base(10, digits); }
+        std::string hex(std::size_t digits = hex_digits) const { return format_as_base(16, digits); }
         constexpr void clear() noexcept { array_ = {{}}; }
         constexpr unsigned char* data() noexcept { return reinterpret_cast<unsigned char*>(array_.data()); }
         constexpr const unsigned char* data() const noexcept { return reinterpret_cast<const unsigned char*>(array_.data()); }
@@ -391,6 +391,7 @@ namespace RS {
 
         constexpr std::strong_ordering compare(const LargeUint& y) const noexcept;
         constexpr void do_mask() noexcept { array_[word_count - 1] &= high_mask; }
+        std::string format_as_base(int base, std::size_t digits) const;
 
         constexpr static void add_with_carry(word_type& x, word_type y, word_type& c) noexcept;
 
@@ -481,43 +482,6 @@ namespace RS {
                 }
             }
             do_mask();
-        }
-
-        template <std::size_t N>
-        std::string LargeUint<N>::bin() const {
-            std::string s;
-            s.reserve(N);
-            s = Detail::unsigned_to_binary(array_[word_count - 1], final_bits);
-            for (auto i = word_count - 2; i != npos; --i) {
-                s += Detail::unsigned_to_binary(array_[i]);
-            }
-            return s;
-        }
-
-        template <std::size_t N>
-        std::string LargeUint<N>::dec() const {
-            std::string s;
-            auto x = *this;
-            LargeUint base{10};
-            LargeUint q, r;
-            do {
-                divide(x, base, q, r);
-                s += static_cast<char>(static_cast<int>(r.array_[0]) + '0');
-                x = q;
-            } while (x);
-            std::ranges::reverse(s);
-            return s;
-        }
-
-        template <std::size_t N>
-        std::string LargeUint<N>::hex() const {
-            std::string s;
-            s.reserve(hex_digits);
-            s = Detail::unsigned_to_hex(array_[word_count - 1], final_hex_digits);
-            for (auto i = word_count - 2; i != npos; --i) {
-                s += Detail::unsigned_to_hex(array_[i]);
-            }
-            return s;
         }
 
         template <std::size_t N>
@@ -777,6 +741,27 @@ namespace RS {
         }
 
         template <std::size_t N>
+        std::string LargeUint<N>::format_as_base(int base, std::size_t digits) const {
+            std::string s;
+            auto t = *this;
+            auto b = static_cast<LargeUint>(base);
+            LargeUint q;
+            int r;
+            while (static_cast<bool>(t) || s.size() < digits) {
+                q = t / b;
+                r = static_cast<int>(t % b);
+                if (r >= 10) {
+                    s += static_cast<char>(r - 10 + 'a');
+                } else {
+                    s += static_cast<char>(r + '0');
+                }
+                t = q;
+            }
+            std::ranges::reverse(s);
+            return s;
+        }
+
+        template <std::size_t N>
         constexpr void LargeUint<N>::add_with_carry(word_type& x, word_type y, word_type& c) noexcept {
             x += y + c;
             c = static_cast<word_type>(x < y || (x == y && c != 0));
@@ -804,19 +789,28 @@ struct std::formatter<RS::SmallUint<N>>:
 RS::CommonFormatter {
 
     std::string flags;
+    unsigned digits = 0;
 
     template <typename ParseContext>
     constexpr auto parse(ParseContext& ctx) {
-        return parse_helper(ctx, "bx", &flags);
+        return parse_helper(ctx, "bdx", &flags, &digits);
     }
 
     template <typename FormatContext>
     auto format(RS::SmallUint<N> x, FormatContext& ctx) const {
         std::string s;
-        switch (flags[0]) {
-            case 'b':  s = x.bin(); break;
-            case 'x':  s = x.hex(); break;
-            default:   s = x.dec(); break;
+        if (digits == 0) {
+            switch (flags[0]) {
+                case 'b':  s = x.bin(); break;
+                case 'x':  s = x.hex(); break;
+                default:   s = x.dec(); break;
+            }
+        } else {
+            switch (flags[0]) {
+                case 'b':  s = x.bin(digits); break;
+                case 'x':  s = x.hex(digits); break;
+                default:   s = x.dec(digits); break;
+            }
         }
         write_out(s, ctx.out());
         return ctx.out();
@@ -829,19 +823,28 @@ struct std::formatter<RS::LargeUint<N>>:
 RS::CommonFormatter {
 
     std::string flags;
+    unsigned digits = 0;
 
     template <typename ParseContext>
     constexpr auto parse(ParseContext& ctx) {
-        return parse_helper(ctx, "bx", &flags);
+        return parse_helper(ctx, "bdx", &flags, &digits);
     }
 
     template <typename FormatContext>
     auto format(RS::LargeUint<N> x, FormatContext& ctx) const {
         std::string s;
-        switch (flags[0]) {
-            case 'b':  s = x.bin(); break;
-            case 'x':  s = x.hex(); break;
-            default:   s = x.dec(); break;
+        if (digits == 0) {
+            switch (flags[0]) {
+                case 'b':  s = x.bin(); break;
+                case 'x':  s = x.hex(); break;
+                default:   s = x.dec(); break;
+            }
+        } else {
+            switch (flags[0]) {
+                case 'b':  s = x.bin(digits); break;
+                case 'x':  s = x.hex(digits); break;
+                default:   s = x.dec(digits); break;
+            }
         }
         write_out(s, ctx.out());
         return ctx.out();

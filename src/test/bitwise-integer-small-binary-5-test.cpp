@@ -1,9 +1,20 @@
 #include "rs-core/bitwise-integer.hpp"
 #include "rs-core/unit-test.hpp"
+#include <format>
 
 using namespace RS;
 
 void test_rs_core_bitwise_integer_small_uint_5() {
+
+    TEST_EQUAL(std::format("{:0b}", 42),     "101010");
+    TEST_EQUAL(std::format("{:01b}", 42),   "101010");
+    TEST_EQUAL(std::format("{:010b}", 42),  "0000101010");
+    TEST_EQUAL(std::format("{:0d}", 42),     "42");
+    TEST_EQUAL(std::format("{:01d}", 42),   "42");
+    TEST_EQUAL(std::format("{:010d}", 42),  "0000000042");
+    TEST_EQUAL(std::format("{:0x}", 42),     "2a");
+    TEST_EQUAL(std::format("{:01x}", 42),   "2a");
+    TEST_EQUAL(std::format("{:010x}", 42),  "000000002a");
 
     using U = SmallUint<5>;
 
@@ -22,18 +33,66 @@ void test_rs_core_bitwise_integer_small_uint_5() {
     TEST_EQUAL(static_cast<int>(y), 10);
     TEST_EQUAL(static_cast<int>(z), 0);
 
-    TEST_EQUAL(x.bin(), "11001");
-    TEST_EQUAL(y.bin(), "01010");
-    TEST_EQUAL(z.bin(), "00000");
-    TEST_EQUAL(x.dec(), "25");
-    TEST_EQUAL(y.dec(), "10");
-    TEST_EQUAL(z.dec(), "0");
-    TEST_EQUAL(x.hex(), "19");
-    TEST_EQUAL(y.hex(), "0a");
-    TEST_EQUAL(z.hex(), "00");
+    TEST_EQUAL(x.bin(),   "11001");
+    TEST_EQUAL(x.bin(3),  "11001");
+    TEST_EQUAL(x.bin(6),  "011001");
+    TEST_EQUAL(y.bin(),   "01010");
+    TEST_EQUAL(y.bin(3),  "1010");
+    TEST_EQUAL(y.bin(6),  "001010");
+    TEST_EQUAL(z.bin(),   "00000");
+    TEST_EQUAL(z.bin(3),  "000");
+    TEST_EQUAL(z.bin(6),  "000000");
+    TEST_EQUAL(x.dec(),   "25");
+    TEST_EQUAL(x.dec(3),  "025");
+    TEST_EQUAL(x.dec(6),  "000025");
+    TEST_EQUAL(y.dec(),   "10");
+    TEST_EQUAL(y.dec(3),  "010");
+    TEST_EQUAL(y.dec(6),  "000010");
+    TEST_EQUAL(z.dec(),   "0");
+    TEST_EQUAL(z.dec(3),  "000");
+    TEST_EQUAL(z.dec(6),  "000000");
+    TEST_EQUAL(x.hex(),   "19");
+    TEST_EQUAL(x.hex(3),  "019");
+    TEST_EQUAL(x.hex(6),  "000019");
+    TEST_EQUAL(y.hex(),   "0a");
+    TEST_EQUAL(y.hex(3),  "00a");
+    TEST_EQUAL(y.hex(6),  "00000a");
+    TEST_EQUAL(z.hex(),   "00");
+    TEST_EQUAL(z.hex(3),  "000");
+    TEST_EQUAL(z.hex(6),  "000000");
+
+    TEST_EQUAL(std::format("{:b}", x),    "11001");
+    TEST_EQUAL(std::format("{:03b}", x),  "11001");
+    TEST_EQUAL(std::format("{:06b}", x),  "011001");
+    TEST_EQUAL(std::format("{:b}", y),    "01010");
+    TEST_EQUAL(std::format("{:03b}", y),  "1010");
+    TEST_EQUAL(std::format("{:06b}", y),  "001010");
+    TEST_EQUAL(std::format("{:b}", z),    "00000");
+    TEST_EQUAL(std::format("{:03b}", z),  "000");
+    TEST_EQUAL(std::format("{:06b}", z),  "000000");
+    TEST_EQUAL(std::format("{:d}", x),    "25");
+    TEST_EQUAL(std::format("{:03d}", x),  "025");
+    TEST_EQUAL(std::format("{:06d}", x),  "000025");
+    TEST_EQUAL(std::format("{:d}", y),    "10");
+    TEST_EQUAL(std::format("{:03d}", y),  "010");
+    TEST_EQUAL(std::format("{:06d}", y),  "000010");
+    TEST_EQUAL(std::format("{:d}", z),    "0");
+    TEST_EQUAL(std::format("{:03d}", z),  "000");
+    TEST_EQUAL(std::format("{:06d}", z),  "000000");
+    TEST_EQUAL(std::format("{:x}", x),    "19");
+    TEST_EQUAL(std::format("{:03x}", x),  "019");
+    TEST_EQUAL(std::format("{:06x}", x),  "000019");
+    TEST_EQUAL(std::format("{:x}", y),    "0a");
+    TEST_EQUAL(std::format("{:03x}", y),  "00a");
+    TEST_EQUAL(std::format("{:06x}", y),  "00000a");
+    TEST_EQUAL(std::format("{:x}", z),    "00");
+    TEST_EQUAL(std::format("{:03x}", z),  "000");
+    TEST_EQUAL(std::format("{:06x}", z),  "000000");
+
     TEST_EQUAL(static_cast<double>(x), 25.0);
     TEST_EQUAL(static_cast<double>(y), 10.0);
     TEST_EQUAL(static_cast<double>(z), 0.0);
+
     TEST_EQUAL(x.significant_bits(), 5u);
     TEST_EQUAL(y.significant_bits(), 4u);
     TEST_EQUAL(z.significant_bits(), 0u);

@@ -160,21 +160,21 @@ the last word) will always be zero when read, but behaviour is undefined if
 these bits are changed through these functions.
 
 ```c++
-std::string Uint::bin() const;
-std::string Uint::dec() const;
-std::string Uint::hex() const;
+std::string Uint::bin(std::size_t digits = [see below]) const;
+std::string Uint::dec(std::size_t digits = 1) const;
+std::string Uint::hex(std::size_t digits = [see below]) const;
 std::string Uint::to_string() const;
 class std::formatter<Uint>;
 ```
 
 String formatting. The `to_string()` function is a synonym for `dec()`. The
-`bin()` and `hex()` functions always return a fixed number of digits, equal
-to `bits` or `hex_digits` respectively, while `dec()` and `to_string()` write
-only the number of digits needed, with no leading zeroes(unless the value is
-zero).
+defaut number of digits for the `bin()` and `hex()` functions is equal to
+`bits` or `hex_digits` respectively.
 
-The formatter calls `dec()` by default. It recognizes only two flags, `'b'` or
-`'x',` calling `bin()` or `hex()` respectively.
+The formatter calls `dec()` by default. The only flags it recognises are
+`'b', 'd',` or `'x'` to set the number base. A minimum digit count can be
+supplied in the same way as for a primitive integer. Other primitive integer
+formatting options are not supported.
 
 ```c++
 constexpr void Uint::clear() noexcept;

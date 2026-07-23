@@ -1,7 +1,6 @@
 #include "rs-core/dice.hpp"
 #include "rs-core/arithmetic.hpp"
 #include "rs-core/unit-test.hpp"
-#include <cstddef>
 #include <format>
 #include <stdexcept>
 #include <vector>
