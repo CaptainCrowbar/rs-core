@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-core/arithmetic.hpp"
+#include "rs-core/character.hpp"
 #include "rs-core/format.hpp"
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
@@ -12,6 +13,7 @@
 #include <functional>
 #include <limits>
 #include <optional>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -545,12 +547,27 @@ RS::CommonFormatter {
 
     template <typename ParseContext>
     constexpr auto parse(ParseContext& ctx) {
-        return parse_helper(ctx, "m", &flags);
+        auto out = parse_helper(ctx, "+mvV", &flags);
+        if (std::ranges::count_if(flags, RS::ascii_isalpha) > 1) {
+            throw std::format_error{"Invalid format"};
+        }
+        return out;
     }
 
     template <typename FormatContext>
     auto format(const RS::Rational<T>& r, FormatContext& ctx) const {
-        return write_out(flags == "m" ? r.mixed() : r.to_string(), ctx.out());
+        if (flags.contains('+') && r.sign() >= 0) {
+            *ctx.out() = '+';
+        }
+        if (flags.contains('m')) {
+            write_out(r.mixed(), ctx.out());
+        } else {
+            write_out(r.to_string(), ctx.out());
+            if (flags.contains('V') && r.den() == 1) {
+                write_out("/1", ctx.out());
+            }
+        }
+        return ctx.out();
     }
 
 };

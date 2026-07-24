@@ -236,8 +236,12 @@ common type.
 struct std::formatter<Rational>;
 ```
 
-The formatter recognizes only one flag, `'m'` causing the value to be
-formatted as a mixed fraction instead of a vulgar fraction.
+Formatting flags:
+
+* `+` - Always show a leading sign
+* `m` - Mixed fraction
+* `v` - Vulgar fraction (default)
+* `V` - Vulgar fraction; always show denominator even if it's 1
 
 ```c++
 struct std::hash<Rational>;
