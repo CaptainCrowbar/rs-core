@@ -1163,7 +1163,8 @@ template <RS::Mpitype M>
 struct std::formatter<M>:
 RS::CommonFormatter {
 
-    unsigned base = 10;
+    bool sign = false;
+    unsigned base = 0;
     std::size_t digits = 0;
 
     template <typename ParseContext>
@@ -1172,15 +1173,23 @@ RS::CommonFormatter {
         auto it = ctx.begin();
 
         for (; it != ctx.end() && *it != '}'; ++it) {
-            if (*it == 'b' && base == 10) {
+            if (*it == '+') {
+                sign = true;
+            } else if (*it == 'b' && base == 0) {
                 base = 2;
-            } else if (*it == 'x' && base == 10) {
+            } else if (*it == 'd' && base == 0) {
+                base = 10;
+            } else if (*it == 'x' && base == 0) {
                 base = 16;
             } else if (*it >= '0' && *it <= '9') {
                 digits = 10 * digits + static_cast<std::size_t>(*it - '0');
             } else {
                 throw std::format_error{"Invalid format"};
             }
+        }
+
+        if (base == 0) {
+            base = 10;
         }
 
         digits = std::max(digits, 1uz);
@@ -1191,6 +1200,11 @@ RS::CommonFormatter {
 
     template <typename FormatContext>
     auto format(const M& m, FormatContext& ctx) const {
+        if constexpr (std::same_as<M, RS::Integer>) {
+            if (sign && m.sign() >= 0) {
+                *ctx.out() = '+';
+            }
+        }
         return write_out(m.to_string(base, digits), ctx.out());
     }
 

@@ -331,9 +331,11 @@ Common type. This follows these rules:
 struct std::formatter<Mpitype>;
 ```
 
-Standard formatter. A minimum width can be supplied. The only other flags
-recognized are `"b"` (binary) and `"x"`(hexadecimal); if neither flag is
-present the value will be returned in decimal.
+Formatter. Available options are:
+
+* `+` - Always show a leading sign (signed integers only).
+* Unsigned integer - Minimum digits (default 1).
+* `[bdx]` - Number base (default 10).
 
 ```c++
 struct std::hash<Mpitype>;
