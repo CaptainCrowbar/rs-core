@@ -360,6 +360,7 @@ class RandomChoice {
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
     void insert(const T& t);
+    void clear() noexcept;
     bool empty() const noexcept;
     std::size_t size() const noexcept;
 };
@@ -402,6 +403,7 @@ class WeightedChoice {
     template <std::uniform_random_bit_generator RNG>
         const T& operator()(RNG& rng) const;
     void insert(const T& t, W w = 1);
+    void clear() noexcept;
     bool empty() const noexcept;
     std::size_t size() const noexcept;
     W total() const;
