@@ -104,14 +104,10 @@ namespace RS {
 
         explicit CartesianPowerIterator(const Range& range, std::size_t k):
         range_{&range}, index_{0} {
-
-            using std::begin;
-
             if (k > 0) {
-                iterators_.resize(k, begin(range));
+                iterators_.resize(k, std::ranges::begin(range));
                 elements_.resize(k, *iterators_[0]);
             }
-
         }
 
         const auto& operator*() const noexcept {
@@ -120,8 +116,7 @@ namespace RS {
 
         CartesianPowerIterator& operator++() {
 
-            using std::begin;
-            using std::end;
+            namespace rs = std::ranges;
 
             ++index_;
             auto p = iterators_.end();
@@ -133,12 +128,12 @@ namespace RS {
                 --q;
                 ++*p;
 
-                if (*p != end(*range_)) {
+                if (*p != rs::end(*range_)) {
                     *q = **p;
                     return *this;
                 }
 
-                *p = begin(*range_);
+                *p = rs::begin(*range_);
                 *q = **p;
 
             }
