@@ -2,7 +2,9 @@
 #include "rs-core/unit-test.hpp"
 #include <array>
 #include <cstdint>
+#include <random>
 #include <string>
+#include <vector>
 
 using namespace RS;
 
@@ -40,6 +42,49 @@ void test_rs_core_hash_mix() {
     TRY(h = hash_mix(42uz, 86uz, 99uz));                 TEST_EQUAL(h, 0x28'cd91'0cbbuz);
     TRY(h = hash_mix(42uz, 86uz, 99uz, 666uz));          TEST_EQUAL(h, 0xa16'f84f'e2fauz);
     TRY(h = hash_mix(42uz, 86uz, 99uz, 666uz, 2501uz));  TEST_EQUAL(h, 0x2'8252'880b'd846uz);
+
+}
+
+void test_rs_core_hash_list() {
+
+    std::minstd_rand rng {42};
+    std::uniform_int_distribution<int> dist {'a', 'z'};
+    std::vector<std::string> sv {5};
+    auto h = 0uz;
+    auto prev = 0uz;
+
+    for (auto i = 0; i < 1000; ++i) {
+        for (auto& s: sv) {
+            s.clear();
+            for (auto j = 0; j < 10; ++j) {
+                s += static_cast<char>(dist(rng));
+            }
+        }
+        TRY(h = hash_list(sv[0], sv[1], sv[2], sv[3], sv[4]));
+        TEST(h != prev);
+    }
+
+}
+
+void test_rs_core_hash_range() {
+
+    std::minstd_rand rng {42};
+    std::uniform_int_distribution<int> dist {'a', 'z'};
+    std::vector<std::string> sv;
+    auto h = 0uz;
+    auto prev = npos;
+
+    for (auto i = 0uz; i < 1000; ++i) {
+        sv.clear();
+        sv.resize(i);
+        for (auto& s: sv) {
+            for (auto j = 0; j < 10; ++j) {
+                s += static_cast<char>(dist(rng));
+            }
+        }
+        TRY(h = hash_range(sv));
+        TEST(h != prev);
+    }
 
 }
 

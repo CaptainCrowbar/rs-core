@@ -24,6 +24,11 @@ namespace RS {
     template <typename T>
     concept RegularHashable = Hashable<T> && std::regular<T>;
 
+    template <typename F, typename T>
+    concept HashFunction = requires (F f, const T t) {
+        { f(t) } -> std::convertible_to<std::size_t>;
+    };
+
     // Hash mixing functions
 
     constexpr std::size_t hash_mix() noexcept {
@@ -44,12 +49,39 @@ namespace RS {
     }
 
     template <std::ranges::range Range>
-    requires (std::convertible_to<std::ranges::range_value_t<Range>, std::size_t>)
+    requires std::convertible_to<std::ranges::range_value_t<Range>, std::size_t>
     std::size_t hash_mix(const Range& range, std::size_t init = 0) {
+        auto h = init;
         for (auto x: range) {
-            init = hash_mix(init, static_cast<std::size_t>(x));
+            h = hash_mix(h, static_cast<std::size_t>(x));
         }
-        return init;
+        return h;
+    }
+
+    constexpr std::size_t hash_list() noexcept {
+        return 0;
+    }
+
+    template <Hashable T, Hashable... TS>
+    std::size_t hash_list(const T& t, const TS&... ts) noexcept {
+        auto x = std::hash<T>{}(t);
+        auto y = hash_list(ts...);
+        return hash_mix(x, y);
+    }
+
+    template <std::ranges::range Range, HashFunction<std::ranges::range_value_t<Range>> F>
+    std::size_t hash_range(const Range& range, F f) noexcept {
+        auto h = 0uz;
+        for (const auto& x: range) {
+            h = hash_mix(h, f(x));
+        }
+        return h;
+    }
+
+    template <std::ranges::range Range>
+    requires Hashable<std::ranges::range_value_t<Range>>
+    std::size_t hash_range(const Range& range) noexcept {
+        return hash_range(range, std::hash<std::ranges::range_value_t<Range>>{});
     }
 
     // Hash function by Brian Kernighan

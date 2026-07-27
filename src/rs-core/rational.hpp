@@ -6,6 +6,7 @@
 #include "rs-core/global.hpp"
 #include "rs-core/hash.hpp"
 #include "rs-core/mp-integer.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <compare>
 #include <concepts>

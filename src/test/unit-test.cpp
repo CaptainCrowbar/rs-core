@@ -96,6 +96,8 @@ void test_rs_core_format_parse_roman();
 void test_rs_core_hash_concepts();
 void test_rs_core_hash_kernighan();
 void test_rs_core_hash_mix();
+void test_rs_core_hash_list();
+void test_rs_core_hash_range();
 void test_rs_core_hash_sip();
 void test_rs_core_interpolate_linear_interval();
 void test_rs_core_interpolate_linear_multipoint();
@@ -363,6 +365,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_hash_concepts, "test_rs_core_hash_concepts");
     call_me_maybe(test_rs_core_hash_kernighan, "test_rs_core_hash_kernighan");
     call_me_maybe(test_rs_core_hash_mix, "test_rs_core_hash_mix");
+    call_me_maybe(test_rs_core_hash_list, "test_rs_core_hash_list");
+    call_me_maybe(test_rs_core_hash_range, "test_rs_core_hash_range");
     call_me_maybe(test_rs_core_hash_sip, "test_rs_core_hash_sip");
     call_me_maybe(test_rs_core_interpolate_linear_interval, "test_rs_core_interpolate_linear_interval");
     call_me_maybe(test_rs_core_interpolate_linear_multipoint, "test_rs_core_interpolate_linear_multipoint");
