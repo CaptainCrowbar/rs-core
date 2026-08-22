@@ -22,6 +22,17 @@
 
 namespace RS {
 
+    // Concepts
+
+    template <typename T>
+    concept EscapeFormat = std::same_as<std::remove_cvref_t<T>, char>
+        || std::same_as<std::remove_cvref_t<T>, std::string>
+        || std::same_as<std::remove_cvref_t<T>, std::string_view>
+        || std::same_as<std::remove_cvref_t<T>, char*>
+        || std::same_as<std::remove_cvref_t<T>, const char*>
+        || (std::is_array_v<std::remove_cvref_t<T>>
+            && std::same_as<std::remove_extent_t<std::remove_cvref_t<T>>, char>);
+
     // Number parsing
 
     enum class ParseNumber: int {

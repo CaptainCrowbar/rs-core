@@ -12,6 +12,16 @@ namespace RS;
 * TOC
 {:toc}
 
+## Concepts
+
+```c++
+template <typename T>
+    concept EscapeFormat;
+```
+
+True if the type is a character or string type that supports the `"{:?}"`
+escape format.
+
 ## Number parsing
 
 ```c++

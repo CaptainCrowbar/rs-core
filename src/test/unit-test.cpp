@@ -83,6 +83,7 @@ void test_rs_core_format_floating_point_exponent_format();
 void test_rs_core_format_floating_point_fixed_format();
 void test_rs_core_format_floating_point_general_format();
 void test_rs_core_format_floating_point_special_values();
+void test_rs_core_format_concepts();
 void test_rs_core_format_helpers();
 void test_rs_core_format_append_integer();
 void test_rs_core_format_parse_integers();
@@ -352,6 +353,7 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_format_floating_point_fixed_format, "test_rs_core_format_floating_point_fixed_format");
     call_me_maybe(test_rs_core_format_floating_point_general_format, "test_rs_core_format_floating_point_general_format");
     call_me_maybe(test_rs_core_format_floating_point_special_values, "test_rs_core_format_floating_point_special_values");
+    call_me_maybe(test_rs_core_format_concepts, "test_rs_core_format_concepts");
     call_me_maybe(test_rs_core_format_helpers, "test_rs_core_format_helpers");
     call_me_maybe(test_rs_core_format_append_integer, "test_rs_core_format_append_integer");
     call_me_maybe(test_rs_core_format_parse_integers, "test_rs_core_format_parse_integers");

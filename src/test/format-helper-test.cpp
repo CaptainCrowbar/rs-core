@@ -2,8 +2,27 @@
 #include "rs-core/unit-test.hpp"
 #include <format>
 #include <string>
+#include <string_view>
 
 using namespace RS;
+
+void test_rs_core_format_concepts() {
+
+    TEST(EscapeFormat<char>);
+    TEST(EscapeFormat<char*>);
+    TEST(EscapeFormat<const char*>);
+    TEST(EscapeFormat<char[]>);
+    TEST(EscapeFormat<char[10]>);
+    TEST(EscapeFormat<std::string>);
+    TEST(EscapeFormat<std::string&>);
+    TEST(EscapeFormat<const std::string>);
+    TEST(EscapeFormat<const std::string&>);
+    TEST(EscapeFormat<std::string_view>);
+    TEST(EscapeFormat<std::string_view&>);
+    TEST(EscapeFormat<const std::string_view>);
+    TEST(EscapeFormat<const std::string_view&>);
+
+}
 
 namespace {
 
