@@ -15,8 +15,7 @@ namespace RS;
 ## Concepts
 
 ```c++
-template <typename T>
-    concept EscapeFormat;
+template <typename T> concept EscapeFormat;
 ```
 
 True if the type is a character or string type that supports the `"{:?}"`

@@ -8,10 +8,12 @@ using namespace RS;
 
 void test_rs_core_format_concepts() {
 
+    TEST(! EscapeFormat<int>);
+    TEST(! EscapeFormat<void>);
+    TEST(! EscapeFormat<void*>);
     TEST(EscapeFormat<char>);
     TEST(EscapeFormat<char*>);
     TEST(EscapeFormat<const char*>);
-    TEST(EscapeFormat<char[]>);
     TEST(EscapeFormat<char[10]>);
     TEST(EscapeFormat<std::string>);
     TEST(EscapeFormat<std::string&>);

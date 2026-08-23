@@ -25,13 +25,10 @@ namespace RS {
     // Concepts
 
     template <typename T>
-    concept EscapeFormat = std::same_as<std::remove_cvref_t<T>, char>
-        || std::same_as<std::remove_cvref_t<T>, std::string>
-        || std::same_as<std::remove_cvref_t<T>, std::string_view>
-        || std::same_as<std::remove_cvref_t<T>, char*>
-        || std::same_as<std::remove_cvref_t<T>, const char*>
-        || (std::is_array_v<std::remove_cvref_t<T>>
-            && std::same_as<std::remove_extent_t<std::remove_cvref_t<T>>, char>);
+    concept EscapeFormat = std::formattable<std::remove_cvref_t<T>, char>
+        && requires (std::formatter<std::remove_cvref_t<T>>& fmt) {
+            { fmt.set_debug_format() };
+        };
 
     // Number parsing
 
