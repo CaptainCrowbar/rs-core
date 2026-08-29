@@ -4,9 +4,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <deque>
+#include <functional>
+#include <map>
 #include <span>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 using namespace RS;
@@ -183,6 +186,62 @@ void test_rs_core_global_constants() {
     TEST_EQUAL(max16, 0xffffu);
     TEST_EQUAL(max32, 0xffff'fffful);
     TEST_EQUAL(max64, 0xffff'ffff'ffff'ffffull);
+
+}
+
+void test_rs_core_global_omparison() {
+
+    auto x = 1;
+    auto y = 2;
+
+    TEST_EQUAL(first_by(x, y, std::less<int>{}), 1);
+    TEST_EQUAL(first_by(x, y, std::greater<int>{}), 2);
+    TEST_EQUAL(second_by(x, y, std::less<int>{}), 2);
+    TEST_EQUAL(second_by(x, y, std::greater<int>{}), 1);
+
+    TRY(sort_by(x, y));                       TEST_EQUAL(x, 1);  TEST_EQUAL(y, 2);
+    TRY(sort_by(x, y, std::greater<int>{}));  TEST_EQUAL(x, 2);  TEST_EQUAL(y, 1);
+
+}
+
+void test_rs_core_global_lookup() {
+
+    std::map<int, std::string> map {
+        { 1, "alpha" },
+        { 2, "bravo" },
+        { 3, "charlie" },
+        { 4, "delta" },
+        { 5, "echo" },
+    };
+
+    std::unordered_map<int, std::string> umap {
+        { 10, "alpha" },
+        { 20, "bravo" },
+        { 30, "charlie" },
+        { 40, "delta" },
+        { 50, "echo" },
+    };
+
+    const auto& cmap {map};
+    const auto& cumap {umap};
+    std::string s;
+
+    TRY(s = lookup(map, 3));             TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(map, 6));             TEST_EQUAL(s, "");
+    TRY(s = lookup(map, 3, "zulu"));     TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(map, 6, "zulu"));     TEST_EQUAL(s, "zulu");
+    TRY(s = lookup(cmap, 3));            TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(cmap, 6));            TEST_EQUAL(s, "");
+    TRY(s = lookup(cmap, 3, "zulu"));    TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(cmap, 6, "zulu"));    TEST_EQUAL(s, "zulu");
+    TRY(s = lookup(umap, 30));           TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(umap, 60));           TEST_EQUAL(s, "");
+    TRY(s = lookup(umap, 30, "zulu"));   TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(umap, 60, "zulu"));   TEST_EQUAL(s, "zulu");
+    TRY(s = lookup(cumap, 30));          TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(cumap, 60));          TEST_EQUAL(s, "");
+    TRY(s = lookup(cumap, 30, "zulu"));  TEST_EQUAL(s, "charlie");
+    TRY(s = lookup(cumap, 60, "zulu"));  TEST_EQUAL(s, "zulu");
 
 }
 

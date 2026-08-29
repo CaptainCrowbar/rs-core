@@ -98,11 +98,7 @@ namespace RS {
 
         auto a = x < T{0} ? T{0} - x : x;
         auto b = y < T{0} ? T{0} - y : y;
-
-        if (a < b) {
-            std::swap(a, b);
-        }
-
+        sort_by(a, b);
         T r;
 
         while (b != T{0}) {

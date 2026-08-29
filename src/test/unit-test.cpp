@@ -11,6 +11,8 @@ void test_rs_core_global_primitive_concepts();
 void test_rs_core_global_arithmetic_concepts();
 void test_rs_core_global_range_concepts();
 void test_rs_core_global_constants();
+void test_rs_core_global_omparison();
+void test_rs_core_global_lookup();
 void test_rs_core_global_metaprogramming();
 void test_rs_core_alias_constructors();
 void test_rs_core_alias_conversions();
@@ -281,6 +283,8 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_global_arithmetic_concepts, "test_rs_core_global_arithmetic_concepts");
     call_me_maybe(test_rs_core_global_range_concepts, "test_rs_core_global_range_concepts");
     call_me_maybe(test_rs_core_global_constants, "test_rs_core_global_constants");
+    call_me_maybe(test_rs_core_global_omparison, "test_rs_core_global_omparison");
+    call_me_maybe(test_rs_core_global_lookup, "test_rs_core_global_lookup");
     call_me_maybe(test_rs_core_global_metaprogramming, "test_rs_core_global_metaprogramming");
     call_me_maybe(test_rs_core_alias_constructors, "test_rs_core_alias_constructors");
     call_me_maybe(test_rs_core_alias_conversions, "test_rs_core_alias_conversions");

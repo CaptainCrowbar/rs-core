@@ -1,9 +1,11 @@
 #pragma once
 
 #include "rs-core/log.hpp"
+#include <algorithm>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <iterator>
 #include <limits>
 #include <print>
@@ -107,6 +109,38 @@ namespace RS {
     constexpr std::uint32_t max32 = ~ std::uint32_t{0};
     constexpr std::uint64_t max64 = ~ std::uint64_t{0};
     constexpr std::size_t npos = ~ 0uz;
+
+    // Comparison utilities
+
+    template <typename T, std::strict_weak_order<T, T> Compare>
+    constexpr const T& first_by(const T& x, const T& y, Compare&& cmp) {
+        return cmp(y, x) ? y : x;
+    }
+
+    template <typename T, std::strict_weak_order<T, T> Compare>
+    constexpr const T& second_by(const T& x, const T& y, Compare&& cmp) {
+        return cmp(y, x) ? x : y;
+    }
+
+    template <typename T, std::strict_weak_order<T, T> Compare = std::less<T>>
+    constexpr void sort_by(T& x, T& y, Compare&& cmp = {}) {
+        if (cmp(y, x)) {
+            std::swap(x, y);
+        }
+    }
+
+    // Lookup utilities
+
+    template <typename Map>
+    const typename Map::mapped_type& lookup(const Map& map, const typename Map::key_type& key,
+            const typename Map::mapped_type& default_value = {}) {
+        auto it = map.find(key);
+        if (it == map.end()) {
+            return default_value;
+        } else {
+            return it->second;
+        }
+    }
 
     // Metaprogramming utilities
 

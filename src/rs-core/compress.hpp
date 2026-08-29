@@ -81,14 +81,7 @@ namespace RS {
 
             };
 
-            auto message = std::format("Zlib error {}: ", code);
-            auto it = table.find(code);
-
-            if (it == table.end()) {
-                message += "Unknown error";
-            } else {
-                message += it->second;
-            }
+            auto message = std::format("Zlib error {}: {}", code, lookup(table, code, "Unknown error"));
 
             if (! details.empty()) {
                 message += ": ";

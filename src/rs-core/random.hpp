@@ -281,9 +281,7 @@ namespace RS {
         template <Integral T>
         constexpr UniformInteger<T>::UniformInteger(T min, T max) noexcept:
         min_(min), max_(max) {
-            if (min_ > max_) {
-                std::swap(min_, max_);
-            }
+            sort_by(min_, max_);
         }
 
         template <Integral T>
@@ -476,15 +474,12 @@ namespace RS {
         min_(a),
         max_(b) {
 
-            if (min_ > max_) {
-                std::swap(min_, max_);
-            }
-
             if (min_ == max_) {
                 mode_ = range_mode::empty;
                 return;
             }
 
+            sort_by(min_, max_);
             auto next1 = std::nextafter(min_, max_);
 
             if (next1 == max_) {
@@ -568,9 +563,7 @@ namespace RS {
         template <std::floating_point T>
         constexpr LogUniform<T>::LogUniform(T a, T b) noexcept:
         dist_{std::log(a), std::log(b)}, min_{a}, max_{b} {
-            if (min_ > max_) {
-                std::swap(min_, max_);
-            }
+            sort_by(min_, max_);
         }
 
         template <std::floating_point T>

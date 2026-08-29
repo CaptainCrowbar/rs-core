@@ -103,6 +103,38 @@ constexpr std::size_t npos = [maximum value of a size_t];
 
 Defined for convenience.
 
+## Comparison utilities
+
+```c++
+template <typename T, std::strict_weak_order<T, T> Compare>
+    constexpr const T& first_by(const T& x, const T& y, Compare&& cmp);
+template <typename T, std::strict_weak_order<T, T> Compare>
+    constexpr const T& second_by(const T& x, const T& y, Compare&& cmp);
+```
+
+Return the first or second argument, according to the comparison predicate. If
+the arguments are equivalent, the functions will return the first or second
+argument, respectively.
+
+```c++
+template <typename T, std::strict_weak_order<T, T> Compare = std::less<T>>
+    constexpr void sort_by(T& x, T& y, Compare&& cmp = {});
+```
+
+Sort two objects into the order implied by the comparison predicate. If the
+arguments are equivalent, they will not be swapped.
+
+## Lookup utilities
+
+```c++
+template <typename Map>
+    const Map::mapped_type& lookup(const Map& map, const Map::key_type& key,
+        const Map::mapped_type& default_value = {});
+```
+
+Look up a key in a map, returning the corresponding mapped value if the key is
+found, or the default value if not.
+
 ## Metaprogramming utilities
 
 ```c++
