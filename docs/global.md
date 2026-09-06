@@ -25,8 +25,8 @@ easily add logging in arbitrary locations without dependency changes.
 template <typename T> concept ByteType;
 ```
 
-Matches the types that can alias a byte of memory: `char, signed char,
-unsigned char, char8_t, std::byte.`
+Matches the types that can alias a byte of memory: `char, unsigned char,
+std::byte.`
 
 ```c++
 template <typename T> concept Character;

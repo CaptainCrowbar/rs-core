@@ -30,9 +30,9 @@ void test_rs_core_global_primitive_concepts() {
 
     TEST(ByteType<std::byte>);
     TEST(ByteType<char>);
-    TEST(ByteType<signed char>);
+    TEST(! ByteType<signed char>);
     TEST(ByteType<unsigned char>);
-    TEST(ByteType<char8_t>);
+    TEST(! ByteType<char8_t>);
     TEST(! ByteType<char16_t>);
     TEST(! ByteType<char32_t>);
     TEST(! ByteType<wchar_t>);
@@ -144,8 +144,8 @@ void test_rs_core_global_range_concepts() {
 
     TEST(InputSpan<std::string>);
     TEST(InputSpan<std::string_view>);
-    TEST(InputSpan<std::u8string>);
-    TEST(InputSpan<std::u8string_view>);
+    TEST(! InputSpan<std::u8string>);
+    TEST(! InputSpan<std::u8string_view>);
     TEST(InputSpan<std::vector<std::byte>>);
     TEST(InputSpan<std::span<std::byte>>);
     TEST(! InputSpan<std::deque<std::byte>>);
@@ -154,7 +154,7 @@ void test_rs_core_global_range_concepts() {
 
     TEST(OutputSpan<std::string>);
     TEST(! OutputSpan<std::string_view>);
-    TEST(OutputSpan<std::u8string>);
+    TEST(! OutputSpan<std::u8string>);
     TEST(! OutputSpan<std::u8string_view>);
     TEST(OutputSpan<std::vector<std::byte>>);
     TEST(OutputSpan<std::span<std::byte>>);
@@ -164,7 +164,7 @@ void test_rs_core_global_range_concepts() {
 
     TEST(OutputBuffer<std::string>);
     TEST(! OutputBuffer<std::string_view>);
-    TEST(OutputBuffer<std::u8string>);
+    TEST(! OutputBuffer<std::u8string>);
     TEST(! OutputBuffer<std::u8string_view>);
     TEST(OutputBuffer<std::vector<std::byte>>);
     TEST(! OutputBuffer<std::span<std::byte>>);

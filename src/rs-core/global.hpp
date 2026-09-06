@@ -24,9 +24,7 @@ namespace RS {
 
     template <typename T>
     concept ByteType = std::same_as<T, char>
-        || std::same_as<T, signed char>
         || std::same_as<T, unsigned char>
-        || std::same_as<T, char8_t>
         || std::same_as<T, std::byte>;
 
     template <typename T>
