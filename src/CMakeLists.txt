@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.30)
 # version.hpp.
 
 project(rs-core
-    VERSION 0.1.226
+    VERSION 0.1.227
     LANGUAGES CXX
 )
 
@@ -61,12 +61,19 @@ add_executable(${unittest}
     test/constants-test.cpp
     test/dice-basic-test.cpp
     test/dice-set-test.cpp
-    test/dice-state-test.cpp
+    test/dice-state-construction-test.cpp
+    test/dice-state-enumeration-test.cpp
+    test/dice-state-formatting-test.cpp
+    test/dice-state-iteration-test.cpp
+    test/dice-state-probability-test.cpp
     test/enum-test.cpp
     test/format-floating-point-test.cpp
     test/format-helper-test.cpp
     test/format-integer-test.cpp
-    test/format-parsing-test.cpp
+    test/format-parse-floating-point-test.cpp
+    test/format-parse-integer-general-test.cpp
+    test/format-parse-integer-maybe-test.cpp
+    test/format-parse-integer-try-test.cpp
     test/format-roman-test.cpp
     test/hash-test.cpp
     test/interpolate-test.cpp
@@ -78,11 +85,23 @@ add_executable(${unittest}
     test/linear-algebra-transform-test.cpp
     test/log-test.cpp
     test/markup-test.cpp
-    test/mp-integer-sign-agnostic-test.cpp
+    test/mp-integer-concepts-test.cpp
     test/mp-integer-signed-arithmetic-test.cpp
-    test/mp-integer-signed-conversion-test.cpp
+    test/mp-integer-signed-comparison-test.cpp
+    test/mp-integer-signed-conversion-format-test.cpp
+    test/mp-integer-signed-conversion-from-integer-test.cpp
+    test/mp-integer-signed-conversion-from-string-test.cpp
+    test/mp-integer-signed-conversion-to-floating-test.cpp
+    test/mp-integer-signed-conversion-to-string-test.cpp
+    test/mp-integer-signed-hash-test.cpp
+    test/mp-integer-signed-literals-test.cpp
     test/mp-integer-unsigned-arithmetic-test.cpp
-    test/mp-integer-unsigned-conversion-test.cpp
+    test/mp-integer-unsigned-comparison-test.cpp
+    test/mp-integer-unsigned-conversion-from-string-test.cpp
+    test/mp-integer-unsigned-conversion-general-test.cpp
+    test/mp-integer-unsigned-conversion-to-string-test.cpp
+    test/mp-integer-unsigned-hash-test.cpp
+    test/mp-integer-unsigned-literals-test.cpp
     test/random-algorithm-test.cpp
     test/random-choice-test.cpp
     test/random-engine-test.cpp
@@ -93,7 +112,11 @@ add_executable(${unittest}
     test/range-algorithms-test.cpp
     test/range-concepts-test.cpp
     test/range-functions-test.cpp
-    test/rational-int-test.cpp
+    test/rational-int-arithmetic-test.cpp
+    test/rational-int-comparison-test.cpp
+    test/rational-int-construction-test.cpp
+    test/rational-int-formatting-test.cpp
+    test/rational-int-properties-test.cpp
     test/rational-mp-integer-basics-test.cpp
     test/rational-mp-integer-maths-addition-subtraction-test.cpp
     test/rational-mp-integer-maths-division-test.cpp
