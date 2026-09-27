@@ -2,7 +2,6 @@
 #include "rs-core/unit-test.hpp"
 #include <cstdint>
 #include <optional>
-#include <string>
 
 using namespace RS;
 

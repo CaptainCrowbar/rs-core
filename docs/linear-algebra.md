@@ -301,16 +301,6 @@ Elementwise linear interpolation. If `T` is an integer type, the results are
 rounded to the nearest integer.
 
 ```c++
-struct std::greater<Vector>;
-struct std::less<Vector>;
-```
-
-Ordered comparison operators are not provided for vectors, since they have no
-intrinsic order, but specializations of `std::greater` and `std::less` are
-supplied to allow vectors to be used as the keys of a map. These perform
-simple lexicographical comparison.
-
-```c++
 struct std::formatter<Vector>;
 ```
 

@@ -386,6 +386,7 @@ void test_rs_core_alias_range_access() {
 
     AS as{"Hello"};
     const auto& cas{as};
+    char ch;
 
     TEST_EQUAL(as[0], 'H');   TEST_EQUAL(cas[0], 'H');
     TEST_EQUAL(as[1], 'e');   TEST_EQUAL(cas[1], 'e');
@@ -400,10 +401,10 @@ void test_rs_core_alias_range_access() {
     TEST_EQUAL(as->at(3), 'l');  TEST_EQUAL(cas->at(3), 'l');
     TEST_EQUAL(as->at(4), 'o');  TEST_EQUAL(cas->at(4), 'o');
 
-    TEST_THROW(as->at(5), std::out_of_range, "string");
-    TEST_THROW(cas->at(5), std::out_of_range, "string");
-    TEST_THROW(as->at(6), std::out_of_range, "string");
-    TEST_THROW(cas->at(6), std::out_of_range, "string");
+    TEST_THROW(ch = as->at(5), std::out_of_range, "string");
+    TEST_THROW(ch = cas->at(5), std::out_of_range, "string");
+    TEST_THROW(ch = as->at(6), std::out_of_range, "string");
+    TEST_THROW(ch = cas->at(6), std::out_of_range, "string");
 
     TRY(as[4] = '!');
     TEST_EQUAL(*as, "Hell!");

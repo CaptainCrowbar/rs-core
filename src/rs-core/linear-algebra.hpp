@@ -972,20 +972,6 @@ std::formatter<T> {
 };
 
 template <RS::Scalar T, std::size_t N>
-struct std::greater<RS::Vector<T, N>> {
-    bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
-        return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::greater<T>());
-    }
-};
-
-template <RS::Scalar T, std::size_t N>
-struct std::less<RS::Vector<T, N>> {
-    bool operator()(const RS::Vector<T, N>& x, const RS::Vector<T, N>& y) const noexcept {
-        return std::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end(), std::less<T>());
-    }
-};
-
-template <RS::Scalar T, std::size_t N>
 struct std::hash<RS::Vector<T, N>> {
     std::size_t operator()(const RS::Vector<T, N>& v) const noexcept {
         return v.hash();

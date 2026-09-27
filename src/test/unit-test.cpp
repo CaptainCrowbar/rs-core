@@ -134,7 +134,6 @@ void test_rs_core_linear_algebra_concepts();
 void test_rs_core_linear_algebra_vector_integer_construction();
 void test_rs_core_linear_algebra_vector_integer_arithmetic();
 void test_rs_core_linear_algebra_vector_integer_hash();
-void test_rs_core_linear_algebra_vector_integer_total_order();
 void test_rs_core_linear_algebra_vector_floating_construction();
 void test_rs_core_linear_algebra_vector_floating_arithmetic();
 void test_rs_core_linear_algebra_vector_floating_interpolation();
@@ -422,7 +421,6 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_linear_algebra_vector_integer_construction, "test_rs_core_linear_algebra_vector_integer_construction");
     call_me_maybe(test_rs_core_linear_algebra_vector_integer_arithmetic, "test_rs_core_linear_algebra_vector_integer_arithmetic");
     call_me_maybe(test_rs_core_linear_algebra_vector_integer_hash, "test_rs_core_linear_algebra_vector_integer_hash");
-    call_me_maybe(test_rs_core_linear_algebra_vector_integer_total_order, "test_rs_core_linear_algebra_vector_integer_total_order");
     call_me_maybe(test_rs_core_linear_algebra_vector_floating_construction, "test_rs_core_linear_algebra_vector_floating_construction");
     call_me_maybe(test_rs_core_linear_algebra_vector_floating_arithmetic, "test_rs_core_linear_algebra_vector_floating_arithmetic");
     call_me_maybe(test_rs_core_linear_algebra_vector_floating_interpolation, "test_rs_core_linear_algebra_vector_floating_interpolation");
