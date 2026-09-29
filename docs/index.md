@@ -21,7 +21,6 @@ Requires C++23. Not yet tested on all compilers.
 * Algorithms
     * [`rs-core/hash.hpp` -- Hash functions](hash.html)
     * [`rs-core/range.hpp` -- Range utilities](range.html)
-    * [`rs-core/topological.hpp` -- Topological sorting](topological.html)
 * Byte array utilities
     * [`rs-core/compress.hpp` -- Compression](compress.html)
     * [`rs-core/uuid.hpp` -- UUID class](uuid.html)

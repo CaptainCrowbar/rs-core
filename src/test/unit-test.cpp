@@ -240,8 +240,6 @@ void test_rs_core_statistics_combination();
 void test_rs_core_terminal_escape_codes();
 void test_rs_core_thread_pool_class();
 void test_rs_core_thread_pool_benchmark();
-void test_rs_core_topological_sorting();
-void test_rs_core_topological_sorting_reverse();
 void test_rs_core_typelist_size();
 void test_rs_core_typelist_conversion();
 void test_rs_core_typelist_append();
@@ -527,8 +525,6 @@ int main(int argc, char** argv) {
     call_me_maybe(test_rs_core_terminal_escape_codes, "test_rs_core_terminal_escape_codes");
     call_me_maybe(test_rs_core_thread_pool_class, "test_rs_core_thread_pool_class");
     call_me_maybe(test_rs_core_thread_pool_benchmark, "test_rs_core_thread_pool_benchmark");
-    call_me_maybe(test_rs_core_topological_sorting, "test_rs_core_topological_sorting");
-    call_me_maybe(test_rs_core_topological_sorting_reverse, "test_rs_core_topological_sorting_reverse");
     call_me_maybe(test_rs_core_typelist_size, "test_rs_core_typelist_size");
     call_me_maybe(test_rs_core_typelist_conversion, "test_rs_core_typelist_conversion");
     call_me_maybe(test_rs_core_typelist_append, "test_rs_core_typelist_append");
