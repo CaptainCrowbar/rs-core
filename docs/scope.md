@@ -44,8 +44,8 @@ Calling `release()` cancels all destructor behaviour; the callback will never
 be invoked after release.
 
 Behaviour is undefined if the callback is a null function pointer or
-`std::function,` or if the callback's function call operator, or its copy or
-move constructor, throws an exception.
+`std::function,` or if the callback's function call operator or move
+constructor throws an exception.
 
 ```c++
 template <std::invocable F> [scope guard] on_success(F&& f);

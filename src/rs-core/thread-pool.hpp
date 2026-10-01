@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rs-core/global.hpp"
+#include "rs-core/scope.hpp"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -86,6 +87,7 @@ namespace RS {
 
     inline void ThreadPool::clear() noexcept {
 
+        auto guard = on_failure([this] { --clear_count_; });
         ++clear_count_;
 
         for (auto& w: workers_) {
