@@ -20,6 +20,7 @@
 #include <system_error>
 #include <thread>
 #include <type_traits>
+#include <utility>
 
 #ifdef _WIN32
 
@@ -64,13 +65,11 @@ namespace RS {
     };
 
     constexpr LogFlags operator|(LogFlags a, LogFlags b) noexcept {
-        using U = std::underlying_type_t<LogFlags>;
-        return static_cast<LogFlags>(static_cast<U>(a) | static_cast<U>(b));
+        return static_cast<LogFlags>(std::to_underlying(a) | std::to_underlying(b));
     }
 
     constexpr LogFlags operator&(LogFlags a, LogFlags b) noexcept {
-        using U = std::underlying_type_t<LogFlags>;
-        return static_cast<LogFlags>(static_cast<U>(a) & static_cast<U>(b));
+        return static_cast<LogFlags>(std::to_underlying(a) & std::to_underlying(b));
     }
 
     class Log {

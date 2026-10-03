@@ -168,7 +168,7 @@ namespace RS {
         template <typename T>
         requires std::is_enum_v<T>
         constexpr auto force_unsigned(T t) noexcept {
-            return force_unsigned(static_cast<std::underlying_type_t<T>>(t));
+            return force_unsigned(std::to_underlying(t));
         }
 
     }

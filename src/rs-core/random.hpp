@@ -24,6 +24,7 @@
 #include <random>
 #include <ranges>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 namespace RS {
@@ -985,12 +986,12 @@ namespace RS {
         unsigned long long umask;
 
         if constexpr (std::is_enum_v<T>) {
-            using UT = std::underlying_type_t<T>;
-            auto utmask = static_cast<UT>(mask);
-            if constexpr (std::signed_integral<UT>) {
-                umask = static_cast<std::make_unsigned_t<UT>>(utmask);
+            using U = std::underlying_type_t<T>;
+            auto tmask = std::to_underlying(mask);
+            if constexpr (std::signed_integral<U>) {
+                umask = static_cast<std::make_unsigned_t<U>>(tmask);
             } else {
-                umask = utmask;
+                umask = tmask;
             }
         } else if constexpr (std::signed_integral<T>) {
             umask = static_cast<std::make_unsigned_t<T>>(mask);
@@ -1021,9 +1022,9 @@ namespace RS {
 
         template <AutoEnum E>
         constexpr int select_enum_minimum =
-            std::unsigned_integral<std::underlying_type_t<E>> ? 0 :
-            sizeof(E) >= sizeof(int) ? std::numeric_limits<int>::min() :
-            static_cast<int>(std::numeric_limits<std::underlying_type_t<E>>::min());
+            std::unsigned_integral<std::underlying_type_t<E>> ? 0
+                : sizeof(E) >= sizeof(int) ? std::numeric_limits<int>::min()
+                : static_cast<int>(std::numeric_limits<std::underlying_type_t<E>>::min());
 
         template <AutoEnum E, E Min>
         const auto& select_enum_values() {

@@ -11,7 +11,6 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -335,12 +334,11 @@ RS::CommonFormatter {
     auto format(const T& t, FormatContext& ctx) const {
 
         using namespace RS::Detail;
-        using U = std::underlying_type_t<T>;
 
         std::string str;
 
         if (mode == EnumCase::integer) {
-            str = std::to_string(static_cast<U>(t));
+            str = std::to_string(std::to_underlying(t));
         } else {
             str = to_string(t);
             reformat_enum(str, mode, delimiter);
