@@ -3,7 +3,7 @@
 
 using namespace RS;
 
-void test_rs_core_character_properties() {
+void test_rs_core_character_properties_8bit() {
 
     TEST(is_ascii('\0'));      TEST(ascii_iscntrl('\0'));      TEST(! ascii_isblank('\0'));    TEST(! ascii_isspace('\0'));
     TEST(is_ascii('\t'));      TEST(ascii_iscntrl('\t'));      TEST(ascii_isblank('\t'));      TEST(ascii_isspace('\t'));
@@ -134,6 +134,145 @@ void test_rs_core_character_properties() {
     TEST_EQUAL(ascii_toupper('\x7f'),  '\x7f');  TEST_EQUAL(ascii_tolower('\x7f'),  '\x7f');
     TEST_EQUAL(ascii_toupper('\x80'),  '\x80');  TEST_EQUAL(ascii_tolower('\x80'),  '\x80');
     TEST_EQUAL(ascii_toupper('\xff'),  '\xff');  TEST_EQUAL(ascii_tolower('\xff'),  '\xff');
+
+}
+
+void test_rs_core_character_properties_32bit() {
+
+    TEST(is_ascii32(U'\0'));        TEST(ascii_iscntrl32(U'\0'));        TEST(! ascii_isblank32(U'\0'));      TEST(! ascii_isspace32(U'\0'));
+    TEST(is_ascii32(U'\t'));        TEST(ascii_iscntrl32(U'\t'));        TEST(ascii_isblank32(U'\t'));        TEST(ascii_isspace32(U'\t'));
+    TEST(is_ascii32(U'\r'));        TEST(ascii_iscntrl32(U'\r'));        TEST(! ascii_isblank32(U'\r'));      TEST(ascii_isspace32(U'\r'));
+    TEST(is_ascii32(U'\u001f'));    TEST(ascii_iscntrl32(U'\u001f'));    TEST(! ascii_isblank32(U'\u001f'));  TEST(! ascii_isspace32(U'\u001f'));
+    TEST(is_ascii32(U' '));         TEST(! ascii_iscntrl32(U' '));       TEST(ascii_isblank32(U' '));         TEST(ascii_isspace32(U' '));
+    TEST(is_ascii32(U'!'));         TEST(! ascii_iscntrl32(U'!'));       TEST(! ascii_isblank32(U'!'));       TEST(! ascii_isspace32(U'!'));
+    TEST(is_ascii32(U'/'));         TEST(! ascii_iscntrl32(U'/'));       TEST(! ascii_isblank32(U'/'));       TEST(! ascii_isspace32(U'/'));
+    TEST(is_ascii32(U'0'));         TEST(! ascii_iscntrl32(U'0'));       TEST(! ascii_isblank32(U'0'));       TEST(! ascii_isspace32(U'0'));
+    TEST(is_ascii32(U'9'));         TEST(! ascii_iscntrl32(U'9'));       TEST(! ascii_isblank32(U'9'));       TEST(! ascii_isspace32(U'9'));
+    TEST(is_ascii32(U':'));         TEST(! ascii_iscntrl32(U':'));       TEST(! ascii_isblank32(U':'));       TEST(! ascii_isspace32(U':'));
+    TEST(is_ascii32(U'@'));         TEST(! ascii_iscntrl32(U'@'));       TEST(! ascii_isblank32(U'@'));       TEST(! ascii_isspace32(U'@'));
+    TEST(is_ascii32(U'A'));         TEST(! ascii_iscntrl32(U'A'));       TEST(! ascii_isblank32(U'A'));       TEST(! ascii_isspace32(U'A'));
+    TEST(is_ascii32(U'F'));         TEST(! ascii_iscntrl32(U'F'));       TEST(! ascii_isblank32(U'F'));       TEST(! ascii_isspace32(U'F'));
+    TEST(is_ascii32(U'Z'));         TEST(! ascii_iscntrl32(U'Z'));       TEST(! ascii_isblank32(U'Z'));       TEST(! ascii_isspace32(U'Z'));
+    TEST(is_ascii32(U'['));         TEST(! ascii_iscntrl32(U'['));       TEST(! ascii_isblank32(U'['));       TEST(! ascii_isspace32(U'['));
+    TEST(is_ascii32(U'_'));         TEST(! ascii_iscntrl32(U'_'));       TEST(! ascii_isblank32(U'_'));       TEST(! ascii_isspace32(U'_'));
+    TEST(is_ascii32(U'`'));         TEST(! ascii_iscntrl32(U'`'));       TEST(! ascii_isblank32(U'`'));       TEST(! ascii_isspace32(U'`'));
+    TEST(is_ascii32(U'a'));         TEST(! ascii_iscntrl32(U'a'));       TEST(! ascii_isblank32(U'a'));       TEST(! ascii_isspace32(U'a'));
+    TEST(is_ascii32(U'f'));         TEST(! ascii_iscntrl32(U'f'));       TEST(! ascii_isblank32(U'f'));       TEST(! ascii_isspace32(U'f'));
+    TEST(is_ascii32(U'z'));         TEST(! ascii_iscntrl32(U'z'));       TEST(! ascii_isblank32(U'z'));       TEST(! ascii_isspace32(U'z'));
+    TEST(is_ascii32(U'{'));         TEST(! ascii_iscntrl32(U'{'));       TEST(! ascii_isblank32(U'{'));       TEST(! ascii_isspace32(U'{'));
+    TEST(is_ascii32(U'~'));         TEST(! ascii_iscntrl32(U'~'));       TEST(! ascii_isblank32(U'~'));       TEST(! ascii_isspace32(U'~'));
+    TEST(is_ascii32(U'\u007f'));    TEST(ascii_iscntrl32(U'\u007f'));    TEST(! ascii_isblank32(U'\u007f'));  TEST(! ascii_isspace32(U'\u007f'));
+    TEST(! is_ascii32(U'\u0080'));  TEST(! ascii_iscntrl32(U'\u0080'));  TEST(! ascii_isblank32(U'\u0080'));  TEST(! ascii_isspace32(U'\u0080'));
+    TEST(! is_ascii32(U'\u00ff'));  TEST(! ascii_iscntrl32(U'\u00ff'));  TEST(! ascii_isblank32(U'\u00ff'));  TEST(! ascii_isspace32(U'\u00ff'));
+    TEST(! is_ascii32(U'\uffff'));  TEST(! ascii_iscntrl32(U'\uffff'));  TEST(! ascii_isblank32(U'\uffff'));  TEST(! ascii_isspace32(U'\uffff'));
+
+    TEST(! ascii_isdigit32(U'\0'));      TEST(! ascii_isxdigit32(U'\0'));      TEST(! ascii_isalnum32(U'\0'));      TEST(! ascii_isalnum_w32(U'\0'));
+    TEST(! ascii_isdigit32(U'\t'));      TEST(! ascii_isxdigit32(U'\t'));      TEST(! ascii_isalnum32(U'\t'));      TEST(! ascii_isalnum_w32(U'\t'));
+    TEST(! ascii_isdigit32(U'\r'));      TEST(! ascii_isxdigit32(U'\r'));      TEST(! ascii_isalnum32(U'\r'));      TEST(! ascii_isalnum_w32(U'\r'));
+    TEST(! ascii_isdigit32(U'\u001f'));  TEST(! ascii_isxdigit32(U'\u001f'));  TEST(! ascii_isalnum32(U'\u001f'));  TEST(! ascii_isalnum_w32(U'\u001f'));
+    TEST(! ascii_isdigit32(U' '));       TEST(! ascii_isxdigit32(U' '));       TEST(! ascii_isalnum32(U' '));       TEST(! ascii_isalnum_w32(U' '));
+    TEST(! ascii_isdigit32(U'!'));       TEST(! ascii_isxdigit32(U'!'));       TEST(! ascii_isalnum32(U'!'));       TEST(! ascii_isalnum_w32(U'!'));
+    TEST(! ascii_isdigit32(U'/'));       TEST(! ascii_isxdigit32(U'/'));       TEST(! ascii_isalnum32(U'/'));       TEST(! ascii_isalnum_w32(U'/'));
+    TEST(ascii_isdigit32(U'0'));         TEST(ascii_isxdigit32(U'0'));         TEST(ascii_isalnum32(U'0'));         TEST(ascii_isalnum_w32(U'0'));
+    TEST(ascii_isdigit32(U'9'));         TEST(ascii_isxdigit32(U'9'));         TEST(ascii_isalnum32(U'9'));         TEST(ascii_isalnum_w32(U'9'));
+    TEST(! ascii_isdigit32(U':'));       TEST(! ascii_isxdigit32(U':'));       TEST(! ascii_isalnum32(U':'));       TEST(! ascii_isalnum_w32(U':'));
+    TEST(! ascii_isdigit32(U'@'));       TEST(! ascii_isxdigit32(U'@'));       TEST(! ascii_isalnum32(U'@'));       TEST(! ascii_isalnum_w32(U'@'));
+    TEST(! ascii_isdigit32(U'A'));       TEST(ascii_isxdigit32(U'A'));         TEST(ascii_isalnum32(U'A'));         TEST(ascii_isalnum_w32(U'A'));
+    TEST(! ascii_isdigit32(U'F'));       TEST(ascii_isxdigit32(U'F'));         TEST(ascii_isalnum32(U'F'));         TEST(ascii_isalnum_w32(U'F'));
+    TEST(! ascii_isdigit32(U'Z'));       TEST(! ascii_isxdigit32(U'Z'));       TEST(ascii_isalnum32(U'Z'));         TEST(ascii_isalnum_w32(U'Z'));
+    TEST(! ascii_isdigit32(U'['));       TEST(! ascii_isxdigit32(U'['));       TEST(! ascii_isalnum32(U'['));       TEST(! ascii_isalnum_w32(U'['));
+    TEST(! ascii_isdigit32(U'_'));       TEST(! ascii_isxdigit32(U'_'));       TEST(! ascii_isalnum32(U'_'));       TEST(ascii_isalnum_w32(U'_'));
+    TEST(! ascii_isdigit32(U'`'));       TEST(! ascii_isxdigit32(U'`'));       TEST(! ascii_isalnum32(U'`'));       TEST(! ascii_isalnum_w32(U'`'));
+    TEST(! ascii_isdigit32(U'a'));       TEST(ascii_isxdigit32(U'a'));         TEST(ascii_isalnum32(U'a'));         TEST(ascii_isalnum_w32(U'a'));
+    TEST(! ascii_isdigit32(U'f'));       TEST(ascii_isxdigit32(U'f'));         TEST(ascii_isalnum32(U'f'));         TEST(ascii_isalnum_w32(U'f'));
+    TEST(! ascii_isdigit32(U'z'));       TEST(! ascii_isxdigit32(U'z'));       TEST(ascii_isalnum32(U'z'));         TEST(ascii_isalnum_w32(U'z'));
+    TEST(! ascii_isdigit32(U'{'));       TEST(! ascii_isxdigit32(U'{'));       TEST(! ascii_isalnum32(U'{'));       TEST(! ascii_isalnum_w32(U'{'));
+    TEST(! ascii_isdigit32(U'~'));       TEST(! ascii_isxdigit32(U'~'));       TEST(! ascii_isalnum32(U'~'));       TEST(! ascii_isalnum_w32(U'~'));
+    TEST(! ascii_isdigit32(U'\u007f'));  TEST(! ascii_isxdigit32(U'\u007f'));  TEST(! ascii_isalnum32(U'\u007f'));  TEST(! ascii_isalnum_w32(U'\u007f'));
+    TEST(! ascii_isdigit32(U'\u0080'));  TEST(! ascii_isxdigit32(U'\u0080'));  TEST(! ascii_isalnum32(U'\u0080'));  TEST(! ascii_isalnum_w32(U'\u0080'));
+    TEST(! ascii_isdigit32(U'\u00ff'));  TEST(! ascii_isxdigit32(U'\u00ff'));  TEST(! ascii_isalnum32(U'\u00ff'));  TEST(! ascii_isalnum_w32(U'\u00ff'));
+    TEST(! ascii_isdigit32(U'\uffff'));  TEST(! ascii_isxdigit32(U'\uffff'));  TEST(! ascii_isalnum32(U'\uffff'));  TEST(! ascii_isalnum_w32(U'\uffff'));
+
+    TEST(! ascii_isupper32(U'\0'));      TEST(! ascii_islower32(U'\0'));      TEST(! ascii_isalpha32(U'\0'));      TEST(! ascii_isalpha_w32(U'\0'));
+    TEST(! ascii_isupper32(U'\t'));      TEST(! ascii_islower32(U'\t'));      TEST(! ascii_isalpha32(U'\t'));      TEST(! ascii_isalpha_w32(U'\t'));
+    TEST(! ascii_isupper32(U'\r'));      TEST(! ascii_islower32(U'\r'));      TEST(! ascii_isalpha32(U'\r'));      TEST(! ascii_isalpha_w32(U'\r'));
+    TEST(! ascii_isupper32(U'\u001f'));  TEST(! ascii_islower32(U'\u001f'));  TEST(! ascii_isalpha32(U'\u001f'));  TEST(! ascii_isalpha_w32(U'\u001f'));
+    TEST(! ascii_isupper32(U' '));       TEST(! ascii_islower32(U' '));       TEST(! ascii_isalpha32(U' '));       TEST(! ascii_isalpha_w32(U' '));
+    TEST(! ascii_isupper32(U'!'));       TEST(! ascii_islower32(U'!'));       TEST(! ascii_isalpha32(U'!'));       TEST(! ascii_isalpha_w32(U'!'));
+    TEST(! ascii_isupper32(U'/'));       TEST(! ascii_islower32(U'/'));       TEST(! ascii_isalpha32(U'/'));       TEST(! ascii_isalpha_w32(U'/'));
+    TEST(! ascii_isupper32(U'0'));       TEST(! ascii_islower32(U'0'));       TEST(! ascii_isalpha32(U'0'));       TEST(! ascii_isalpha_w32(U'0'));
+    TEST(! ascii_isupper32(U'9'));       TEST(! ascii_islower32(U'9'));       TEST(! ascii_isalpha32(U'9'));       TEST(! ascii_isalpha_w32(U'9'));
+    TEST(! ascii_isupper32(U':'));       TEST(! ascii_islower32(U':'));       TEST(! ascii_isalpha32(U':'));       TEST(! ascii_isalpha_w32(U':'));
+    TEST(! ascii_isupper32(U'@'));       TEST(! ascii_islower32(U'@'));       TEST(! ascii_isalpha32(U'@'));       TEST(! ascii_isalpha_w32(U'@'));
+    TEST(ascii_isupper32(U'A'));         TEST(! ascii_islower32(U'A'));       TEST(ascii_isalpha32(U'A'));         TEST(ascii_isalpha_w32(U'A'));
+    TEST(ascii_isupper32(U'F'));         TEST(! ascii_islower32(U'F'));       TEST(ascii_isalpha32(U'F'));         TEST(ascii_isalpha_w32(U'F'));
+    TEST(ascii_isupper32(U'Z'));         TEST(! ascii_islower32(U'Z'));       TEST(ascii_isalpha32(U'Z'));         TEST(ascii_isalpha_w32(U'Z'));
+    TEST(! ascii_isupper32(U'['));       TEST(! ascii_islower32(U'['));       TEST(! ascii_isalpha32(U'['));       TEST(! ascii_isalpha_w32(U'['));
+    TEST(! ascii_isupper32(U'_'));       TEST(! ascii_islower32(U'_'));       TEST(! ascii_isalpha32(U'_'));       TEST(ascii_isalpha_w32(U'_'));
+    TEST(! ascii_isupper32(U'`'));       TEST(! ascii_islower32(U'`'));       TEST(! ascii_isalpha32(U'`'));       TEST(! ascii_isalpha_w32(U'`'));
+    TEST(! ascii_isupper32(U'a'));       TEST(ascii_islower32(U'a'));         TEST(ascii_isalpha32(U'a'));         TEST(ascii_isalpha_w32(U'a'));
+    TEST(! ascii_isupper32(U'f'));       TEST(ascii_islower32(U'f'));         TEST(ascii_isalpha32(U'f'));         TEST(ascii_isalpha_w32(U'f'));
+    TEST(! ascii_isupper32(U'z'));       TEST(ascii_islower32(U'z'));         TEST(ascii_isalpha32(U'z'));         TEST(ascii_isalpha_w32(U'z'));
+    TEST(! ascii_isupper32(U'{'));       TEST(! ascii_islower32(U'{'));       TEST(! ascii_isalpha32(U'{'));       TEST(! ascii_isalpha_w32(U'{'));
+    TEST(! ascii_isupper32(U'~'));       TEST(! ascii_islower32(U'~'));       TEST(! ascii_isalpha32(U'~'));       TEST(! ascii_isalpha_w32(U'~'));
+    TEST(! ascii_isupper32(U'\u007f'));  TEST(! ascii_islower32(U'\u007f'));  TEST(! ascii_isalpha32(U'\u007f'));  TEST(! ascii_isalpha_w32(U'\u007f'));
+    TEST(! ascii_isupper32(U'\u0080'));  TEST(! ascii_islower32(U'\u0080'));  TEST(! ascii_isalpha32(U'\u0080'));  TEST(! ascii_isalpha_w32(U'\u0080'));
+    TEST(! ascii_isupper32(U'\u00ff'));  TEST(! ascii_islower32(U'\u00ff'));  TEST(! ascii_isalpha32(U'\u00ff'));  TEST(! ascii_isalpha_w32(U'\u00ff'));
+    TEST(! ascii_isupper32(U'\uffff'));  TEST(! ascii_islower32(U'\uffff'));  TEST(! ascii_isalpha32(U'\uffff'));  TEST(! ascii_isalpha_w32(U'\uffff'));
+
+    TEST(! ascii_isgraph32(U'\0'));      TEST(! ascii_isprint32(U'\0'));      TEST(! ascii_ispunct32(U'\0'));      TEST(! ascii_ispunct_w32(U'\0'));
+    TEST(! ascii_isgraph32(U'\t'));      TEST(! ascii_isprint32(U'\t'));      TEST(! ascii_ispunct32(U'\t'));      TEST(! ascii_ispunct_w32(U'\t'));
+    TEST(! ascii_isgraph32(U'\r'));      TEST(! ascii_isprint32(U'\r'));      TEST(! ascii_ispunct32(U'\r'));      TEST(! ascii_ispunct_w32(U'\r'));
+    TEST(! ascii_isgraph32(U'\u001f'));  TEST(! ascii_isprint32(U'\u001f'));  TEST(! ascii_ispunct32(U'\u001f'));  TEST(! ascii_ispunct_w32(U'\u001f'));
+    TEST(! ascii_isgraph32(U' '));       TEST(ascii_isprint32(U' '));         TEST(! ascii_ispunct32(U' '));       TEST(! ascii_ispunct_w32(U' '));
+    TEST(ascii_isgraph32(U'!'));         TEST(ascii_isprint32(U'!'));         TEST(ascii_ispunct32(U'!'));         TEST(ascii_ispunct_w32(U'!'));
+    TEST(ascii_isgraph32(U'/'));         TEST(ascii_isprint32(U'/'));         TEST(ascii_ispunct32(U'/'));         TEST(ascii_ispunct_w32(U'/'));
+    TEST(ascii_isgraph32(U'0'));         TEST(ascii_isprint32(U'0'));         TEST(! ascii_ispunct32(U'0'));       TEST(! ascii_ispunct_w32(U'0'));
+    TEST(ascii_isgraph32(U'9'));         TEST(ascii_isprint32(U'9'));         TEST(! ascii_ispunct32(U'9'));       TEST(! ascii_ispunct_w32(U'9'));
+    TEST(ascii_isgraph32(U':'));         TEST(ascii_isprint32(U':'));         TEST(ascii_ispunct32(U':'));         TEST(ascii_ispunct_w32(U':'));
+    TEST(ascii_isgraph32(U'@'));         TEST(ascii_isprint32(U'@'));         TEST(ascii_ispunct32(U'@'));         TEST(ascii_ispunct_w32(U'@'));
+    TEST(ascii_isgraph32(U'A'));         TEST(ascii_isprint32(U'A'));         TEST(! ascii_ispunct32(U'A'));       TEST(! ascii_ispunct_w32(U'A'));
+    TEST(ascii_isgraph32(U'F'));         TEST(ascii_isprint32(U'F'));         TEST(! ascii_ispunct32(U'F'));       TEST(! ascii_ispunct_w32(U'F'));
+    TEST(ascii_isgraph32(U'Z'));         TEST(ascii_isprint32(U'Z'));         TEST(! ascii_ispunct32(U'Z'));       TEST(! ascii_ispunct_w32(U'Z'));
+    TEST(ascii_isgraph32(U'['));         TEST(ascii_isprint32(U'['));         TEST(ascii_ispunct32(U'['));         TEST(ascii_ispunct_w32(U'['));
+    TEST(ascii_isgraph32(U'_'));         TEST(ascii_isprint32(U'_'));         TEST(ascii_ispunct32(U'_'));         TEST(! ascii_ispunct_w32(U'_'));
+    TEST(ascii_isgraph32(U'`'));         TEST(ascii_isprint32(U'`'));         TEST(ascii_ispunct32(U'`'));         TEST(ascii_ispunct_w32(U'`'));
+    TEST(ascii_isgraph32(U'a'));         TEST(ascii_isprint32(U'a'));         TEST(! ascii_ispunct32(U'a'));       TEST(! ascii_ispunct_w32(U'a'));
+    TEST(ascii_isgraph32(U'f'));         TEST(ascii_isprint32(U'f'));         TEST(! ascii_ispunct32(U'f'));       TEST(! ascii_ispunct_w32(U'f'));
+    TEST(ascii_isgraph32(U'z'));         TEST(ascii_isprint32(U'z'));         TEST(! ascii_ispunct32(U'z'));       TEST(! ascii_ispunct_w32(U'z'));
+    TEST(ascii_isgraph32(U'{'));         TEST(ascii_isprint32(U'{'));         TEST(ascii_ispunct32(U'{'));         TEST(ascii_ispunct_w32(U'{'));
+    TEST(ascii_isgraph32(U'~'));         TEST(ascii_isprint32(U'~'));         TEST(ascii_ispunct32(U'~'));         TEST(ascii_ispunct_w32(U'~'));
+    TEST(! ascii_isgraph32(U'\u007f'));  TEST(! ascii_isprint32(U'\u007f'));  TEST(! ascii_ispunct32(U'\u007f'));  TEST(! ascii_ispunct_w32(U'\u007f'));
+    TEST(! ascii_isgraph32(U'\u0080'));  TEST(! ascii_isprint32(U'\u0080'));  TEST(! ascii_ispunct32(U'\u0080'));  TEST(! ascii_ispunct_w32(U'\u0080'));
+    TEST(! ascii_isgraph32(U'\u00ff'));  TEST(! ascii_isprint32(U'\u00ff'));  TEST(! ascii_ispunct32(U'\u00ff'));  TEST(! ascii_ispunct_w32(U'\u00ff'));
+    TEST(! ascii_isgraph32(U'\uffff'));  TEST(! ascii_isprint32(U'\uffff'));  TEST(! ascii_ispunct32(U'\uffff'));  TEST(! ascii_ispunct_w32(U'\uffff'));
+
+    TEST(ascii_toupper32(U'\0') == U'\0');          TEST(ascii_tolower32(U'\0') == U'\0');
+    TEST(ascii_toupper32(U'\t') == U'\t');          TEST(ascii_tolower32(U'\t') == U'\t');
+    TEST(ascii_toupper32(U'\r') == U'\r');          TEST(ascii_tolower32(U'\r') == U'\r');
+    TEST(ascii_toupper32(U'\u001f') == U'\u001f');  TEST(ascii_tolower32(U'\u001f') == U'\u001f');
+    TEST(ascii_toupper32(U' ') == U' ');            TEST(ascii_tolower32(U' ') == U' ');
+    TEST(ascii_toupper32(U'!') == U'!');            TEST(ascii_tolower32(U'!') == U'!');
+    TEST(ascii_toupper32(U'/') == U'/');            TEST(ascii_tolower32(U'/') == U'/');
+    TEST(ascii_toupper32(U'0') == U'0');            TEST(ascii_tolower32(U'0') == U'0');
+    TEST(ascii_toupper32(U'9') == U'9');            TEST(ascii_tolower32(U'9') == U'9');
+    TEST(ascii_toupper32(U':') == U':');            TEST(ascii_tolower32(U':') == U':');
+    TEST(ascii_toupper32(U'@') == U'@');            TEST(ascii_tolower32(U'@') == U'@');
+    TEST(ascii_toupper32(U'A') == U'A');            TEST(ascii_tolower32(U'A') == U'a');
+    TEST(ascii_toupper32(U'F') == U'F');            TEST(ascii_tolower32(U'F') == U'f');
+    TEST(ascii_toupper32(U'Z') == U'Z');            TEST(ascii_tolower32(U'Z') == U'z');
+    TEST(ascii_toupper32(U'[') == U'[');            TEST(ascii_tolower32(U'[') == U'[');
+    TEST(ascii_toupper32(U'_') == U'_');            TEST(ascii_tolower32(U'_') == U'_');
+    TEST(ascii_toupper32(U'`') == U'`');            TEST(ascii_tolower32(U'`') == U'`');
+    TEST(ascii_toupper32(U'a') == U'A');            TEST(ascii_tolower32(U'a') == U'a');
+    TEST(ascii_toupper32(U'f') == U'F');            TEST(ascii_tolower32(U'f') == U'f');
+    TEST(ascii_toupper32(U'z') == U'Z');            TEST(ascii_tolower32(U'z') == U'z');
+    TEST(ascii_toupper32(U'{') == U'{');            TEST(ascii_tolower32(U'{') == U'{');
+    TEST(ascii_toupper32(U'~') == U'~');            TEST(ascii_tolower32(U'~') == U'~');
+    TEST(ascii_toupper32(U'\u007f') == U'\u007f');  TEST(ascii_tolower32(U'\u007f') == U'\u007f');
+    TEST(ascii_toupper32(U'\u0080') == U'\u0080');  TEST(ascii_tolower32(U'\u0080') == U'\u0080');
+    TEST(ascii_toupper32(U'\u00ff') == U'\u00ff');  TEST(ascii_tolower32(U'\u00ff') == U'\u00ff');
+    TEST(ascii_toupper32(U'\uffff') == U'\uffff');  TEST(ascii_tolower32(U'\uffff') == U'\uffff');
 
 }
 
