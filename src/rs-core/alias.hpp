@@ -462,7 +462,7 @@ namespace RS {
         RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T         (tgamma)
         RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_T_YIELDS_T         (trunc)
 
-        #if __cpp_lib_math_special_functions >= 201603L
+        #if defined(__cpp_lib_math_special_functions) && __cpp_lib_math_special_functions >= 201603L
 
             RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T  (assoc_laguerre, unsigned)
             RS_CORE_DEFINE_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T  (assoc_legendre, unsigned)

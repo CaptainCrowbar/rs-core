@@ -231,7 +231,7 @@ namespace RS::UnitTest {
 
 // Check that every element of two ranges matches within epsilon.
 
-#define TEST_RANGES_NEAR(lhs, rhs, epsilon) \
+#define TEST_RANGES_NEAR(lhs, rhs, epsilon) do { \
     try { \
         const auto& _test_lhs = lhs; \
         const auto& _test_rhs = rhs; \
@@ -259,7 +259,8 @@ namespace RS::UnitTest {
     } \
     catch (...) { \
         FAIL("Unexpected exception"); \
-    }
+    } \
+} while (false)
 
 // Check an expression against a range. Fails if the expression is outside the
 // range, or if any exception is thrown.

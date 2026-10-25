@@ -178,7 +178,7 @@ void test_rs_core_alias_maths_functions() {
     TEST_ALIAS_MATHS_FUNCTION_T_YIELDS_T         (tgamma,          5.0);
     TEST_ALIAS_MATHS_FUNCTION_T_YIELDS_T         (trunc,           1.5);
 
-    #if __cpp_lib_math_special_functions >= 201603L
+    #if defined(__cpp_lib_math_special_functions) && __cpp_lib_math_special_functions >= 201603L
 
         TEST_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T  (assoc_laguerre,  2u, 10u, 0.5)
         TEST_ALIAS_MATHS_FUNCTION_U_U_T_YIELDS_T  (assoc_legendre,  2u, 1u, 0.5)
