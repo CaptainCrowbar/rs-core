@@ -78,12 +78,21 @@ using Ldouble4 = Vector<long double, 4>;
 Predefined type aliases.
 
 ```c++
+struct Vector::compare {
+    constexpr static bool
+        operator()(const Vector& u, const Vector& v) const noexcept;
+};
+```
+
+Comparison function that sorts vectors in lexicographical order.
+
+```c++
 using Vector::value_type = T;
 using Vector::iterator = T*;
 using Vector::const_iterator = const T*;
 ```
 
-Member types.
+Other member types.
 
 ```c++
 static constexpr std::size_t Vector::dim = N;
@@ -349,13 +358,23 @@ using Ldouble4x4r = Matrix<long double, 4, MatrixLayout::row>;
 Predefined type aliases.
 
 ```c++
+struct Matrix::compare {
+    constexpr static bool
+        operator()(const Matrix& m, const Matrix& n) const noexcept;
+};
+```
+
+Comparison function that sorts matrices in lexicographical order (according to
+the element order implied by the layout parameter).
+
+```c++
 using Matrix::value_type = T;
 using Matrix::vector_type = Vector<T, N>;
 using Matrix::alt_matrix = Matrix<T, N, ...>;
 ```
 
-Member types. The `alt_matrix` type is a matrix of the same size and element
-type, but with the opposite layout.
+Other member types. The `alt_matrix` type is a matrix of the same size and
+element type, but with the opposite layout.
 
 ```c++
 static constexpr std::size_t Matrix::dim = N;
@@ -558,10 +577,19 @@ using Qldouble = Quaternion<long double>;
 Predefined type aliases.
 
 ```c++
+struct Quaternion::compare {
+    constexpr static bool
+        operator()(const Quaternion& q, const Quaternion& r) const noexcept;
+};
+```
+
+Comparison function that sorts quaternions in lexicographical order.
+
+```c++
 using Quaternion::value_type = T;
 ```
 
-Member types.
+Other member types.
 
 ```c++
 constexpr Quaternion::Quaternion() noexcept;

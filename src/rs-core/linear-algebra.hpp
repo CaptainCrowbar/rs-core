@@ -53,6 +53,10 @@ namespace RS {
         using iterator = T*;
         using const_iterator = const T*;
 
+        struct compare {
+            constexpr bool operator()(const Vector& u, const Vector& v) const noexcept { return u.array_ < v.array_; }
+        };
+
         static constexpr std::size_t dim = N;
 
         constexpr Vector() noexcept: array_{T{}} {}
@@ -316,6 +320,10 @@ namespace RS {
         using value_type = T;
         using vector_type = Vector<T, N>;
         using alt_matrix = Matrix<T, N, alt_layout>;
+
+        struct compare {
+            constexpr bool operator()(const Matrix& m, const Matrix& n) const noexcept { return m.array_ < n.array_; }
+        };
 
         static constexpr std::size_t dim = N;
         static constexpr std::size_t cells = N * N;
@@ -603,6 +611,10 @@ namespace RS {
     public:
 
         using value_type = T;
+
+        struct compare {
+            constexpr bool operator()(const Quaternion& q, const Quaternion& r) const noexcept { return q.array_ < r.array_; }
+        };
 
         constexpr Quaternion() noexcept: array_{} {}
         constexpr Quaternion(T a) noexcept: array_{a, T{0}, T{0}, T{0}} {}

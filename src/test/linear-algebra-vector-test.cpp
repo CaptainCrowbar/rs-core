@@ -125,6 +125,20 @@ void test_rs_core_linear_algebra_vector_integer_arithmetic() {
 
 }
 
+void test_rs_core_linear_algebra_vector_integer_comparison() {
+
+    std::set<Int3, Int3::compare> set;
+
+    TRY(set.emplace(3, 2, 1));
+    TRY(set.emplace(1, 2, 3));
+    TRY(set.emplace(0, 0, 0));
+    TRY(set.emplace(3, 2, 1));
+    TRY(set.emplace(1, 2, 3));
+    TEST_EQUAL(set.size(), 3u);
+    TEST_EQUAL(std::format("{}", set), "{[0,0,0], [1,2,3], [3,2,1]}");
+
+}
+
 void test_rs_core_linear_algebra_vector_integer_hash() {
 
     std::unordered_set<Int3> set;
@@ -288,5 +302,19 @@ void test_rs_core_linear_algebra_vector_floating_interpolation() {
     TRY(w = lerp(u, v, 1.00));   TEST_RANGES_NEAR(w, (Double3{12.0,34.0,56.0}), 0);
     TRY(w = lerp(u, v, 1.25));   TEST_RANGES_NEAR(w, (Double3{12.5,37.5,62.5}), 0);
     TRY(w = lerp(u, v, 1.50));   TEST_RANGES_NEAR(w, (Double3{13.0,41.0,69.0}), 0);
+
+}
+
+void test_rs_core_linear_algebra_vector_floating_comparison() {
+
+    std::set<Double3, Double3::compare> set;
+
+    TRY(set.emplace(3.5, 2.5, 1.5));
+    TRY(set.emplace(1.5, 2.5, 3.5));
+    TRY(set.emplace(0.5, 0.5, 0.5));
+    TRY(set.emplace(3.5, 2.5, 1.5));
+    TRY(set.emplace(1.5, 2.5, 3.5));
+    TEST_EQUAL(set.size(), 3u);
+    TEST_EQUAL(std::format("{}", set), "{[0.5,0.5,0.5], [1.5,2.5,3.5], [3.5,2.5,1.5]}");
 
 }
