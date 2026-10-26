@@ -2,6 +2,7 @@
 #include "rs-core/unit-test.hpp"
 #include <format>
 #include <numbers>
+#include <set>
 #include <tuple>
 #include <unordered_set>
 
